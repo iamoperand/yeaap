@@ -1,0 +1,4 @@
+{
+  "watch": ["src/api", "src/server.js", "src/config.js"],
+  "ext": "js, gql"
+}

@@ -1,0 +1,29 @@
+# scalar JSON
+scalar URL
+scalar DateTime
+scalar Email
+
+directive @withUser on OBJECT | FIELD_DEFINITION
+
+type Query {
+  _: Boolean
+}
+type Mutation {
+  _: Boolean
+}
+type Subscription {
+  _: Boolean
+}
+
+#
+# :: TEMPORARY SAMPLES
+#
+extend type Query {
+  hello: String
+}
+extend type Mutation {
+  sayHello(name: String): Boolean
+}
+extend type Subscription {
+  hello: String
+}
