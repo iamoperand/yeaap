@@ -6,15 +6,20 @@
     "url": "git@github.com:mannol/yeaap.git"
   },
   "dependencies": {
+    "@emotion/core": "^10.0.27",
+    "@emotion/styled": "^10.0.27",
     "apollo-server-express": "^2.9.16",
     "convict": "^5.2.0",
     "dotenv": "^8.2.0",
+    "emotion": "^10.0.27",
+    "emotion-server": "^10.0.27",
     "express": "^4.17.1",
     "firebase-admin": "^8.9.2",
     "graphql": "^14.6.0",
     "graphql-iso-date": "^3.6.1",
     "lodash": "^4.17.15",
     "next": "^9.2.1",
+    "prop-types": "^15.7.2",
     "react": "^16.12.0",
     "react-dom": "^16.12.0"
   },
@@ -24,6 +29,7 @@
     "start": "NODE_ENV=production node ./src/server.js"
   },
   "devDependencies": {
+    "@emotion/babel-preset-css-prop": "^10.0.27",
     "eslint": "^6.8.0",
     "eslint-config-prettier": "^6.10.0",
     "eslint-plugin-jsx-a11y": "^6.2.3",
