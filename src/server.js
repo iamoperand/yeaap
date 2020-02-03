@@ -1,7 +1,7 @@
-const { ary } = require('lodash');
+const { ary, startsWith, trimStart } = require('lodash');
 const http = require('http');
-const express = require('express');
-const next = require('next');
+const createExpressApp = require('express');
+const createNextApp = require('next');
 const { attachApi } = require('./api');
 const config = require('./config');
 
@@ -14,14 +14,32 @@ const handleListen = (err) => {
   }
 };
 
-const attachNext = (app, handler) => {
-  app.all('*', ary(handler, 2));
+const handleRedirects = (req, res, next) => {
+  if (req.headers['x-forwarded-proto'] === 'http') {
+    res
+      .status(301)
+      .set('Location', 'https://' + req.headers.host + req.url)
+      .end();
+  } else if (startsWith(req.headers.host, 'www.')) {
+    const host = trimStart(req.headers.host, 'www.');
+
+    res
+      .status(301)
+      .set('Location', 'https://' + host + req.url)
+      .end();
+  } else {
+    next();
+  }
 };
 
-const app = next({ dev: !config.get('env').isProduction });
+const attachNext = (app, handler) => {
+  app.use(handleRedirects).all('*', ary(handler, 2));
+};
+
+const app = createNextApp({ dev: !config.get('env').isProduction });
 
 app.prepare().then(() => {
-  const expressApp = express();
+  const expressApp = createExpressApp();
   const httpServer = http.createServer(expressApp);
 
   attachApi(expressApp, httpServer);
