@@ -124,12 +124,18 @@
     "no-undef-init": "error",
     "no-undefined": "error",
     "no-unused-vars": "error",
-    "no-use-before-define": "error",
+    "no-use-before-define": "off",
 
     "no-var": "error",
     "prefer-const": ["error", { "destructuring": "any" }],
     "prefer-arrow-callback": "error",
-    "func-style": ["error", "expression"],
+    "func-style": [
+      "error",
+      "declaration",
+      {
+        "allowArrowFunctions": true
+      }
+    ],
 
     "react/boolean-prop-naming": "error",
     "react/destructuring-assignment": ["error", "always"],
@@ -139,9 +145,10 @@
     "react/jsx-handler-names": "error",
     "react/jsx-no-bind": "error",
     "react/prop-types": "error",
-    "react/jsx-pascal-case": "error",
+    "react/jsx-pascal-case": "off",
 
     "jsx-a11y/media-has-caption": "off",
+    "jsx-a11y/anchor-is-valid": "off",
 
     "react-hooks/rules-of-hooks": "error",
     "react-hooks/exhaustive-deps": "warn",

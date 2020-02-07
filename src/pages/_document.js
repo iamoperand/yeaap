@@ -40,6 +40,8 @@ export default class MyDocument extends Document {
             data-emotion-css={this.props.ids.join(' ')}
             dangerouslySetInnerHTML={{ __html: this.props.css }}
           />
+
+          <link rel="shortcut icon" href="/images/favicon.ico" />
         </Head>
         <body>
           <Main />
