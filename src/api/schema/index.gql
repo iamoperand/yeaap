@@ -3,8 +3,6 @@ scalar URL
 scalar DateTime
 scalar Email
 
-directive @withUser on OBJECT | FIELD_DEFINITION
-
 type Query {
   _: Boolean
 }
@@ -15,15 +13,17 @@ type Subscription {
   _: Boolean
 }
 
-#
-# :: TEMPORARY SAMPLES
-#
-extend type Query {
-  hello: String
+enum PageOrder {
+  ASC
+  DESC
 }
-extend type Mutation {
-  sayHello(name: String): Boolean
+
+type PageInfo {
+  endCursor: String
+  hasNextPage: Boolean!
 }
-extend type Subscription {
-  hello: String
+
+input PageInput {
+  cursor: String!
+  order: PageOrder
 }

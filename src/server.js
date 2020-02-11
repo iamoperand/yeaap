@@ -10,7 +10,7 @@ const handleListen = (err) => {
     console.error('error during startup:', err);
     process.exit(1);
   } else {
-    console.log('server ready on port:', config.get('port'));
+    console.info('server ready on port:', config.get('port'));
   }
 };
 
@@ -36,14 +36,23 @@ const attachNext = (app, handler) => {
   app.use(handleRedirects).all('*', ary(handler, 2));
 };
 
-const app = createNextApp({ dev: !config.get('env').isProduction });
-
-app.prepare().then(() => {
+const exec = async () => {
   const expressApp = createExpressApp();
   const httpServer = http.createServer(expressApp);
 
-  attachApi(expressApp, httpServer);
-  attachNext(expressApp, app.getRequestHandler());
+  if (config.get('enable').backend) {
+    attachApi(expressApp, httpServer);
+    console.info('BACKEND enabled');
+  }
+  if (config.get('enable').frontend) {
+    const app = createNextApp({ dev: !config.get('env').isProduction });
+    await app.prepare();
+
+    attachNext(expressApp, app.getRequestHandler());
+    console.info('FRONTEND enabled');
+  }
 
   httpServer.listen(config.get('port'), handleListen);
-});
+};
+
+exec();

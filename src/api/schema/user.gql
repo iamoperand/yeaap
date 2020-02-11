@@ -1,0 +1,28 @@
+directive @requireUser(hasBilling: Boolean) on OBJECT | FIELD_DEFINITION
+
+interface UserI {
+  id: String!
+  name: String!
+}
+
+type User implements UserI {
+  id: String!
+  name: String!
+}
+
+type UserWithAuctionsAndBids implements UserI {
+  id: String!
+  name: String!
+}
+
+extend type Auction {
+  creator: User!
+}
+
+extend type Bid {
+  creator: User!
+}
+
+extend type Query {
+  me: UserWithAuctionsAndBids
+}

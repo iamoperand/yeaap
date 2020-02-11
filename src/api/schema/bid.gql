@@ -1,0 +1,82 @@
+directive @requireBid(
+  bidIdRef: String
+  isOwner: Boolean
+  refundState: BidRefundState # if null, fails if refund is present
+) on OBJECT | FIELD_DEFINITION
+
+input BidWhereInput {
+  auctionId: String!
+  bidId: String!
+}
+
+input BidCreateInput {
+  amount: Int!
+  message: String
+}
+
+input BidRefundCreateInput {
+  message: String
+}
+
+type BidRefund {
+  message: String
+  state: BidRefundState!
+
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
+type Bid {
+  id: String!
+  auctionId: String!
+  creatorId: String!
+
+  amount: Int!
+  isWinner: Boolean!
+  message: String
+  refund: BidRefund
+
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
+enum BidRefundState {
+  REQUESTED
+  DENIED
+  APPROVED
+}
+
+extend type UserWithAuctionsAndBids {
+  bids(page: PageInput): ConnectionBid
+}
+
+extend type Query {
+  bids(where: AuctionWhereInput!, page: PageInput): ConnectionBid
+}
+
+extend type Mutation {
+  createBid(where: AuctionWhereInput!, data: BidCreateInput!): Bid
+    @requireUser(hasBilling: true)
+    @requireAuction(isActive: true, isOwner: false)
+  requestBidRefund(where: BidWhereInput!, data: BidRefundCreateInput): Bid
+    @requireUser
+    @requireAuction(isActive: false, isCanceled: false, isOwner: false)
+    @requireBid(isOwner: true, refundState: null)
+  cancelBidRefund(where: BidWhereInput!): Bid
+    @requireUser
+    @requireAuction(isActive: false, isOwner: false)
+    @requireBid(isOwner: true, refundState: REQUESTED)
+  acceptBidRefund(where: BidWhereInput!): Bid
+    @requireUser
+    @requireAuction(isActive: false, isOwner: true)
+    @requireBid(refundState: REQUESTED)
+  rejectBidRefund(where: BidWhereInput!): Bid
+    @requireUser
+    @requireAuction(isActive: false, isOwner: true)
+    @requireBid(refundState: REQUESTED)
+}
+
+extend type Subscription {
+  onBidsCreated(where: AuctionWhereInput!): [Bid]
+    @requireAuction(isActive: true)
+}

@@ -1,0 +1,27 @@
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+#
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+
+type EdgeAuction {
+  node: Auction!
+  cursor: String!
+}
+
+type ConnectionAuction {
+  edges: [EdgeAuction!]!
+  pageInfo: PageInfo!
+}
+
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+#
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+
+type EdgeBid {
+  node: Bid!
+  cursor: String!
+}
+
+type ConnectionBid {
+  edges: [EdgeBid!]!
+  pageInfo: PageInfo!
+}

@@ -1,0 +1,65 @@
+directive @requireAuction(
+  auctionIdRef: String
+  isActive: Boolean
+  isOwner: Boolean
+  isCanceled: Boolean
+) on OBJECT | FIELD_DEFINITION
+
+input AuctionWhereInput {
+  auctionId: String!
+}
+
+input AuctionCreateInput {
+  description: String!
+  endsAt: DateTime!
+  type: AuctionType!
+  hasBidsVisible: Boolean!
+  winnerCount: Int!
+}
+
+input AuctionUpdateInput {
+  description: String
+  endsAt: DateTime
+}
+
+enum AuctionType {
+  HIGHEST_BID_WINS
+  CLOSEST_BID_WINS
+}
+
+type Auction {
+  id: String!
+  creatorId: String!
+
+  description: String!
+  endsAt: DateTime!
+  type: AuctionType!
+  hasBidsVisible: Boolean!
+  isCanceled: Boolean!
+
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
+extend type UserWithAuctionsAndBids {
+  auctions(page: PageInput): ConnectionAuction
+}
+
+extend type Query {
+  auctions(where: AuctionWhereInput!, page: PageInput): ConnectionAuction
+}
+
+extend type Mutation {
+  createAuction(data: AuctionCreateInput!): Auction
+    @requireUser(hasBilling: true)
+  updateAuction(where: AuctionWhereInput!, data: AuctionUpdateInput!): Auction
+    @requireUser
+    @requireAuction(isOwner: true, isActive: true)
+  cancelAuction(where: AuctionWhereInput!): Auction
+    @requireUser
+    @requireAuction(isOwner: true, isActive: true)
+}
+
+extend type Subscription {
+  onAuctionUpdated(where: AuctionWhereInput!): Auction @requireAuction
+}
