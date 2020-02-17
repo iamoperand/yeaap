@@ -50,7 +50,7 @@ module.exports = convict({
       format: Object,
       default: null,
       required: true,
-      env: 'FIREBASE_CREDENTIALS'
+      env: 'FIREBASE_BACKEND_CREDENTIALS'
     },
     webapiKey: {
       doc: 'Firebase webapi key secret.',
@@ -60,7 +60,7 @@ module.exports = convict({
     },
     database: {
       url: {
-        doc: 'Firebase databse URL (firestore).',
+        doc: 'Firebase database URL (firestore).',
         format: String,
         default: '',
         env: 'FIREBASE_DATABASE_URL'

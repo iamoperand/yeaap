@@ -14,15 +14,36 @@ import CrossIcon from '../assets/icons/cross.svg?sprite';
 import ShareIcon from '../assets/icons/share.svg?sprite';
 
 import BidModal from '../components/modal/bid';
+import AuthModal from '../components/modal/auth';
+import useSession from '../hooks/use-session';
+
+const handleBidSubmit = () => {
+  console.log('Woohoo!');
+};
 
 const BidInfo = ({ name, description }) => {
-  function handleBidSubmit() {
-    console.log('Woohoo!');
-  }
+  const user = useSession();
 
-  const [showModal, hideModal] = useModal(() => (
-    <BidModal onClose={hideModal} onSubmit={handleBidSubmit} />
+  const [showAuthModal, hideAuthModal] = useModal(() => (
+    <AuthModal onClose={hideAuthModal} />
   ));
+  const [showBidModal, hideBidModal] = useModal(() => (
+    <BidModal onClose={hideBidModal} onSubmit={handleBidSubmit} />
+  ));
+
+  // handler responsible for bidding
+  const bidHandler = () => {
+    // check if the user is authenticated
+
+    if (!user) {
+      console.log('user is not authenticated');
+      showAuthModal();
+      return;
+    }
+
+    console.log('user is authenticated, yay!');
+    showBidModal();
+  };
 
   return (
     <Box>
@@ -56,7 +77,7 @@ const BidInfo = ({ name, description }) => {
               `}
             />
           </IconButton>
-          <Button onClick={showModal}>Bid</Button>
+          <Button onClick={bidHandler}>Bid</Button>
           <IconButton type="success">
             <ShareIcon
               css={css`

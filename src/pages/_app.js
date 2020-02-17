@@ -1,14 +1,14 @@
 import React from 'react';
 import NextApp from 'next/app';
-import { CacheProvider } from '@emotion/core';
-import { cache } from 'emotion';
 import { css, Global } from '@emotion/core';
-import { ModalProvider } from 'react-modal-hook';
 import ReactModal from 'react-modal';
 
 import theme from '../utils/theme';
 import normalizeStyles from '../styles/normalize';
 import fonts from '../styles/fonts';
+import AppProviders from '../context';
+
+import '../utils/firebase';
 
 export default class App extends NextApp {
   componentDidMount() {
@@ -20,12 +20,10 @@ export default class App extends NextApp {
   render() {
     const { Component, pageProps } = this.props;
     return (
-      <ModalProvider>
-        <CacheProvider value={cache}>
-          <Global styles={globalStyles} />
-          <Component {...pageProps} />
-        </CacheProvider>
-      </ModalProvider>
+      <AppProviders>
+        <Global styles={globalStyles} />
+        <Component {...pageProps} />
+      </AppProviders>
     );
   }
 }
