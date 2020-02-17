@@ -50,7 +50,7 @@ module.exports = convict({
       format: Object,
       default: null,
       required: true,
-      env: 'FIREBASE_BACKEND_CREDENTIALS'
+      env: 'FIREBASE_CREDENTIALS'
     },
     webapiKey: {
       doc: 'Firebase webapi key secret.',
