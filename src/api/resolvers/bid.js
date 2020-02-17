@@ -1,5 +1,6 @@
 const { set, last, inRange } = require('lodash');
 const uniqid = require('uniqid');
+const moment = require('moment');
 const { FieldValue } = require('firebase-admin').firestore;
 const firestoreAsyncIterator = require('../firestore-async-iterator');
 
@@ -18,11 +19,6 @@ const serializeFirestoreBid = (data) => ({
   creatorId: data.createdBy
 });
 const serializeFirestoreBidRefund = serializeFirestoreBid;
-
-const bidIsWinner = async (data) => {
-  const { parent } = data;
-  return parent.state === 'WINNER';
-};
 
 const bidRefund = async (data) => {
   const { parent } = data;
@@ -103,15 +99,15 @@ const onBidsCreated = {
 
 const createBid = async (data) => {
   const {
-    context: { db, user },
+    context: { db, user, stripe },
     args: { where, data: inputData }
   } = data;
 
   const id = uniqid();
   const bids = db.collection('bids');
+  const auctions = db.collection('auctions');
 
-  const auction = await db
-    .collection('auctions')
+  const auction = await auctions
     .doc(where.auctionId)
     .get()
     .then((doc) => doc.data());
@@ -163,6 +159,23 @@ const createBid = async (data) => {
     throw new Error('message is too large');
   }
 
+  const source = await stripe.sources.retrieve(inputData.paymentMethodId);
+
+  if (!source || source.customer !== user.stripeCustomerId) {
+    throw new Error(
+      'no attached payment source with id: ' + inputData.paymentMethodId
+    );
+  }
+
+  if (
+    auction.type === 'HIGHEST_BID_WINS' &&
+    moment().add(2, 'minutes') > moment(auction.endsAt)
+  ) {
+    await auctions
+      .doc(where.auctionId)
+      .update({ endsAt: moment().add(2, 'minutes') });
+  }
+
   return bids
     .doc(id)
     .set({
@@ -173,7 +186,7 @@ const createBid = async (data) => {
       updatedAt: FieldValue.serverTimestamp(),
       createdBy: user.id,
       auctionId: where.auctionId,
-      state: 'PLACED',
+      isWinner: false,
       refund: null
     })
     .then(() => bids.doc(id).get())
@@ -274,10 +287,9 @@ const rejectBidRefund = async (data) => {
 
 module.exports = {
   Bid: {
-    isWinner: bidIsWinner,
     refund: bidRefund
   },
-  UserWithAuctionsAndBids: {
+  UserPrivate: {
     bids: userBids
   },
   Query: {

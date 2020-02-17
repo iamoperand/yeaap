@@ -10,6 +10,7 @@ input BidWhereInput {
 }
 
 input BidCreateInput {
+  paymentMethodId: String!
   amount: Int!
   message: String
 }
@@ -46,7 +47,7 @@ enum BidRefundState {
   APPROVED
 }
 
-extend type UserWithAuctionsAndBids {
+extend type UserPrivate {
   bids(page: PageInput): ConnectionBid
 }
 
@@ -56,7 +57,7 @@ extend type Query {
 
 extend type Mutation {
   createBid(where: AuctionWhereInput!, data: BidCreateInput!): Bid
-    @requireUser(hasBilling: true)
+    @requireUser(hasPaymentMethod: true)
     @requireAuction(isActive: true, isOwner: false)
   requestBidRefund(where: BidWhereInput!, data: BidRefundCreateInput): Bid
     @requireUser

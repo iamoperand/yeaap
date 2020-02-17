@@ -1,0 +1,111 @@
+input AttachPaymentMethodDataInput {
+  paymentMethodId: String!
+}
+
+input PaymentMethodWhereInput {
+  paymentMethodId: String!
+}
+
+input CreatePaymentPayoutAccountInput {
+  country: String!
+  paymentMethodId: String
+}
+
+input CreatePaymentPayoutAccountOnboardingLinkDataInput {
+  failureRedirectUrl: String!
+  successRedirectUrl: String!
+}
+
+enum PaymentMethodCardBrand {
+  AMEX
+  DINERS
+  DISCOVER
+  JCB
+  MASTERCARD
+  UNIONPAY
+  VISA
+  UNKNOWN
+}
+
+enum PaymentMethodType {
+  CARD
+  BANK_ACCOUNT
+}
+
+enum PaymentAccountType {
+  INDIVIDUAL
+  COMPANY
+}
+
+type PaymentMethodExpires {
+  month: Int!
+  year: Int!
+}
+
+type PaymentMethodAddress {
+  city: String
+  country: String
+  line1: String
+  line2: String
+  postalCode: String
+  state: String
+}
+
+type PaymentMethodCard {
+  brand: PaymentMethodCardBrand!
+  expires: PaymentMethodExpires!
+  last4: String!
+  holderName: String
+}
+
+type PaymentMethodBankAccount {
+  country: String!
+  currency: String!
+  last4: String!
+  routingNumber: String!
+  isVerified: Boolean!
+  bankName: String
+  holderName: String
+}
+
+union PaymentMethodSource = PaymentMethodCard | PaymentMethodBankAccount
+
+type PaymentMethod {
+  id: String!
+  billingAddress: PaymentMethodAddress!
+  type: PaymentMethodType!
+  source: PaymentMethodSource!
+}
+
+type PaymentPayoutAccount {
+  id: String!
+  type: PaymentAccountType!
+  country: String!
+  currency: String!
+  paymentMethods: [PaymentMethod]
+  isVerificationRequired: Boolean!
+
+  createdAt: DateTime!
+}
+
+extend type UserPrivate {
+  paymentPayoutAccount: PaymentPayoutAccount
+  paymentMethods: [PaymentMethod]
+}
+
+extend type Mutation {
+  attachPaymentMethod(data: AttachPaymentMethodDataInput!): PaymentMethod
+    @requireUser
+  removePaymentMethod(where: PaymentMethodWhereInput!): Boolean
+    @requireUser(hasPaymentMethod: true)
+  createPaymentPayoutAccount(
+    data: CreatePaymentPayoutAccountInput!
+  ): PaymentPayoutAccount @requireUser(hasPaymentPayoutMethod: false)
+  attachPayoutPaymentMethod(data: AttachPaymentMethodDataInput!): PaymentMethod
+    @requireUser(hasPaymentPayoutMethod: true)
+  removePayoutPaymentMethod(where: PaymentMethodWhereInput!): Boolean
+    @requireUser(hasPaymentPayoutMethod: true)
+  createPaymentPayoutAccountOnboardingUrl(
+    data: CreatePaymentPayoutAccountOnboardingLinkDataInput!
+  ): String @requireUser(hasPaymentPayoutMethod: true)
+}

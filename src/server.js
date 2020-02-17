@@ -38,18 +38,27 @@ const attachNext = (app, handler) => {
 
 const exec = async () => {
   const expressApp = createExpressApp();
+  expressApp.set('trust proxy', true);
+
   const httpServer = http.createServer(expressApp);
+
+  console.info(
+    'backend:',
+    config.get('enable').backend ? 'ENABLED' : 'DISABLED'
+  );
+  console.info(
+    'frontend:',
+    config.get('enable').frontend ? 'ENABLED' : 'DISABLED'
+  );
 
   if (config.get('enable').backend) {
     attachApi(expressApp, httpServer);
-    console.info('BACKEND enabled');
   }
   if (config.get('enable').frontend) {
     const app = createNextApp({ dev: !config.get('env').isProduction });
     await app.prepare();
 
     attachNext(expressApp, app.getRequestHandler());
-    console.info('FRONTEND enabled');
   }
 
   httpServer.listen(config.get('port'), handleListen);

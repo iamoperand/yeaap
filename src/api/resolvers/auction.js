@@ -96,8 +96,8 @@ const createAuction = async (data) => {
     throw new Error('auction duration is too short or in the past');
   }
 
-  if (!inRange(inputData.winnerCount, 1, 100)) {
-    throw new Error('winner count must be between 1 - 100 bids');
+  if (!inRange(inputData.winnerCount, 1, 10)) {
+    throw new Error('winner count must be between 1 - 10 bids');
   }
 
   const id = uniqid();
@@ -111,7 +111,8 @@ const createAuction = async (data) => {
       createdAt: FieldValue.serverTimestamp(),
       updatedAt: FieldValue.serverTimestamp(),
       createdBy: user.id,
-      isCanceled: false
+      isCanceled: false,
+      isSettled: false
     })
     .then(() => auctions.doc(id).get())
     .then((doc) => serializeFirestoreAuction(doc.data()));
@@ -160,7 +161,7 @@ const cancelAuction = async (data) => {
 };
 
 module.exports = {
-  UserWithAuctionsAndBids: {
+  UserPrivate: {
     auctions: userAuctions
   },
   Query: {

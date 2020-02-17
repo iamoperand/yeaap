@@ -1,12 +1,15 @@
-const { get, chain, split, toLower } = require('lodash');
+const { chain, split, toLower } = require('lodash');
 const fs = require('fs');
 const path = require('path');
 const { ApolloServer, gql } = require('apollo-server-express');
 const firebaseAdmin = require('firebase-admin');
+const createStripe = require('stripe');
 
 const config = require('../config');
 const resolvers = require('./resolvers');
 const directives = require('./directives');
+const User = require('./user');
+const SettlementProcessor = require('./settlement-processor');
 
 const schemaDir = __dirname + '/schema/';
 const typeDefs = gql(
@@ -17,24 +20,15 @@ const typeDefs = gql(
     .value()
 );
 
-class User {
-  constructor(data) {
-    this._data = data;
-  }
-  async verifyOptionsOrThrow() {
-    if (!this.id) {
-      throw new Error('Authentication required');
-    }
-  }
-  get id() {
-    return get(this._data, 'uid', null);
-  }
-}
+const buildContext = (defaults) => async ({ req, connection }) => {
+  const { db, auth } = defaults;
 
-const buildContext = ({ auth, db }) => async ({ req, connection }) => {
   const context = {
-    auth,
-    db,
+    ...defaults,
+    request: {
+      ip: req.ip,
+      userAgent: req.headers['user-agent']
+    },
     user: new User()
   };
 
@@ -61,7 +55,23 @@ const buildContext = ({ auth, db }) => async ({ req, connection }) => {
       .verifyIdToken(token)
       .then(({ uid }) => auth.getUser(uid));
 
-    return { ...context, user: new User(data) };
+    const id = data.uid;
+    const users = db.collection('users');
+
+    const firestoreUser = await users
+      .doc(id)
+      .get()
+      .then((doc) =>
+        doc.exists
+          ? doc
+          : users
+              .doc(id)
+              .set({ id })
+              .then(() => users.doc(id).get())
+      )
+      .then((doc) => doc.data());
+
+    return { ...context, user: new User({ ...data, firestoreUser }, db) };
   } catch (error) {
     const graphqlError = new Error(error);
 
@@ -82,8 +92,20 @@ const attachApi = (app, httpServer) => {
   });
   const db = firebaseApp.firestore();
   const auth = firebaseApp.auth();
+  const stripe = createStripe(config.get('stripe').apiKey);
+  const processor = new SettlementProcessor(
+    config.get('redis').url,
+    config.get('env').isProduction ? 100 : 3,
+    config.get('payment').fee
+  );
 
   const hasPlayground = config.get('enable').playground;
+
+  const contextDefaults = {
+    db,
+    auth,
+    stripe
+  };
 
   const server = new ApolloServer({
     typeDefs,
@@ -98,12 +120,14 @@ const attachApi = (app, httpServer) => {
         'request.credentials': 'include'
       }
     },
-    context: buildContext({ auth, db }),
+    context: buildContext(contextDefaults),
     introspection: hasPlayground,
     tracing: hasPlayground
   });
   server.applyMiddleware({ app });
   server.installSubscriptionHandlers(httpServer);
+
+  processor.startWithContext(contextDefaults);
 
   return app;
 };

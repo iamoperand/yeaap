@@ -66,6 +66,32 @@ module.exports = convict({
         env: 'FIREBASE_DATABASE_URL'
       }
     }
+  },
+  redis: {
+    url: {
+      doc: 'Redis databse URL.',
+      format: String,
+      default: 'redis://localhost:6379',
+      env: 'REDIS_URL'
+    }
+  },
+  stripe: {
+    apiKey: {
+      doc: 'Stripe API secret key.',
+      format: String,
+      default: '',
+      required: true,
+      env: 'STRIPE_API_KEY'
+    }
+  },
+  payment: {
+    fee: {
+      doc: 'Application payment fee in precentage (eg 15 == 15%).',
+      format: Number,
+      default: 15,
+      required: true,
+      env: 'PAYMENT_FEE'
+    }
   }
 })
   .load({

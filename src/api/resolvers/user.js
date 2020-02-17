@@ -1,7 +1,9 @@
 const resolveTypeUserI = (data) => {
   const { parent } = data;
 
-  return parent.bids || parent.auctions ? 'UserWithAuctionsAndBids' : 'User';
+  return parent.bids || parent.auctions || parent.paymentMethods
+    ? 'UserPrivate'
+    : 'User';
 };
 
 const auctionCreator = async (data) => {

@@ -1,4 +1,7 @@
-directive @requireUser(hasBilling: Boolean) on OBJECT | FIELD_DEFINITION
+directive @requireUser(
+  hasPaymentMethod: Boolean
+  hasPaymentPayoutMethod: Boolean
+) on OBJECT | FIELD_DEFINITION
 
 interface UserI {
   id: String!
@@ -10,7 +13,7 @@ type User implements UserI {
   name: String!
 }
 
-type UserWithAuctionsAndBids implements UserI {
+type UserPrivate implements UserI {
   id: String!
   name: String!
 }
@@ -24,5 +27,5 @@ extend type Bid {
 }
 
 extend type Query {
-  me: UserWithAuctionsAndBids
+  me: UserPrivate
 }
