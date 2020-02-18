@@ -64,4 +64,8 @@ const exec = async () => {
   httpServer.listen(config.get('port'), handleListen);
 };
 
-exec();
+exec().catch((err) => {
+  console.error('Encountered runtime error. Details:');
+  console.error(err.message || err);
+  process.exit(1);
+});
