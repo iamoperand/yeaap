@@ -1,6 +1,8 @@
 substitutions:
   _ENABLE_PLAYGROUND: 'true'
   _FIREBASE_DATABASE_URL: 'https://yeaap-1.firebaseio.com'
+  _FIREBASE_APP_CONFIG: '{}'
+  _REDIS_URL: 'redis://localhost:6379'
 steps:
   - id: 'create .env file'
     name: 'ubuntu'
@@ -11,11 +13,15 @@ steps:
         touch .env &&
         echo "ENABLE_PLAYGROUND=$_ENABLE_PLAYGROUND" >> .env &&
         echo "FIREBASE_DATABASE_URL=$_FIREBASE_DATABASE_URL" >> .env &&
+        echo "FIREBASE_APP_CONFIG=$_FIREBASE_APP_CONFIG" >> .env &&
+        echo "REDIS_URL=$_REDIS_URL" >> .env &&
         echo "FIREBASE_CREDENTIALS=$$FIREBASE_CREDENTIALS" >> .env &&
-        echo "FIREBASE_WEBAPI_KEY=$$FIREBASE_WEBAPI_KEY" >> .env
+        echo "FIREBASE_WEBAPI_KEY=$$FIREBASE_WEBAPI_KEY" >> .env &&
+        echo "STRIPE_API_KEY=$$STRIPE_API_KEY" >> .env
     secretEnv:
       - FIREBASE_CREDENTIALS
       - FIREBASE_WEBAPI_KEY
+      - STRIPE_API_KEY
   - id: 'deploy to app engine'
     name: 'gcr.io/cloud-builders/gcloud'
     args:
@@ -28,4 +34,7 @@ secrets:
   - kmsKeyName: projects/yeaap-1/locations/global/keyRings/env-variables/cryptoKeys/firebase-webapi-key
     secretEnv:
       FIREBASE_WEBAPI_KEY: CiQARCaVke2VlmpqEsx2ZYIdDay9OWYGc4rzqWCT+iZ9JpEjUn4SUABZpZ8EJGOCkThOWUBP1fBGSrJn9ST5aoKRRj4d2e2o8KlEBLhZ4J6UVz1w1WCb3YUCuOtKd/53xMTYwJXlWtl8rVcWStDtrt3mWdLExaG5
+  - kmsKeyName: projects/yeaap-1/locations/global/keyRings/env-variables/cryptoKeys/stripe-api-key
+    secretEnv:
+      STRIPE_API_KEY: CiQAVHgGGS/+kMWSoFIsCT97dxpghYnBvp5D4ZsSl5m/JD23Uq8SSQAdb+RGqgHQNvSm+9ogcF5lhFoOkdXtSvzd2ZXuvvbc3X3zf2emgHuJtO+C68QsqvOD0TtE5WD+UAkMv4hfDdRPV1XksMaA6Tc=
 timeout: 1840s
