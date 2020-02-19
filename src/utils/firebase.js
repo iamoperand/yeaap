@@ -1,11 +1,12 @@
 import firebase from 'firebase/app';
 import 'firebase/auth';
 import 'firebase/firestore';
+import getConfig from 'next/config';
 
-import clientConfig from './client-config';
+const { publicRuntimeConfig } = getConfig();
 
 if (!firebase.apps.length) {
-  firebase.initializeApp(clientConfig.firebase.config);
+  firebase.initializeApp(publicRuntimeConfig.firebaseAppConfig);
 }
 
 export const auth = firebase.auth();

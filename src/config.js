@@ -65,6 +65,15 @@ module.exports = convict({
         default: '',
         env: 'FIREBASE_DATABASE_URL'
       }
+    },
+    app: {
+      config: {
+        doc: 'Firebase app config.',
+        format: Object,
+        default: null,
+        required: true,
+        env: 'FIREBASE_APP_CONFIG'
+      }
     }
   },
   redis: {
