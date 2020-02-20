@@ -38,6 +38,8 @@ export default Footer;
  */
 
 const Wrapper = styled.footer`
+  align-self: center;
+
   display: flex;
   justify-content: space-between;
   flex-wrap: wrap;

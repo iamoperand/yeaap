@@ -5,15 +5,15 @@ import styled from '@emotion/styled';
 import rem from '../utils/rem';
 import theme from '../utils/theme';
 import Footer from '../components/footer';
+import Header from '../components/header';
 
 const Layout = ({ children }) => {
   return (
     <Body>
       <Center>
+        <Header />
         <Content>{children}</Content>
-        <FooterWrapper>
-          <Footer />
-        </FooterWrapper>
+        <Footer />
       </Center>
     </Body>
   );
@@ -49,18 +49,14 @@ const Center = styled.div`
 
   display: grid;
   grid-template-areas:
+    'header'
     'content'
     'footer';
 
-  grid-template-rows: 1fr ${rem(100)};
+  grid-template-rows: ${rem(70)} 1fr ${rem(100)};
   grid-row-gap: ${rem(30)};
 `;
 
 const Content = styled.div`
   grid-area: content;
-`;
-
-const FooterWrapper = styled.div`
-  grid-area: footer;
-  align-self: center;
 `;

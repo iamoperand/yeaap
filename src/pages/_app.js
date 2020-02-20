@@ -59,6 +59,16 @@ const globalStyles = css`
   input[type='number']::-webkit-inner-spin-button {
     -webkit-appearance: none;
   }
+  textarea {
+    resize: none;
+  }
+  input,
+  textarea,
+  select {
+    border: 2px solid rgba(120, 129, 136, 0.5);
+    border-radius: 4px;
+    padding: 8px;
+  }
 
   button {
     border: none;
