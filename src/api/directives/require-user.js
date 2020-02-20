@@ -24,14 +24,14 @@ class RequireUserDirective extends SchemaDirectiveVisitor {
         const requireUserArgs =
           field._requireUserArgs || objectType._requireUserArgs;
 
+        if (!requireUserArgs) {
+          return resolve.apply(this, args);
+        }
+
         const { user, stripe } = args[2]; // context
 
         if (!user.id) {
           throw new Error('user required for this operation');
-        }
-
-        if (!requireUserArgs) {
-          return resolve.apply(this, args);
         }
 
         const { hasPaymentMethod, hasPaymentPayoutMethod } = requireUserArgs;
