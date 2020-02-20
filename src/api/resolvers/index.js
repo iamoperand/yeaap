@@ -15,7 +15,7 @@ module.exports = merge(
   {
     DateTime: GraphQLDateTime
   },
-  ...['auction', 'bid', 'payment', 'user']
+  ...['auction', 'bid', 'payment', 'session', 'user']
     .map((mod) => require('./' + mod))
     .map(mapResolverFunctions)
 );

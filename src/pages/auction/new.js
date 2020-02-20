@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import PropTypes from 'prop-types';
 import styled from '@emotion/styled';
 import { css } from '@emotion/core';
 import DateTimePicker from 'react-datetime-picker/dist/entry.nostyle';
@@ -6,7 +7,7 @@ import { useForm } from 'react-hook-form';
 import { useMutation } from '@apollo/react-hooks';
 import { gql } from 'apollo-boost';
 import { useToasts } from 'react-toast-notifications';
-import { toNumber, has, noop } from 'lodash';
+import { toNumber, has, noop, capitalize } from 'lodash';
 import * as yup from 'yup';
 import spacetime from 'spacetime';
 
@@ -16,6 +17,7 @@ import Toggle from '../../components/toggle';
 import AuctionType from '../../components/auction-type';
 
 import rem from '../../utils/rem';
+import redirectWithSSR from '../../utils/redirectWithSSR';
 import {
   dateTimePickerStyles,
   calendarStyles,
@@ -95,7 +97,7 @@ const validateFormData = (formData) => {
 };
 
 // eslint-disable-next-line max-lines-per-function
-const New = () => {
+const New = ({ user }) => {
   const { register, handleSubmit, errors } = useForm();
 
   const [expiryTime, setExpiryTime] = useState(new Date());
@@ -162,7 +164,7 @@ const New = () => {
     <Layout>
       <SEO title="Create a new auction" />
 
-      <Heading>Create a new auction</Heading>
+      <Heading>Create a new auction, {capitalize(user.displayName)}</Heading>
       <form onSubmit={handleSubmit(beforeSubmit(onSubmit))}>
         <Field>
           <AuctionTypeWrapper>
@@ -297,6 +299,23 @@ const New = () => {
       </form>
     </Layout>
   );
+};
+
+New.getInitialProps = ({ req, res }) => {
+  const user = req && req.session ? req.session.user : null;
+
+  if (!user) {
+    redirectWithSSR({ res, path: '/login' });
+    return {};
+  }
+
+  return { user };
+};
+
+New.propTypes = {
+  user: PropTypes.shape({
+    displayName: PropTypes.string.isRequired
+  }).isRequired
 };
 
 export default New;

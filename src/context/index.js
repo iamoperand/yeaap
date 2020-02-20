@@ -12,13 +12,13 @@ import apolloClient from '../utils/apollo-client';
 function AppProviders({ children }) {
   return (
     <ApolloProvider client={apolloClient}>
-      <AuthProvider>
-        <ToastProvider>
+      <ToastProvider>
+        <AuthProvider>
           <ModalProvider>
             <CacheProvider value={cache}>{children}</CacheProvider>
           </ModalProvider>
-        </ToastProvider>
-      </AuthProvider>
+        </AuthProvider>
+      </ToastProvider>
     </ApolloProvider>
   );
 }

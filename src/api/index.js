@@ -29,6 +29,7 @@ const buildContext = (defaults) => async ({ req, connection }) => {
       ip: req.ip,
       userAgent: req.headers['user-agent']
     },
+    req,
     user: new User()
   };
 

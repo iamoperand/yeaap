@@ -2,6 +2,7 @@ const { ary, startsWith, trimStart } = require('lodash');
 const http = require('http');
 const createExpressApp = require('express');
 const createNextApp = require('next');
+const session = require('express-session');
 const { attachApi } = require('./api');
 const config = require('./config');
 
@@ -39,6 +40,15 @@ const attachNext = (app, handler) => {
 const exec = async () => {
   const expressApp = createExpressApp();
   expressApp.set('trust proxy', true);
+  expressApp.use(
+    session({
+      secret: 'geheimnis',
+      saveUninitialized: true,
+      resave: false,
+      rolling: true,
+      cookie: { maxAge: 604800000, httpOnly: true } // week
+    })
+  );
 
   const httpServer = http.createServer(expressApp);
 
