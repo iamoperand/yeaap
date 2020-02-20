@@ -6,7 +6,7 @@ import { useForm } from 'react-hook-form';
 import { useMutation } from '@apollo/react-hooks';
 import { gql } from 'apollo-boost';
 import { useToasts } from 'react-toast-notifications';
-import { toNumber, has } from 'lodash';
+import { toNumber, has, noop } from 'lodash';
 import * as yup from 'yup';
 import spacetime from 'spacetime';
 
@@ -202,9 +202,14 @@ const New = () => {
               onClick={toggle}
             />
             <span
+              onClick={toggle}
+              onKeyPress={noop}
+              role="button"
+              tabIndex="0"
               css={css`
                 ${labelStyles};
                 margin-left: ${rem(8)};
+                outline: none;
               `}
             >
               Show bids to the public?
