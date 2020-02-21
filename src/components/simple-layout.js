@@ -4,14 +4,12 @@ import styled from '@emotion/styled';
 
 import rem from '../utils/rem';
 import Footer from '../components/footer';
-import Header from '../components/header';
 import { bodyStyles, centerStyles } from '../styles/layout';
 
-const Layout = ({ children }) => {
+const SimpleLayout = ({ children }) => {
   return (
     <Body>
       <Center>
-        <Header />
         <Content>{children}</Content>
         <Footer />
       </Center>
@@ -19,11 +17,11 @@ const Layout = ({ children }) => {
   );
 };
 
-Layout.propTypes = {
+SimpleLayout.propTypes = {
   children: PropTypes.node
 };
 
-export default Layout;
+export default SimpleLayout;
 
 /*
  ********************************************
@@ -40,10 +38,9 @@ const Center = styled.div`
 
   display: grid;
   grid-template-areas:
-    'header'
     'content'
     'footer';
-  grid-template-rows: ${rem(70)} 1fr ${rem(100)};
+  grid-template-rows: 1fr ${rem(100)};
   grid-row-gap: ${rem(30)};
 `;
 
