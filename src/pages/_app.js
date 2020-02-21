@@ -93,4 +93,8 @@ const globalStyles = css`
       border-color: #c7c3fb;
     }
   }
+
+  small {
+    font-size: 14px;
+  }
 `;

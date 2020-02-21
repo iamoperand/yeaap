@@ -2,10 +2,16 @@ import React from 'react';
 import styled from '@emotion/styled';
 import { css } from '@emotion/core';
 import Link from 'next/link';
+import { useToasts } from 'react-toast-notifications';
+import { isEmpty } from 'lodash';
+import Route from 'next/router';
 
 import SimpleLayout from '../components/simple-layout';
 import SEO from '../components/seo';
 import rem from '../utils/rem';
+import { handleSignInError, providerCollection } from '../utils/auth';
+import firebase, { auth } from '../utils/firebase';
+import redirectWithSSR from '../utils/redirectWithSSR';
 
 import LoginIcon from '../assets/icons/login.svg?sprite';
 import GoogleIcon from '../assets/icons/google.svg?sprite';
@@ -13,6 +19,29 @@ import FacebookIcon from '../assets/icons/facebook.svg?sprite';
 import TwitterIcon from '../assets/icons/twitter.svg?sprite';
 
 const Login = () => {
+  const { addToast } = useToasts();
+
+  const loginHandler = (providerId) => () => {
+    const { provider } = providerCollection[providerId];
+
+    auth
+      .signInWithPopup(provider)
+      .then(() => {
+        Route.push('/account');
+      })
+      .catch((error) => {
+        console.log('sorry, there was some issue while signing in!', { error });
+
+        handleSignInError(error).then((message) => {
+          if (!isEmpty(message)) {
+            addToast(message, {
+              appearance: 'error'
+            });
+          }
+        });
+      });
+  };
+
   return (
     <SimpleLayout>
       <SEO title="Login" />
@@ -33,7 +62,11 @@ const Login = () => {
           </div>
           <Buttons>
             <Title>{`Let's log you in!`}</Title>
-            <Google>
+            <Google
+              onClick={loginHandler(
+                firebase.auth.GoogleAuthProvider.PROVIDER_ID
+              )}
+            >
               <GoogleIcon
                 css={css`
                   ${iconStyles}
@@ -41,7 +74,11 @@ const Login = () => {
               />
               <Text>Google</Text>
             </Google>
-            <Facebook>
+            <Facebook
+              onClick={loginHandler(
+                firebase.auth.FacebookAuthProvider.PROVIDER_ID
+              )}
+            >
               <FacebookIcon
                 css={css`
                   ${iconStyles}
@@ -49,7 +86,11 @@ const Login = () => {
               />
               <Text>Facebook</Text>
             </Facebook>
-            <Twitter>
+            <Twitter
+              onClick={loginHandler(
+                firebase.auth.TwitterAuthProvider.PROVIDER_ID
+              )}
+            >
               <TwitterIcon
                 css={css`
                   ${iconStyles}
@@ -62,6 +103,15 @@ const Login = () => {
       </Wrapper>
     </SimpleLayout>
   );
+};
+
+Login.getInitialProps = ({ req, res }) => {
+  const user = req && req.session ? req.session.user : null;
+  if (user) {
+    redirectWithSSR({ res, path: '/account' });
+  }
+
+  return {};
 };
 
 export default Login;
