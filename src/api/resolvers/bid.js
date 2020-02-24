@@ -51,7 +51,7 @@ const queryBids = async (data) => {
 
   if (page) {
     const direction = page.order === 'ASC' ? '>' : '<';
-    ref = ref.where('createdAt', direction, page.cursor);
+    ref = ref.where('createdAt', direction, new Date(+page.cursor));
   }
 
   ref = ref.orderBy('createdAt', (page && page.order) || 'DESC');
