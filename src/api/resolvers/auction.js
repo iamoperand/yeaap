@@ -64,7 +64,7 @@ const queryAuctions = async (data) => {
     edges: nodeSlice.map(auctionToEdge),
     pageInfo: {
       endCursor: auctionToEdge(last(nodeSlice)).cursor,
-      hasNextPage: nodeSlice.length > nodes.length
+      hasNextPage: nodes.length > nodeSlice.length
     }
   };
 };
