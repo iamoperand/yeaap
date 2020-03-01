@@ -116,6 +116,10 @@ const createAuction = async (data) => {
     throw new Error('winner count must be between 1 - 10 bids');
   }
 
+  if (inputData.type === 'CLOSEST_BID_WINS' && !inputData.amount) {
+    throw new Error('must provide amount for this auction type');
+  }
+
   const id = uniqid();
   const auctions = db.collection('auctions');
 

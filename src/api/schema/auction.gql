@@ -15,6 +15,10 @@ input AuctionCreateInput {
   type: AuctionType!
   hasBidsVisible: Boolean!
   winnerCount: Int!
+  """
+  An amount to compare the 'CLOSEST_BID_WINS' auction types
+  """
+  amount: Int
 }
 
 input AuctionUpdateInput {

@@ -1,4 +1,4 @@
-const { round } = require('lodash');
+const { round, sortBy } = require('lodash');
 const moment = require('moment');
 const Queue = require('bull');
 
@@ -144,25 +144,32 @@ class SettlementProcessor {
       .get()
       .then((doc) => doc.data());
 
-    const bids = await db
+    const rawBids = await db
       .collection('bids')
       .where('auctionId', '==', auctionId)
       .select('id', 'amount', 'createdBy', 'isWinner', 'paymentMethodId')
       .orderBy('createdAt', 'desc')
       .get()
-      .then((snap) => snap.docs);
+      .then((snap) => snap.docs)
+      .then((docs) => docs.map((doc) => doc.data()));
 
-    const { winnerCount } = auction;
+    const { winnerCount, type, amount = 1000000 } = auction;
+
+    const bids =
+      type === 'HIGHEST_BID_WINS'
+        ? rawBids
+        : sortBy(rawBids, (bid) => Math.abs(amount - bid.amount));
+
     const winners = bids
-      .filter((doc) => doc.data().isWinner)
-      .map((doc) => doc.data().createdBy);
+      .filter((bid) => bid.isWinner)
+      .map((bid) => bid.createdBy);
 
     if (winners.length) {
       console.info('Loaded winners:', winners);
     }
 
     for (let it = 0; it < bids.length && winners.length < winnerCount; it++) {
-      const bid = bids[it].data();
+      const bid = bids[it];
 
       if (!winners.includes(bid.createdBy)) {
         try {
