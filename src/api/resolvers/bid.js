@@ -4,6 +4,7 @@ const moment = require('moment');
 const { FieldValue } = require('firebase-admin').firestore;
 const firestoreAsyncIterator = require('../firestore-async-iterator');
 const queryCount = require('../util/query-count');
+const pageDefaults = require('../util/page-defaults');
 
 const bidToEdge = (auction) =>
   auction
@@ -68,6 +69,8 @@ const queryBids = async (data) => {
     args: { where, page }
   } = data;
 
+  const { order, sign, limit, cursor } = pageDefaults(page);
+
   let ref = db.collection('bids');
 
   if (where.auctionId) {
@@ -78,25 +81,23 @@ const queryBids = async (data) => {
     ref = ref.where('createdBy', '==', where.createdBy);
   }
 
-  if (page) {
-    const direction = page.order === 'ASC' ? '>' : '<';
-    ref = ref.where('createdAt', direction, new Date(+page.cursor));
+  if (cursor) {
+    ref = ref.where('createdAt', sign, new Date(+cursor));
   }
 
-  ref = ref.orderBy('createdAt', (page && page.order) || 'DESC');
-
   const nodes = await ref
-    .limit(21)
+    .orderBy('createdAt', order)
+    .limit(limit + 1)
     .get()
     .then((snap) => snap.docs.map((doc) => serializeFirestoreBid(doc.data())));
 
-  const nodeSlice = nodes.slice(0, 20);
+  const nodeSlice = nodes.slice(0, limit);
 
   return {
     edges: nodeSlice.map(bidToEdge),
     pageInfo: {
       endCursor: bidToEdge(last(nodeSlice)).cursor,
-      hasNextPage: nodeSlice.length > nodes.length
+      hasNextPage: nodes.length > nodeSlice.length
     }
   };
 };
