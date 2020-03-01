@@ -127,6 +127,63 @@ const onBidsCreated = {
   }
 };
 
+const createBidCheckConditionsHighestBidWins = async (data) => {
+  const {
+    context: { db, user },
+    args: { where, data: inputData }
+  } = data;
+
+  const lastBid = await db
+    .collection('bids')
+    .where('auctionId', '==', where.auctionId)
+    .orderBy('createdAt', 'desc')
+    .limit(1)
+    .get()
+    .then((snap) =>
+      snap.size ? serializeFirestoreBid(snap.docs[0].data()) : null
+    );
+
+  const minAmount = lastBid ? lastBid.amount + 1 : 10;
+
+  if (!inRange(inputData.amount, minAmount, 10000)) {
+    throw new Error('bid amount must be between ' + minAmount + '$ - 10000$');
+  }
+
+  if (lastBid && lastBid.createdBy === user.id) {
+    throw new Error('you already hold the highest bid');
+  }
+};
+const createBidCheckConditionsClosestBidWins = async (data) => {
+  const {
+    context: { db, user },
+    args: { where, data: inputData }
+  } = data;
+
+  const bids = db.collection('bids');
+
+  const myBid = await bids
+    .where('auctionId', '==', where.auctionId)
+    .where('createdBy', '==', user.id)
+    .get();
+
+  if (myBid.exsists) {
+    throw new Error('you have already placed a bid');
+  }
+
+  if (!inRange(inputData.amount, 10, 10000)) {
+    throw new Error('bid amount must be between 10$ - 10000$');
+  }
+
+  const amountExsists = await queryCount(
+    bids
+      .where('auctionId', '==', where.auctionId)
+      .where('price', '==', inputData.amount)
+  );
+
+  if (amountExsists) {
+    throw new Error('somebody already placed a bid with that amount');
+  }
+};
 const createBid = async (data) => {
   const {
     context: { db, user, stripe },
@@ -144,42 +201,10 @@ const createBid = async (data) => {
 
   switch (auction.type) {
     case 'HIGHEST_BID_WINS':
-      const lastBid = await bids
-        .where('auctionId', '==', where.auctionId)
-        .orderBy('createdAt', 'desc')
-        .limit(1)
-        .get()
-        .then((snap) =>
-          snap.size ? serializeFirestoreBid(snap.docs[0].data()) : null
-        );
-
-      const minAmount = lastBid ? lastBid.amount : 10;
-
-      if (!inRange(inputData.amount, minAmount, 10000)) {
-        throw new Error(
-          'bid amount must be between ' + minAmount + '$ - 10000$'
-        );
-      }
-
-      if (lastBid && lastBid.createdBy === user.id) {
-        throw new Error('you already hold the highest bid');
-      }
+      await createBidCheckConditionsHighestBidWins(data);
       break;
     case 'CLOSEST_BID_WINS':
-      const myBid = await bids
-        .where('auctionId', '==', where.auctionId)
-        .where('createdBy', '==', user.id)
-        .get();
-
-      if (myBid.exsists) {
-        throw new Error('you have already placed a bid');
-      }
-
-      if (!inRange(inputData.amount, 10, 10000)) {
-        throw new Error(
-          'bid amount must be between ' + minAmount + '$ - 10000$'
-        );
-      }
+      await createBidCheckConditionsClosestBidWins(data);
       break;
     default:
       throw new Error('unknown auction type: ' + auction.type);
