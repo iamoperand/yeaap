@@ -45,6 +45,7 @@ type Auction {
 
 extend type UserPrivate {
   auctions(page: PageInput): ConnectionAuction
+  auctionCount: Int!
 }
 
 extend type Query {

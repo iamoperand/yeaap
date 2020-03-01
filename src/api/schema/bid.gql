@@ -47,8 +47,13 @@ enum BidRefundState {
   APPROVED
 }
 
+extend type Auction {
+  bidCount: Int!
+}
+
 extend type UserPrivate {
   bids(page: PageInput): ConnectionBid
+  bidCount: Int!
 }
 
 extend type Query {

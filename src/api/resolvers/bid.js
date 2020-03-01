@@ -3,6 +3,7 @@ const uniqid = require('uniqid');
 const moment = require('moment');
 const { FieldValue } = require('firebase-admin').firestore;
 const firestoreAsyncIterator = require('../firestore-async-iterator');
+const queryCount = require('../util/query-count');
 
 const bidToEdge = (auction) =>
   auction
@@ -19,6 +20,34 @@ const serializeFirestoreBid = (data) => ({
   creatorId: data.createdBy
 });
 const serializeFirestoreBidRefund = serializeFirestoreBid;
+
+const auctionBidCount = async (data) => {
+  const {
+    context: { db },
+    parent
+  } = data;
+
+  return queryCount(
+    db
+      .collection('bids')
+      .select()
+      .where('auctionId', '==', parent.id)
+  );
+};
+
+const userBidCount = async (data) => {
+  const {
+    context: { db },
+    parent
+  } = data;
+
+  return queryCount(
+    db
+      .collection('bids')
+      .select()
+      .where('createdBy', '==', parent.id)
+  );
+};
 
 const bidRefund = async (data) => {
   const { parent } = data;
@@ -286,11 +315,15 @@ const rejectBidRefund = async (data) => {
 };
 
 module.exports = {
-  Bid: {
-    refund: bidRefund
+  Auction: {
+    bidCount: auctionBidCount
   },
   UserPrivate: {
-    bids: userBids
+    bids: userBids,
+    bidCount: userBidCount
+  },
+  Bid: {
+    refund: bidRefund
   },
   Query: {
     bids: queryBids

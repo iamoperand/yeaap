@@ -3,6 +3,7 @@ const uniqid = require('uniqid');
 const moment = require('moment');
 const { FieldValue } = require('firebase-admin').firestore;
 const firestoreAsyncIterator = require('../firestore-async-iterator');
+const queryCount = require('../util/query-count');
 
 const auctionToEdge = (auction) =>
   auction
@@ -26,6 +27,20 @@ const userAuctions = async (data) => {
   set(args, 'where.createdBy', parent.id);
 
   return queryAuctions(data);
+};
+
+const userAuctionCount = async (data) => {
+  const {
+    context: { db },
+    parent
+  } = data;
+
+  return queryCount(
+    db
+      .collection('auctions')
+      .select()
+      .where('createdBy', '==', parent.id)
+  );
 };
 
 const queryAuctions = async (data) => {
@@ -162,7 +177,8 @@ const cancelAuction = async (data) => {
 
 module.exports = {
   UserPrivate: {
-    auctions: userAuctions
+    auctions: userAuctions,
+    auctionCount: userAuctionCount
   },
   Query: {
     auctions: queryAuctions
