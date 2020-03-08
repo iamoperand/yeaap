@@ -6,7 +6,11 @@ const config = require('./src/config');
 module.exports = withPlugins([
   {
     publicRuntimeConfig: {
-      firebaseAppConfig: config.get('firebase').app.config
+      firebaseAppConfig: config.get('firebase').app.config,
+      stripePublishableKey: config.get('stripe').publishableKey,
+      googleMapsKey: config.get('maps'),
+      apiUrl: config.get('apiUrl'),
+      appUrl: config.get('appUrl')
     }
   },
   optimizedFonts,

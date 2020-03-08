@@ -2,15 +2,16 @@ import React from 'react';
 import NextApp from 'next/app';
 import { css, Global } from '@emotion/core';
 import ReactModal from 'react-modal';
+import withApollo from 'next-with-apollo';
+import { ApolloProvider } from '@apollo/react-hooks';
 
 import theme from '../utils/theme';
+import { initApollo } from '../utils/apollo-client';
 import normalizeStyles from '../styles/normalize';
 import fonts from '../styles/fonts';
 import AppProviders from '../context';
 
-import '../utils/firebase';
-
-export default class App extends NextApp {
+class App extends NextApp {
   componentDidMount() {
     if (process.browser) {
       // for accessibility, to let screenreaders know that the other page content will be hidden, when the modal is open!
@@ -18,15 +19,24 @@ export default class App extends NextApp {
     }
   }
   render() {
-    const { Component, pageProps } = this.props;
+    const { Component, pageProps, apollo } = this.props;
     return (
-      <AppProviders>
+      <ApolloProvider client={apollo}>
         <Global styles={globalStyles} />
-        <Component {...pageProps} />
-      </AppProviders>
+        <AppProviders>
+          <Component {...pageProps} />
+        </AppProviders>
+      </ApolloProvider>
     );
   }
 }
+
+App.getInitialProps = async (appContext) => {
+  const appProps = await NextApp.getInitialProps(appContext);
+  return { ...appProps };
+};
+
+export default withApollo(initApollo)(App);
 
 /*
  ********************************************
@@ -96,5 +106,27 @@ const globalStyles = css`
 
   small {
     font-size: 14px;
+  }
+
+  ul,
+  ol {
+    list-style-type: none;
+  }
+
+  /* google maps autocomplete */
+  .pac-container {
+    font-size: 16px;
+    box-sizing: border-box;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    font-family: 'DIN Next LT Pro';
+
+    /* adjust the position of the dropdown */
+    margin-left: 3px;
+
+    .pac-item {
+      cursor: pointer;
+      padding: 2px 5px;
+    }
   }
 `;

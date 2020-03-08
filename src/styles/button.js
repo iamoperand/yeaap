@@ -21,3 +21,10 @@ export const buttonRounded = css`
 export const buttonCTAPadding = css`
   padding: ${rem(11)} ${rem(19)};
 `;
+
+export const buttonDisabled = css`
+  :disabled {
+    background-color: ${theme.colors.disabledButton};
+    cursor: not-allowed;
+  }
+`;

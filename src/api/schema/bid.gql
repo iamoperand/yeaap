@@ -10,7 +10,6 @@ input BidWhereInput {
 }
 
 input BidCreateInput {
-  paymentMethodId: String!
   amount: Int!
   message: String
 }

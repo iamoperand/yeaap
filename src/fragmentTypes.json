@@ -1,0 +1,19 @@
+{
+  "__schema": {
+    "types": [
+      {
+        "kind": "INTERFACE",
+        "name": "UserI",
+        "possibleTypes": [{ "name": "User" }, { "name": "UserPrivate" }]
+      },
+      {
+        "kind": "UNION",
+        "name": "PaymentMethodSource",
+        "possibleTypes": [
+          { "name": "PaymentMethodCard" },
+          { "name": "PaymentMethodBankAccount" }
+        ]
+      }
+    ]
+  }
+}

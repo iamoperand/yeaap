@@ -24,13 +24,13 @@ export const dateTimePickerStyles = css`
     align-items: center;
     flex-grow: 1;
     flex-shrink: 0;
-    border: 2px solid rgba(120, 129, 136, 0.5);
+    border: 2px solid #ccc;
     border-radius: 4px;
   }
   .react-datetime-picker__inputGroup {
     min-width: calc(4px + (4px * 3) + 3.24em + 0.434em);
     flex-grow: 1;
-    padding: 4px 7px 4px 6px;
+    padding: 6.5px 10px;
   }
   .react-datetime-picker__inputGroup__divider {
     padding: 1px 0;

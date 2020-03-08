@@ -1,12 +1,12 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { isEmpty } from 'lodash';
 
 const defaultAvatar = '/images/avatar.png';
 
-const Avatar = ({ src = defaultAvatar, alt = 'Avatar image not found' }) => {
-  let imageSource = '';
-
-  if (src === '') {
+const Avatar = ({ src, alt = 'Avatar image not found' }) => {
+  let imageSource = src;
+  if (isEmpty(imageSource)) {
     imageSource = defaultAvatar;
   }
 
@@ -15,7 +15,7 @@ const Avatar = ({ src = defaultAvatar, alt = 'Avatar image not found' }) => {
 
 Avatar.propTypes = {
   src: PropTypes.string,
-  alt: PropTypes.string.isRequired
+  alt: PropTypes.string
 };
 
 export default Avatar;

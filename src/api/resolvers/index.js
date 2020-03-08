@@ -1,5 +1,9 @@
 const { isFunction, isObject, mapValues, merge } = require('lodash');
-const { GraphQLDateTime } = require('graphql-iso-date');
+const {
+  DateTimeResolver,
+  URLResolver,
+  EmailAddressResolver
+} = require('graphql-scalars');
 
 const mapResolverFunctions = (resolve) => {
   if (isFunction(resolve)) {
@@ -13,7 +17,9 @@ const mapResolverFunctions = (resolve) => {
 
 module.exports = merge(
   {
-    DateTime: GraphQLDateTime
+    URL: URLResolver,
+    DateTime: DateTimeResolver,
+    Email: EmailAddressResolver
   },
   ...['auction', 'bid', 'payment', 'session', 'user']
     .map((mod) => require('./' + mod))

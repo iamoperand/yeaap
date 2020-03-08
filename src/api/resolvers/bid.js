@@ -166,7 +166,7 @@ const createBidCheckConditionsClosestBidWins = async (data) => {
     .where('createdBy', '==', user.id)
     .get();
 
-  if (myBid.exsists) {
+  if (myBid.exists) {
     throw new Error('you have already placed a bid');
   }
 
@@ -174,13 +174,13 @@ const createBidCheckConditionsClosestBidWins = async (data) => {
     throw new Error('bid amount must be between 10$ - 10000$');
   }
 
-  const amountExsists = await queryCount(
+  const amountExists = await queryCount(
     bids
       .where('auctionId', '==', where.auctionId)
       .where('price', '==', inputData.amount)
   );
 
-  if (amountExsists) {
+  if (amountExists) {
     throw new Error('somebody already placed a bid with that amount');
   }
 };
@@ -214,17 +214,17 @@ const createBid = async (data) => {
     throw new Error('message is too large');
   }
 
-  const source = await stripe.sources.retrieve(inputData.paymentMethodId);
+  const customer = await stripe.customers.retrieve(user.stripeCustomerId);
 
-  if (!source || source.customer !== user.stripeCustomerId) {
-    throw new Error(
-      'no attached payment source with id: ' + inputData.paymentMethodId
-    );
+  // only 1 payment method is allowed at the moment
+  const [paymentMethod] = customer.sources.data;
+  if (!paymentMethod) {
+    throw new Error('user ' + user.name + ' does not have any payment method');
   }
 
   if (
     auction.type === 'HIGHEST_BID_WINS' &&
-    moment().add(2, 'minutes') > moment(auction.endsAt)
+    moment().add(2, 'minutes') > moment(auction.endsAt.toDate())
   ) {
     await auctions
       .doc(where.auctionId)

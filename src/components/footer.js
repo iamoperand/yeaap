@@ -8,19 +8,19 @@ const Footer = () => {
   return (
     <Wrapper>
       <Links>
-        <Link href="/about">
+        <Link href="/about" passHref>
           <Anchor>About</Anchor>
         </Link>
-        <Link href="/help">
+        <Link href="/help" passHref>
           <Anchor>Help</Anchor>
         </Link>
-        <Link href="/privacy">
+        <Link href="/privacy" passHref>
           <Anchor>Privacy</Anchor>
         </Link>
-        <Link href="/terms">
+        <Link href="/terms" passHref>
           <Anchor>Terms of service</Anchor>
         </Link>
-        <Link href="/feedback">
+        <Link href="/feedback" passHref>
           <Anchor>Feedback</Anchor>
         </Link>
       </Links>

@@ -11,7 +11,7 @@ import SEO from '../components/seo';
 import rem from '../utils/rem';
 import { handleSignInError, providerCollection } from '../utils/auth';
 import firebase, { auth } from '../utils/firebase';
-import redirectWithSSR from '../utils/redirectWithSSR';
+import redirectWithSSR from '../utils/redirect-with-ssr';
 
 import LoginIcon from '../assets/icons/login.svg?sprite';
 import GoogleIcon from '../assets/icons/google.svg?sprite';
@@ -47,7 +47,7 @@ const Login = () => {
       <SEO title="Login" />
 
       <Wrapper>
-        <Link href="/">
+        <Link href="/" passHref>
           <Logo>yeaap.co</Logo>
         </Link>
 
@@ -150,8 +150,7 @@ const Box = styled.div`
   margin: 0 auto;
   margin-top: ${rem(100)};
   padding: ${rem(65)} ${rem(50)};
-  box-shadow: rgba(60, 66, 87, 0.12) 0px 7px 14px 0px,
-    rgba(0, 0, 0, 0.12) 0px 3px 6px 0px;
+  box-shadow: #3273dc 0 7px 25px 0;
   background-color: #f9f9f9;
 
   display: flex;

@@ -6,16 +6,19 @@ directive @requireUser(
 interface UserI {
   id: String!
   name: String!
+  photoUrl: URL
 }
 
 type User implements UserI {
   id: String!
   name: String!
+  photoUrl: URL
 }
 
 type UserPrivate implements UserI {
   id: String!
   name: String!
+  photoUrl: URL
 }
 
 extend type Auction {

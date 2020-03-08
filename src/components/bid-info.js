@@ -3,68 +3,68 @@ import PropTypes from 'prop-types';
 import styled from '@emotion/styled';
 import { css } from '@emotion/core';
 import { useModal } from 'react-modal-hook';
+import { isEmpty } from 'lodash';
 
 import rem from '../utils/rem';
 import theme from '../utils/theme';
 
 import { boxBorder } from '../styles/box';
-import { buttonPrimary, buttonRounded } from '../styles/button';
+import { buttonPrimary, buttonRounded, buttonDisabled } from '../styles/button';
 
 import CrossIcon from '../assets/icons/cross.svg?sprite';
 import ShareIcon from '../assets/icons/share.svg?sprite';
 
 import BidModal from '../components/modal/bid';
 import AuthModal from '../components/modal/auth';
+import PaymentMethodModal from '../components/modal/payment-method';
 import useSession from '../hooks/use-session';
+import useAuction from '../hooks/use-auction';
 
-const handleBidSubmit = () => {
-  console.log('Woohoo!');
-};
-
-const BidInfo = ({ name, description }) => {
-  const user = useSession();
+const BidInfo = ({ name, description, isLeaderboardLoading }) => {
+  const { user, isUserLoading } = useSession();
+  const { id: auctionId, topBid } = useAuction();
 
   const [showAuthModal, hideAuthModal] = useModal(() => (
     <AuthModal onClose={hideAuthModal} />
   ));
-  const [showBidModal, hideBidModal] = useModal(() => (
-    <BidModal onClose={hideBidModal} onSubmit={handleBidSubmit} />
-  ));
+  const [showPaymentMethodModal, hidePaymentMethodModal] = useModal(
+    () => <PaymentMethodModal onClose={hidePaymentMethodModal} user={user} />,
+    [user]
+  );
+  const [showBidModal, hideBidModal] = useModal(
+    () => (
+      <BidModal onClose={hideBidModal} auctionId={auctionId} topBid={topBid} />
+    ),
+    [auctionId, topBid]
+  );
 
   // handler responsible for bidding
   const bidHandler = () => {
     // check if the user is authenticated
-
-    if (!user) {
+    if (isEmpty(user)) {
       console.log('user is not authenticated');
       showAuthModal();
       return;
     }
 
-    console.log('user is authenticated, yay!');
+    // check if user has an active payment method
+    if (isEmpty(user.paymentMethods)) {
+      showPaymentMethodModal();
+      return;
+    }
+
+    console.log('user is authenticated and has payment method, yay!');
     showBidModal();
   };
 
   return (
     <Box>
       <Row>
-        <span
-          css={css`
-            color: ${theme.colors.label};
-          `}
-        >
-          Bid by
-        </span>
+        <Label>Bid by</Label>
         <Name>{name}</Name>
       </Row>
       <Row>
-        <span
-          css={css`
-            font-style: italic;
-          `}
-        >
-          {description}
-        </span>
+        <Italic>{description}</Italic>
       </Row>
 
       <CTARowWrapper>
@@ -77,7 +77,13 @@ const BidInfo = ({ name, description }) => {
               `}
             />
           </IconButton>
-          <Button onClick={bidHandler}>Bid</Button>
+          {/* disable the button until user is fetched, to check if user has payment methods or not */}
+          <Button
+            onClick={bidHandler}
+            disabled={isUserLoading || isLeaderboardLoading}
+          >
+            Bid
+          </Button>
           <IconButton type="success">
             <ShareIcon
               css={css`
@@ -94,7 +100,8 @@ const BidInfo = ({ name, description }) => {
 
 BidInfo.propTypes = {
   name: PropTypes.string.isRequired,
-  description: PropTypes.string.isRequired
+  description: PropTypes.string.isRequired,
+  isLeaderboardLoading: PropTypes.bool.isRequired
 };
 
 export default BidInfo;
@@ -149,6 +156,7 @@ const Button = styled.button`
 
   ${buttonPrimary};
   ${buttonRounded};
+  ${buttonDisabled};
 `;
 
 const IconButton = styled.button`
@@ -159,4 +167,12 @@ const IconButton = styled.button`
       type === 'success' ? '#a7ded9' : type === 'danger' ? '#f7d2b8' : '#ccc'};
 
   ${buttonRounded};
+`;
+
+const Italic = styled.span`
+  font-style: italic;
+`;
+
+const Label = styled.span`
+  color: ${theme.colors.label};
 `;

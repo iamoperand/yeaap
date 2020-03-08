@@ -97,6 +97,18 @@ class SettlementProcessor {
       throw new Error('user ' + bid.createdBy + ' does not have billing setup');
     }
 
+    const customer = await stripe.customers.retrieve(user.stripeCustomerId);
+
+    // only 1 payment method is allowed at the moment
+    const [paymentMethod] = customer.sources.data;
+    if (!paymentMethod) {
+      throw new Error(
+        'user ' + bid.createdBy + ' does not have any payment method'
+      );
+    }
+
+    const { id: paymentMethodId } = paymentMethod;
+
     const ref = db.collection('bids').doc(bid.id);
     const chargeAmount = bid.amount * 100;
     const chargeApplicationFeeAmount =
@@ -111,10 +123,10 @@ class SettlementProcessor {
         amount: chargeAmount,
         application_fee_amount: chargeApplicationFeeAmount,
         customer: user.stripeCustomerId,
-        source: bid.paymentMethodId,
+        source: paymentMethodId,
         metadata: {
           bidId: bid.id,
-          paymentMethodId: bid.paymentMethodId
+          paymentMethodId: paymentMethodId
         },
         on_behalf_of: stripeAccountId,
         transfer_data: {
@@ -147,7 +159,7 @@ class SettlementProcessor {
     const rawBids = await db
       .collection('bids')
       .where('auctionId', '==', auctionId)
-      .select('id', 'amount', 'createdBy', 'isWinner', 'paymentMethodId')
+      .select('id', 'amount', 'createdBy', 'isWinner')
       .orderBy('createdAt', 'desc')
       .get()
       .then((snap) => snap.docs)

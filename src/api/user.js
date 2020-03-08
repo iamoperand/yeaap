@@ -25,6 +25,9 @@ class User {
   get name() {
     return get(this._data, 'displayName', null);
   }
+  get photoUrl() {
+    return get(this._data, 'photoURL', null);
+  }
   get stripeCustomerId() {
     return get(this._data, 'firestoreUser.stripeCustomerId', null);
   }

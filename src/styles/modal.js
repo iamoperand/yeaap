@@ -10,6 +10,7 @@ export const modalBasic = css`
   outline: none;
   background: #fff;
   border-radius: ${rem(5)};
+  min-width: ${rem(400)};
 `;
 
 export const modalCentered = css`
@@ -24,5 +25,5 @@ export const modalBorder = css`
 `;
 
 export const modalPadding = css`
-  padding: ${rem(30)};
+  padding: ${rem(40)};
 `;

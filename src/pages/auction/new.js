@@ -5,25 +5,38 @@ import { css } from '@emotion/core';
 import DateTimePicker from 'react-datetime-picker/dist/entry.nostyle';
 import { useForm } from 'react-hook-form';
 import { useMutation } from '@apollo/react-hooks';
-import { gql } from 'apollo-boost';
+import gql from 'graphql-tag';
 import { useToasts } from 'react-toast-notifications';
-import { toNumber, has, noop, capitalize } from 'lodash';
+import { toNumber, get, noop } from 'lodash';
 import * as yup from 'yup';
-import spacetime from 'spacetime';
+import addMinutes from 'date-fns/addMinutes';
+import { useModal } from 'react-modal-hook';
+import { useRouter } from 'next/router';
+import getConfig from 'next/config';
 
 import Layout from '../../components/layout';
 import SEO from '../../components/seo';
 import Toggle from '../../components/toggle';
 import AuctionType from '../../components/auction-type';
+import PayoutMethodModal from '../../components/modal/payout-method';
+import ConfirmationModal from '../../components/modal/confirmation';
 
-import rem from '../../utils/rem';
-import redirectWithSSR from '../../utils/redirectWithSSR';
 import {
   dateTimePickerStyles,
   calendarStyles,
   clockStyles
 } from '../../styles/date-time-picker';
-import { buttonPrimary, buttonRounded } from '../../styles/button';
+import {
+  buttonPrimary,
+  buttonRounded,
+  buttonDisabled
+} from '../../styles/button';
+import { errorBasic, labelBasic, inputBasic } from '../../styles/form';
+
+import useSession from '../../hooks/use-session';
+import rem from '../../utils/rem';
+import redirectWithSSR from '../../utils/redirect-with-ssr';
+import { openPopup, pollPopup } from '../../utils/popup';
 
 const dateTimePickerProps = {
   showLeadingZeros: true,
@@ -62,6 +75,16 @@ const CREATE_AUCTION = gql`
   }
 `;
 
+const VERIFY_PAYOUT_ACCOUNT = gql`
+  # input CreatePaymentPayoutAccountOnboardingLinkDataInput {
+  #   failureRedirectUrl: String!
+  #   successRedirectUrl: String!
+  # }
+  mutation($input: CreatePaymentPayoutAccountOnboardingLinkDataInput!) {
+    createPaymentPayoutAccountOnboardingUrl(data: $input)
+  }
+`;
+
 const formatInput = (input) => {
   return {
     ...input,
@@ -71,11 +94,15 @@ const formatInput = (input) => {
 
 const getSchema = ({ validEndsAt }) =>
   yup.object().shape({
-    endsAt: yup.date().min(validEndsAt, 'Duration should be > 10 mins')
+    endsAt: yup
+      .date()
+      .typeError(`"Expiry Date" must be a valid date.`)
+      .required(`"Expiry Date" is required.`)
+      .min(validEndsAt, `"Expiry Date" should be > 10 mins`)
   });
 
 const validateFormData = (formData) => {
-  const tenMinutesFromNow = spacetime.now().add(10, 'minutes').d;
+  const tenMinutesFromNow = addMinutes(new Date(), 10);
   const schema = getSchema({ validEndsAt: tenMinutesFromNow });
 
   return schema
@@ -96,13 +123,44 @@ const validateFormData = (formData) => {
     });
 };
 
+const schema = {
+  winnerCount: {
+    min: {
+      value: 1,
+      message: 'Has to be between 0-10.'
+    },
+    max: {
+      value: 10,
+      message: 'Has to be between 0-10.'
+    },
+    required: {
+      value: true,
+      message: `"Winner count" is required.`
+    }
+  },
+  description: {
+    required: {
+      value: true,
+      message: `"Description" is required.`
+    }
+  }
+};
+
+const { publicRuntimeConfig } = getConfig();
+const { apiUrl } = publicRuntimeConfig;
+
+const failureRedirectUrl = `${apiUrl}/user-verification?status=failure`;
+const successRedirectUrl = `${apiUrl}/user-verification?status=success`;
+
 // eslint-disable-next-line max-lines-per-function
-const New = ({ user }) => {
+const New = () => {
+  const { user, isUserLoading } = useSession();
   const { register, handleSubmit, errors } = useForm();
+  const router = useRouter();
 
-  const [expiryTime, setExpiryTime] = useState(new Date());
+  const [expiryTime, setExpiryTime] = useState(addMinutes(new Date(), 15));
 
-  const [hasBidsPublic, setBidsPublic] = useState(false);
+  const [hasBidsPublic, setBidsPublic] = useState(true);
   const toggle = () => setBidsPublic(!hasBidsPublic);
 
   const { addToast } = useToasts();
@@ -111,14 +169,117 @@ const New = ({ user }) => {
       console.error({ err });
       addToast('There was some error', { appearance: 'error' });
     },
-    onCompleted: (data) => {
-      console.log({ data });
-      addToast('Successfull!', { appearance: 'success' });
+    onCompleted: ({ createAuction: response }) => {
+      addToast('Auction created.', {
+        appearance: 'success',
+        autoDismiss: true,
+        autoDismissTimeout: 3000,
+        onDismiss: () => router.push(`/auction/${response.id}`)
+      });
     }
   });
 
-  const [validationErrors, setValidationErrors] = useState(null);
+  const handleContinue = () => {
+    // fire out the mutation
+    verifyPayoutAccount({
+      variables: {
+        input: {
+          failureRedirectUrl,
+          successRedirectUrl
+        }
+      }
+    });
+  };
+  const handleCancel = () => {
+    addToast(`User couldn't be verified`, {
+      appearance: 'error',
+      autoDismiss: true,
+      autoDismissTimeout: 3000,
+      onDismiss: router.reload
+    });
+  };
 
+  const [showConfirmVerificationModal, hideConfirmVerificationModal] = useModal(
+    () => (
+      <ConfirmationModal
+        onClose={hideConfirmVerificationModal}
+        title="Verify user"
+        onContinue={handleContinue}
+        onCancel={handleCancel}
+        continueButtonLabel="Verify user"
+      >
+        <Text>
+          {`Stripe needs to verify the user in order to carry out smooth out-flow
+          of payments. This won't take long, I promise!`}
+        </Text>
+      </ConfirmationModal>
+    ),
+    [handleContinue, handleCancel]
+  );
+
+  const [verifyPayoutAccount] = useMutation(VERIFY_PAYOUT_ACCOUNT, {
+    onError: (error) => {
+      console.log({ error });
+      addToast('An error occurred while verifying the user', {
+        appearance: 'error',
+        autoDismiss: true
+      });
+
+      hideConfirmVerificationModal();
+    },
+    onCompleted: ({ createPaymentPayoutAccountOnboardingUrl: url }) => {
+      if (!url) {
+        addToast(`Invalid URL sent by stripe.`, {
+          appearance: 'error',
+          autoDismiss: true,
+          autoDismissTimeout: 3000,
+          onDismiss: router.reload
+        });
+        hideConfirmVerificationModal();
+        return;
+      }
+
+      const popup = openPopup({ url });
+      pollPopup(popup, {
+        pollTimeout: 2000,
+        successUrl: successRedirectUrl,
+        failureUrl: failureRedirectUrl,
+        onSuccess: () => {
+          addToast(`Woohoo, you can now create the auction.`, {
+            appearance: 'success',
+            autoDismiss: true,
+            autoDismissTimeout: 3000,
+            onDismiss: router.reload
+          });
+
+          hideConfirmVerificationModal();
+        },
+        onFailure: (message) => {
+          addToast(message, {
+            appearance: 'error',
+            autoDismiss: true,
+            autoDismissTimeout: 3000,
+            onDismiss: router.reload
+          });
+
+          hideConfirmVerificationModal();
+        }
+      });
+    }
+  });
+
+  const [showPayoutMethodModal, hidePayoutMethodModal] = useModal(
+    () => (
+      <PayoutMethodModal
+        onClose={hidePayoutMethodModal}
+        user={user}
+        showConfirmVerificationModal={showConfirmVerificationModal}
+      />
+    ),
+    [user, showConfirmVerificationModal]
+  );
+
+  const [validationErrors, setValidationErrors] = useState(null);
   const doValidation = async (formData) => {
     const [formErrors, validationStatus] = await validateFormData(formData);
     if (!validationStatus) {
@@ -153,6 +314,24 @@ const New = ({ user }) => {
   };
 
   const onSubmit = async (inputData) => {
+    if (!user.paymentPayoutAccount) {
+      addToast(`Oops. You don't have any payout method.`, {
+        appearance: 'info',
+        autoDismiss: true
+      });
+      showPayoutMethodModal();
+      return;
+    }
+
+    if (user.paymentPayoutAccount.isVerificationRequired) {
+      addToast(`Oops. You haven't been verified yet.`, {
+        appearance: 'info',
+        autoDismiss: true
+      });
+      showConfirmVerificationModal();
+      return;
+    }
+
     createAuction({
       variables: {
         input: inputData
@@ -164,7 +343,7 @@ const New = ({ user }) => {
     <Layout>
       <SEO title="Create a new auction" />
 
-      <Heading>Create a new auction, {capitalize(user.displayName)}</Heading>
+      <Heading>Create a new auction</Heading>
       <form onSubmit={handleSubmit(beforeSubmit(onSubmit))}>
         <Field>
           <AuctionTypeWrapper>
@@ -203,19 +382,14 @@ const New = ({ user }) => {
               isOn={hasBidsPublic}
               onClick={toggle}
             />
-            <span
+            <FakeLabel
               onClick={toggle}
               onKeyPress={noop}
               role="button"
               tabIndex="0"
-              css={css`
-                ${labelStyles};
-                margin-left: ${rem(8)};
-                outline: none;
-              `}
             >
               Show bids to the public?
-            </span>
+            </FakeLabel>
           </ToggleWrapper>
           <Error />
         </Field>
@@ -223,16 +397,7 @@ const New = ({ user }) => {
         <Field>
           <Row>
             <DateTimeWrapper>
-              <label
-                htmlFor="endsAt"
-                css={css`
-                  ${labelStyles};
-                  display: block;
-                  margin-bottom: ${rem(5)};
-                `}
-              >
-                Expiry Date
-              </label>
+              <Label htmlFor="endsAt">Expiry Date</Label>
               <DateTimePicker
                 {...dateTimePickerProps}
                 required
@@ -240,61 +405,37 @@ const New = ({ user }) => {
                 value={expiryTime}
                 name="endsAt"
               />
-              <Error>
-                {has(validationErrors, 'endsAt') && validationErrors.endsAt}
-              </Error>
+              <Error>{get(validationErrors, 'endsAt')}</Error>
             </DateTimeWrapper>
 
             <div>
-              <label
-                htmlFor="winnerCount"
-                css={css`
-                  ${labelStyles};
-                  display: block;
-                  margin-bottom: ${rem(5)};
-                `}
-              >
-                Number of winners allowed
-              </label>
-              <input
+              <Label htmlFor="winnerCount">Number of winners allowed</Label>
+              <Input
                 {...winnerCountInputProps}
-                css={css`
-                  width: ${rem(200)};
-                  display: block;
-                `}
-                ref={register({ min: 1, max: 100, required: true })}
+                ref={register(schema.winnerCount)}
                 id="winnerCount"
                 name="winnerCount"
               />
-              <Error>
-                {errors.winnerCount ? `Number should be from 0-10` : ''}
-              </Error>
+              <Error>{get(errors, 'winnerCount.message')}</Error>
             </div>
           </Row>
         </Field>
 
         <Field>
-          <label
-            htmlFor="description"
-            css={css`
-              ${labelStyles};
-              display: block;
-              margin-bottom: ${rem(5)};
-            `}
-          >
-            Description
-          </label>
+          <Label htmlFor="description">Description</Label>
           <TextArea
             name="description"
             placeholder="What this auction is about?"
-            ref={register({ required: true })}
+            ref={register(schema.description)}
             id="description"
           />
-          <Error>{errors.description ? `"Description" is required` : ''}</Error>
+          <Error>{get(errors, 'description.message')}</Error>
         </Field>
 
         <ActionRow>
-          <PrimaryButton type="submit">Create auction</PrimaryButton>
+          <PrimaryButton type="submit" disabled={isUserLoading}>
+            Create auction
+          </PrimaryButton>
         </ActionRow>
       </form>
     </Layout>
@@ -303,19 +444,17 @@ const New = ({ user }) => {
 
 New.getInitialProps = ({ req, res }) => {
   const user = req && req.session ? req.session.user : null;
-
   if (!user) {
     redirectWithSSR({ res, path: '/login' });
-    return {};
   }
 
-  return { user };
+  return {};
 };
 
 New.propTypes = {
   user: PropTypes.shape({
     displayName: PropTypes.string.isRequired
-  }).isRequired
+  })
 };
 
 export default New;
@@ -354,10 +493,22 @@ const ToggleWrapper = styled.div`
 `;
 
 const labelStyles = css`
-  font-size: ${rem(18)};
-  font-weight: 500;
-  color: #222;
-  user-select: none;
+  ${labelBasic};
+  font-size: ${rem(19)};
+`;
+
+const Label = styled.label`
+  ${labelStyles};
+  display: block;
+  margin-bottom: ${rem(5)};
+`;
+
+const FakeLabel = styled.span`
+  ${labelStyles};
+  margin-left: ${rem(5)};
+  position: relative;
+  top: -1px;
+  outline: none;
 `;
 
 const DateTimeWrapper = styled.div`
@@ -376,14 +527,18 @@ const Row = styled.div`
   }
 `;
 
-const Error = styled.small`
-  color: #d8000c;
+const Error = styled.div`
+  ${errorBasic};
+`;
+
+const Input = styled.input`
+  ${inputBasic};
+  width: ${rem(200)};
   display: block;
-  margin-top: ${rem(2)};
-  min-height: ${rem(14)};
 `;
 
 const TextArea = styled.textarea`
+  ${inputBasic};
   width: 80%;
   min-height: ${rem(120)};
   display: block;
@@ -399,7 +554,15 @@ const ActionRow = styled.div`
 const PrimaryButton = styled.button`
   ${buttonPrimary};
   ${buttonRounded};
+  ${buttonDisabled};
 
   font-size: ${rem(18)};
   padding: ${rem(10)} ${rem(30)};
+`;
+
+const Text = styled.div`
+  margin-bottom: ${rem(5)};
+  :last-child {
+    margin-bottom: 0;
+  }
 `;

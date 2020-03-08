@@ -21,7 +21,7 @@ import rem from '../../utils/rem';
 import firebase, { auth } from '../../utils/firebase';
 import { handleSignInError, providerCollection } from '../../utils/auth';
 
-const AuthModal = ({ onClose }) => {
+const Auth = ({ onClose }) => {
   const { addToast } = useToasts();
 
   const loginHandler = (providerId) => () => {
@@ -81,11 +81,11 @@ const AuthModal = ({ onClose }) => {
   );
 };
 
-AuthModal.propTypes = {
+Auth.propTypes = {
   onClose: PropTypes.func.isRequired
 };
 
-export default AuthModal;
+export default Auth;
 
 /*
  ********************************************

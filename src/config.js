@@ -18,6 +18,18 @@ module.exports = convict({
       default: false
     }
   },
+  apiUrl: {
+    doc: 'URL where the API lives.',
+    format: String,
+    default: 'http://localhost:5000',
+    env: 'API_URL'
+  },
+  appUrl: {
+    doc: 'URL where the App lives.',
+    format: String,
+    default: 'http://localhost:5000',
+    env: 'APP_URL'
+  },
   port: {
     doc: 'The port to listen to incoming http requests.',
     format: 'port',
@@ -85,22 +97,35 @@ module.exports = convict({
     }
   },
   stripe: {
-    apiKey: {
+    publishableKey: {
+      doc: 'Stripe API publishable key.',
+      format: String,
+      default: '',
+      required: true,
+      env: 'STRIPE_API_PUBLISHABLE_KEY'
+    },
+    secretKey: {
       doc: 'Stripe API secret key.',
       format: String,
       default: '',
       required: true,
-      env: 'STRIPE_API_KEY'
+      env: 'STRIPE_API_SECRET_KEY'
     }
   },
   payment: {
     fee: {
-      doc: 'Application payment fee in precentage (eg 15 == 15%).',
+      doc: 'Application payment fee in percentage (eg 15 == 15%).',
       format: Number,
       default: 15,
       required: true,
       env: 'PAYMENT_FEE'
     }
+  },
+  maps: {
+    doc: 'API key for using Google Maps API.',
+    format: String,
+    default: '',
+    env: 'GOOGLE_MAPS_KEY'
   }
 })
   .load({

@@ -3,25 +3,34 @@ import PropTypes from 'prop-types';
 import styled from '@emotion/styled';
 import { css } from '@emotion/core';
 import Link from 'next/link';
+import formatNum from 'format-num';
+import { isEmpty } from 'lodash';
 
 import Avatar from './avatar';
-
 import { boxBorder } from '../styles/box';
 import rem from '../utils/rem';
 import theme from '../utils/theme';
 
-const Leaderboard = ({ bidId, data }) => {
-  const currency = '$';
+const Leaderboard = ({ bids, auctionId }) => {
+  if (isEmpty(bids)) {
+    return (
+      <Box>
+        <Label>Leaderboard</Label>
+        <H3>No bids yet!</H3>
+      </Box>
+    );
+  }
 
   return (
     <Box>
       <Label>Leaderboard</Label>
+
       <List>
-        {data.map((entry, index) => (
-          <Item key={entry.username}>
+        {bids.map((bid, index) => (
+          <Item key={bid.id}>
             <Index>#{index + 1}</Index>
-            <Avatar src={entry.avatar} alt={entry.name} />
-            <Name>{entry.name}</Name>
+            <Avatar src={bid.creator.photoUrl} alt={bid.creator.name} />
+            <Name>{bid.creator.name}</Name>
             <span
               css={css`
                 margin: 0 ${rem(4)};
@@ -30,15 +39,16 @@ const Leaderboard = ({ bidId, data }) => {
             >
               bid
             </span>
-            <BidAmount>
-              {currency}
-              {entry.bid}
-            </BidAmount>
+            <BidAmount>${formatNum(bid.amount)}</BidAmount>
           </Item>
         ))}
       </List>
 
-      <Link href={`/leaderboard/[id]`} as={`/leaderboard/${bidId}`}>
+      <Link
+        href={`/auction/[auctionId]/bids`}
+        as={`/auction/${auctionId}/bids`}
+        passHref
+      >
         <Anchor>See all</Anchor>
       </Link>
     </Box>
@@ -48,8 +58,19 @@ const Leaderboard = ({ bidId, data }) => {
 export default Leaderboard;
 
 Leaderboard.propTypes = {
-  bidId: PropTypes.string.isRequired,
-  data: PropTypes.arrayOf(PropTypes.shape())
+  bids: PropTypes.arrayOf(
+    PropTypes.shape({
+      id: PropTypes.string.isRequired,
+      amount: PropTypes.number.isRequired,
+      message: PropTypes.string,
+      creator: PropTypes.shape({
+        id: PropTypes.string.isRequired,
+        name: PropTypes.string.isRequired,
+        photoUrl: PropTypes.string
+      })
+    })
+  ),
+  auctionId: PropTypes.string.isRequired
 };
 
 /*
@@ -60,7 +81,7 @@ Leaderboard.propTypes = {
 
 const Box = styled.div`
   ${boxBorder};
-  padding: ${rem(12)};
+  padding: ${rem(20)};
 `;
 
 const Label = styled.div`
@@ -69,18 +90,22 @@ const Label = styled.div`
 `;
 
 const List = styled.ul`
-  margin: ${rem(15)} 0;
+  margin: ${rem(15)} 0 ${rem(20)} 0;
+  padding-left: 0;
 `;
 
 const Item = styled.li`
   display: flex;
   align-items: center;
 
-  margin: ${rem(8)} 0;
+  margin: ${rem(4)} 0;
 
   img {
-    height: ${rem(20)};
-    width: ${rem(20)};
+    height: ${rem(30)};
+    width: ${rem(30)};
+    border-radius: 50%;
+    box-shadow: rgba(60, 66, 87, 0.12) 0px 7px 14px 0px,
+      rgba(0, 0, 0, 0.12) 0px 3px 6px 0px;
   }
 `;
 
@@ -90,13 +115,32 @@ const Index = styled.span`
 `;
 
 const Name = styled.span`
-  margin-left: ${rem(4)};
+  margin-left: ${rem(8)};
+
+  position: relative;
+  :after {
+    content: '';
+    width: 100%;
+    position: absolute;
+    left: 0;
+    bottom: -1px;
+    border-width: 0 0 2px;
+    border-style: solid;
+    border-color: #818181;
+  }
 `;
 
 const BidAmount = styled.span`
-  font-weight: bold;
+  font-weight: 500;
+  font-size: ${rem(18)};
+  font-variant: tabular-nums;
 `;
 
 const Anchor = styled.a`
   font-size: ${rem(18)};
+`;
+
+const H3 = styled.div`
+  font-size: ${rem(18)};
+  margin-top: ${rem(15)};
 `;

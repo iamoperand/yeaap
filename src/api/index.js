@@ -25,10 +25,12 @@ const buildContext = (defaults) => async ({ req, connection }) => {
 
   const context = {
     ...defaults,
-    request: {
-      ip: req.ip,
-      userAgent: req.headers['user-agent']
-    },
+    request: req
+      ? {
+          ip: req.ip,
+          userAgent: req.headers['user-agent']
+        }
+      : null,
     req,
     user: new User()
   };
@@ -93,7 +95,7 @@ const attachApi = (app, httpServer) => {
   });
   const db = firebaseApp.firestore();
   const auth = firebaseApp.auth();
-  const stripe = createStripe(config.get('stripe').apiKey);
+  const stripe = createStripe(config.get('stripe').secretKey);
   const processor = new SettlementProcessor(
     config.get('redis').url,
     config.get('env').isProduction ? 100 : 3,

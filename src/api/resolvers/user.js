@@ -8,24 +8,32 @@ const resolveTypeUserI = (data) => {
 
 const auctionCreator = async (data) => {
   const {
+    context: { auth },
     parent: { createdBy }
   } = data;
 
-  return {
-    id: createdBy,
-    name: 'John Doe'
-  };
+  return auth.getUser(createdBy).then((user) => {
+    return {
+      id: createdBy,
+      name: user.displayName,
+      photoUrl: user.photoURL
+    };
+  });
 };
 
 const bidCreator = async (data) => {
   const {
+    context: { auth },
     parent: { createdBy }
   } = data;
 
-  return {
-    id: createdBy,
-    name: 'John Doe'
-  };
+  return auth.getUser(createdBy).then((user) => {
+    return {
+      id: createdBy,
+      name: user.displayName,
+      photoUrl: user.photoURL
+    };
+  });
 };
 
 const queryMe = async (data) => {
@@ -39,7 +47,8 @@ const queryMe = async (data) => {
 
   return {
     id: user.id,
-    name: 'John Doe'
+    name: user.name,
+    photoUrl: user.photoUrl
   };
 };
 
