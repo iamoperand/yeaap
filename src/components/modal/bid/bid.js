@@ -144,7 +144,9 @@ const Bid = ({ onClose, auctionId, topBid }) => {
 
         <Footer>
           <CTARow>
-            <Cancel onClick={onClose}>Cancel</Cancel>
+            <Cancel type="button" onClick={onClose}>
+              Cancel
+            </Cancel>
             <Continue type="submit">Bid...</Continue>
           </CTARow>
         </Footer>
