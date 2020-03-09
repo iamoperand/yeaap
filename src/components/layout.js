@@ -49,4 +49,5 @@ const Center = styled.div`
 
 const Content = styled.div`
   grid-area: content;
+  padding: ${rem(30)} 0;
 `;
