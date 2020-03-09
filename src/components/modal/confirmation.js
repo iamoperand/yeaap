@@ -5,12 +5,18 @@ import { css } from '@emotion/core';
 import ReactModal from 'react-modal';
 
 import rem from '../../utils/rem';
-import { buttonPrimary, buttonWhite, buttonRounded } from '../../styles/button';
 import {
   modalBasic,
   modalCentered,
   modalBorder,
-  modalOverlay
+  modalOverlay,
+  modalHead,
+  modalBody,
+  modalFooter,
+  modalTitle,
+  modalCTARow,
+  continueButton,
+  cancelButton
 } from '../../styles/modal';
 
 const Confirmation = ({
@@ -41,10 +47,12 @@ const Confirmation = ({
 
         <Content>{children}</Content>
 
-        <CTARow>
-          <Cancel onClick={handleCancel}>{cancelButtonLabel}</Cancel>
-          <Continue onClick={onContinue}>{continueButtonLabel}</Continue>
-        </CTARow>
+        <Footer>
+          <CTARow>
+            <Cancel onClick={handleCancel}>{cancelButtonLabel}</Cancel>
+            <Continue onClick={onContinue}>{continueButtonLabel}</Continue>
+          </CTARow>
+        </Footer>
       </Wrapper>
     </ReactModal>
   );
@@ -72,6 +80,7 @@ const modalContent = css`
   ${modalBasic};
   ${modalCentered};
   ${modalBorder};
+  width: ${rem(500)};
 `;
 
 const Wrapper = styled.div`
@@ -82,43 +91,27 @@ const Wrapper = styled.div`
 `;
 
 const Head = styled.div`
-  border-top-left-radius: 4px;
-  border-top-right-radius: 4px;
-
-  padding: ${rem(16)} ${rem(20)};
-  box-shadow: inset 0 -1px #e3e8ee;
+  ${modalHead};
 `;
 const Title = styled.div`
-  font-size: ${rem(20)};
-  font-weight: 500;
+  ${modalTitle}
 `;
 
 const Content = styled.div`
-  padding: ${rem(30)} ${rem(20)};
-  box-shadow: inset 0 -1px #e3e8ee;
-  background-color: #f7fafc;
+  ${modalBody};
+`;
+
+const Footer = styled.div`
+  ${modalFooter};
 `;
 
 const CTARow = styled.div`
-  border-top-left-radius: 4px;
-  border-top-right-radius: 4px;
-
-  padding: ${rem(16)} ${rem(20)};
-  box-shadow: inset 0 1px #e3e8ee;
-
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
+  ${modalCTARow};
 `;
 
 const Cancel = styled.button`
-  ${buttonWhite};
-  ${buttonRounded};
-  padding: ${rem(9)} ${rem(15)};
+  ${cancelButton};
 `;
 const Continue = styled.button`
-  ${buttonPrimary};
-  ${buttonRounded};
-  padding: ${rem(11)} ${rem(17)};
-  margin-left: ${rem(5)};
+  ${continueButton};
 `;

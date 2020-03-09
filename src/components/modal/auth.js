@@ -11,15 +11,21 @@ import {
   modalBasic,
   modalBorder,
   modalCentered,
-  modalOverlay,
-  modalPadding
+  modalOverlay
 } from '../../styles/modal';
 import { labelBasic } from '../../styles/form';
-import { buttonRounded, buttonWhite } from '../../styles/button';
 
 import rem from '../../utils/rem';
-import firebase, { auth } from '../../utils/firebase';
-import { handleSignInError, providerCollection } from '../../utils/auth';
+import { auth } from '../../utils/firebase';
+import {
+  handleSignInError,
+  providerCollection,
+  providerMap
+} from '../../utils/auth';
+
+import GoogleIcon from '../../assets/icons/google.svg?sprite';
+import FacebookIcon from '../../assets/icons/facebook.svg?sprite';
+import TwitterIcon from '../../assets/icons/twitter.svg?sprite';
 
 const Auth = ({ onClose }) => {
   const { addToast } = useToasts();
@@ -58,25 +64,22 @@ const Auth = ({ onClose }) => {
       style={{ overlay: modalOverlay }}
       css={modalContent}
     >
-      <Label>Continue with:</Label>
+      <Title>Continue with:</Title>
 
-      <CTAWrapper>
-        <NormalButton
-          onClick={loginHandler(firebase.auth.GoogleAuthProvider.PROVIDER_ID)}
-        >
-          Google
-        </NormalButton>
-        <NormalButton
-          onClick={loginHandler(firebase.auth.FacebookAuthProvider.PROVIDER_ID)}
-        >
-          Facebook
-        </NormalButton>
-        <NormalButton
-          onClick={loginHandler(firebase.auth.TwitterAuthProvider.PROVIDER_ID)}
-        >
-          Twitter
-        </NormalButton>
-      </CTAWrapper>
+      <ButtonWrapper>
+        <Google onClick={loginHandler(providerMap.google)}>
+          <StyledGoogleIcon />
+          <Text>Google</Text>
+        </Google>
+        <Facebook onClick={loginHandler(providerMap.facebook)}>
+          <StyledFacebookIcon />
+          <Text>Facebook</Text>
+        </Facebook>
+        <Twitter onClick={loginHandler(providerMap.twitter)}>
+          <StyledTwitterIcon />
+          <Text>Twitter</Text>
+        </Twitter>
+      </ButtonWrapper>
     </ReactModal>
   );
 };
@@ -97,27 +100,122 @@ const modalContent = css`
   ${modalBasic};
   ${modalCentered};
   ${modalBorder};
-  ${modalPadding};
+
+  min-width: 0;
+  width: ${rem(320)};
+  padding: ${rem(40)};
 `;
 
-const Label = styled.label`
+const Title = styled.div`
   ${labelBasic};
   display: block;
+  font-size: ${rem(22)};
 `;
 
-const NormalButton = styled.button`
-  ${buttonRounded};
-  ${buttonWhite};
+const buttonStyles = css`
+  color: #fff;
+  background-color: transparent;
+  border-radius: 3px;
+  box-sizing: border-box;
+  position: relative;
+  top: -2px;
+  left: -2px;
+  transition: transform 0.2s;
+  z-index: 0;
 
-  padding: ${rem(10)} ${rem(50)};
+  :before {
+    content: '';
+    background: #fff;
+    border: 3px solid #313131;
+    border-radius: 3px;
+    position: absolute;
+    top: -2px;
+    left: -2px;
+    height: 100%;
+    width: 100%;
+    z-index: -1;
+  }
 
-  margin-top: ${rem(10)};
-  :first-child {
-    margin-top: ${rem(20)};
+  :after {
+    content: '';
+    display: block;
+    background: #ccc;
+    border: 3px solid #313131;
+    border-radius: 3px;
+    height: 100%;
+    width: 100%;
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    right: 0;
+    z-index: -2;
+    transition: transform 0.2s;
+  }
+
+  :focus:after,
+  :hover:after {
+    transform: translate(-1px, -1.5px);
+  }
+  :focus,
+  :hover {
+    transform: translate(1px, 1px);
+  }
+
+  padding: ${rem(15)} ${rem(40)};
+  margin: ${rem(10)} 0;
+  min-width: ${rem(220)};
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+`;
+
+const ButtonWrapper = styled.div`
+  display: flex;
+  flex-direction: column;
+  padding: ${rem(15)} 0 0;
+  text-align: center;
+`;
+
+const Google = styled.button`
+  ${buttonStyles};
+  ::before {
+    background-color: #dd4b39;
+  }
+`;
+const Facebook = styled.button`
+  ${buttonStyles};
+  ::before {
+    background-color: #4c69ba;
+  }
+`;
+const Twitter = styled.button`
+  ${buttonStyles};
+  ::before {
+    background-color: #00acee;
   }
 `;
 
-const CTAWrapper = styled.div`
-  display: flex;
-  flex-direction: column;
+const iconStyles = css`
+  width: ${rem(20)};
+  height: ${rem(20)};
+`;
+
+const StyledGoogleIcon = styled(GoogleIcon)`
+  ${iconStyles};
+`;
+const StyledFacebookIcon = styled(FacebookIcon)`
+  ${iconStyles};
+`;
+const StyledTwitterIcon = styled(TwitterIcon)`
+  ${iconStyles};
+`;
+
+const Text = styled.div`
+  font-size: ${rem(18)};
+  font-weight: 500;
+
+  margin-left: ${rem(5)};
+  position: relative;
+  top: ${rem(1)};
 `;

@@ -12,24 +12,27 @@ import gql from 'graphql-tag';
 import { get, some } from 'lodash';
 import { useRouter } from 'next/router';
 
-import Loading from '../../loading';
+import Loading from '../loading';
 
-import rem from '../../../utils/rem';
-import { getAddress, validateAddress } from '../../../utils/address';
+import rem from '../../utils/rem';
+import { getAddress, validateAddress } from '../../utils/address';
 
 import {
   modalBasic,
   modalCentered,
   modalBorder,
-  modalOverlay
-} from '../../../styles/modal';
-import { CARD_OPTIONS } from '../../../styles/stripe';
-import { inputBasic, errorBasic, labelBasic } from '../../../styles/form';
-import {
-  buttonPrimary,
-  buttonRounded,
-  buttonDisabled
-} from '../../../styles/button';
+  modalOverlay,
+  modalHead,
+  modalBody,
+  modalFooter,
+  modalCTARow,
+  continueButton,
+  cancelButton,
+  modalTitle,
+  modalNote
+} from '../../styles/modal';
+import { CARD_OPTIONS } from '../../styles/stripe';
+import { inputBasic, errorBasic, labelBasic } from '../../styles/form';
 
 const { publicRuntimeConfig } = getConfig();
 const mapsApiUrl = `https://maps.googleapis.com/maps/api/js?key=${publicRuntimeConfig.googleMapsKey}&libraries=places`;
@@ -269,10 +272,11 @@ const PayoutMethod = ({ onClose, user, showConfirmVerificationModal }) => {
       onRequestClose={onClose}
     >
       <Head>
-        <Title>Set payout method</Title>
+        <Title>Add payout method</Title>
+        <Note>You will get money only after the auction ends.</Note>
       </Head>
 
-      <Content>
+      <Body>
         <Field>
           <Label>Debit card</Label>
           <InputWrapper>
@@ -291,16 +295,15 @@ const PayoutMethod = ({ onClose, user, showConfirmVerificationModal }) => {
           />
           <ErrorMessage>{formError.address}</ErrorMessage>
         </Field>
-
-        <CTAButton onClick={handleSubmit} disabled={isCTADisabled}>
-          Add payout method
-        </CTAButton>
-      </Content>
+      </Body>
 
       <Footer>
-        <Note>
-          <Bold>Note:</Bold> You are charged only if your bid succeeds.
-        </Note>
+        <CTARow>
+          <Cancel onClick={onClose}>Cancel</Cancel>
+          <Continue onClick={handleSubmit} disabled={isCTADisabled}>
+            Add card
+          </Continue>
+        </CTARow>
       </Footer>
 
       <Script
@@ -340,32 +343,24 @@ const InputWrapper = styled.div`
 `;
 
 const Head = styled.div`
-  border-top-left-radius: 4px;
-  border-top-right-radius: 4px;
-
-  padding: ${rem(20)} ${rem(30)};
-  box-shadow: inset 0 -1px #e3e8ee;
+  ${modalHead};
 `;
 
 const Title = styled.div`
-  font-size: ${rem(20)};
-  font-weight: 500;
+  ${modalTitle};
 `;
 
-const Content = styled.div`
-  padding: ${rem(20)} ${rem(30)};
-  box-shadow: inset 0 -1px #e3e8ee;
-  background-color: #f7fafc;
+const Note = styled.small`
+  ${modalNote};
+`;
+
+const Body = styled.div`
+  ${modalBody};
 `;
 
 const Footer = styled.div`
-  border-top-left-radius: 4px;
-  border-top-right-radius: 4px;
-
-  padding: ${rem(20)} ${rem(30)};
-  box-shadow: inset 0 1px #e3e8ee;
+  ${modalFooter};
 `;
-
 const Label = styled.div`
   ${labelBasic};
   margin-bottom: ${rem(5)};
@@ -385,28 +380,18 @@ const AutocompleteInput = styled.input`
   width: 100%;
 `;
 
-const CTAButton = styled.button`
-  ${buttonPrimary};
-  ${buttonRounded};
-  ${buttonDisabled};
+const CTARow = styled.div`
+  ${modalCTARow};
+`;
 
-  width: 100%;
-  margin-top: ${rem(10)};
-  padding: ${rem(13)} 0;
-  font-size: ${rem(18)};
-  font-weight: 500;
+const Continue = styled.button`
+  ${continueButton};
+`;
 
-  text-align: center;
+const Cancel = styled.button`
+  ${cancelButton};
 `;
 
 const ErrorMessage = styled.div`
   ${errorBasic};
-`;
-
-const Bold = styled.span`
-  font-weight: 500;
-`;
-
-const Note = styled.div`
-  text-align: center;
 `;

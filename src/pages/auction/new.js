@@ -445,7 +445,7 @@ const New = () => {
 New.getInitialProps = ({ req, res }) => {
   const user = req && req.session ? req.session.user : null;
   if (!user) {
-    redirectWithSSR({ res, path: '/login' });
+    redirectWithSSR({ res, path: '/' });
   }
 
   return {};

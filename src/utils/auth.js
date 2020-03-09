@@ -2,6 +2,12 @@ import { isEmpty } from 'lodash';
 
 import firebase from './firebase';
 
+export const providerMap = {
+  google: firebase.auth.GoogleAuthProvider.PROVIDER_ID,
+  facebook: firebase.auth.FacebookAuthProvider.PROVIDER_ID,
+  twitter: firebase.auth.TwitterAuthProvider.PROVIDER_ID
+};
+
 export const providerCollection = {
   [firebase.auth.GoogleAuthProvider.PROVIDER_ID]: {
     label: 'Google',

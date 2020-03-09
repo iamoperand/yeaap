@@ -18,16 +18,18 @@ import { CARD_OPTIONS } from '../../styles/stripe';
 import {
   modalBasic,
   modalCentered,
-  modalPadding,
   modalBorder,
-  modalOverlay
+  modalOverlay,
+  modalHead,
+  modalBody,
+  modalFooter,
+  modalCTARow,
+  continueButton,
+  cancelButton,
+  modalTitle,
+  modalNote
 } from '../../styles/modal';
 import { labelBasic, inputBasic, errorBasic } from '../../styles/form';
-import {
-  buttonPrimary,
-  buttonRounded,
-  buttonDisabled
-} from '../../styles/button';
 
 import rem from '../../utils/rem';
 import { getAddress, validateAddress } from '../../utils/address';
@@ -248,35 +250,40 @@ const PaymentMethod = ({ onClose, user }) => {
       isOpen={true}
       onRequestClose={onClose}
     >
-      <Label>Card details</Label>
+      <Head>
+        <Title>Add payment method</Title>
+        <Note>You are charged only if your bid succeeds.</Note>
+      </Head>
 
-      <Row>
-        <InputWrapper>
-          <CardElement options={CARD_OPTIONS} onChange={handleCardChange} />
-        </InputWrapper>
-        <ErrorMessage>{formError.card}</ErrorMessage>
-      </Row>
+      <Body>
+        <Field>
+          <Label>Card details</Label>
+          <InputWrapper>
+            <CardElement options={CARD_OPTIONS} onChange={handleCardChange} />
+          </InputWrapper>
+          <ErrorMessage>{formError.card}</ErrorMessage>
+        </Field>
 
-      <Row>
-        <Label>Address</Label>
-        <AutocompleteInput
-          ref={autocompleteInputRef}
-          placeholder="Enter your address"
-          onBlur={handleAddressBlur}
-          disabled={!isScriptLoaded}
-        />
-        <ErrorMessage>{formError.address}</ErrorMessage>
-      </Row>
+        <Field>
+          <Label>Address</Label>
+          <AutocompleteInput
+            ref={autocompleteInputRef}
+            placeholder="Enter your address"
+            onBlur={handleAddressBlur}
+            disabled={!isScriptLoaded}
+          />
+          <ErrorMessage>{formError.address}</ErrorMessage>
+        </Field>
+      </Body>
 
-      <CTAButton onClick={handleSubmit} disabled={isCTADisabled}>
-        Add payment method
-      </CTAButton>
-
-      <Hr />
-
-      <Note>
-        <Bold>Note:</Bold> You are charged only if your bid succeeds.
-      </Note>
+      <Footer>
+        <CTARow>
+          <Cancel onClick={onClose}>Cancel</Cancel>
+          <Continue onClick={handleSubmit} disabled={isCTADisabled}>
+            Add card
+          </Continue>
+        </CTARow>
+      </Footer>
 
       <Script
         url={mapsApiUrl}
@@ -307,25 +314,43 @@ const modalContent = css`
   ${modalBasic};
   ${modalCentered};
   ${modalBorder};
-  ${modalPadding};
+`;
 
-  padding-bottom: ${rem(20)};
+const Head = styled.div`
+  ${modalHead};
+`;
+
+const Title = styled.div`
+  ${modalTitle};
+`;
+
+const Note = styled.small`
+  ${modalNote};
+`;
+
+const Body = styled.div`
+  ${modalBody};
+`;
+
+const Footer = styled.div`
+  ${modalFooter};
 `;
 
 const Label = styled.div`
   ${labelBasic};
-  display: block;
   margin-bottom: ${rem(5)};
-  font-size: ${rem(18)};
-  text-align: center;
+  font-size: ${rem(17)};
 `;
 
 const InputWrapper = styled.div`
   ${inputBasic};
 `;
 
-const Row = styled.div`
-  margin: ${rem(5)} 0;
+const Field = styled.div`
+  margin-top: ${rem(10)};
+  :first-child {
+    margin-top: 0;
+  }
 `;
 
 const AutocompleteInput = styled.input`
@@ -334,32 +359,16 @@ const AutocompleteInput = styled.input`
   width: 100%;
 `;
 
-const CTAButton = styled.button`
-  ${buttonPrimary};
-  ${buttonRounded};
-  ${buttonDisabled};
-
-  width: 100%;
-  margin-top: ${rem(4)};
-  padding: ${rem(13)} 0;
-  font-size: ${rem(18)};
-  font-weight: 500;
-
-  text-align: center;
+const CTARow = styled.div`
+  ${modalCTARow};
 `;
 
-const Hr = styled.hr`
-  margin: ${rem(20)} auto;
-  width: 60%;
-  border-top-color: #ccc;
+const Continue = styled.button`
+  ${continueButton};
 `;
 
-const Bold = styled.span`
-  font-weight: 500;
-`;
-
-const Note = styled.div`
-  text-align: center;
+const Cancel = styled.button`
+  ${cancelButton};
 `;
 
 const ErrorMessage = styled.div`
