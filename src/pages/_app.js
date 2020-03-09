@@ -129,4 +129,23 @@ const globalStyles = css`
       padding: 2px 5px;
     }
   }
+
+  /* react-modal animation */
+  .ReactModal__Overlay {
+    opacity: 0;
+    transform: scale(0);
+    transition: opacity linear 0.15s;
+  }
+
+  .ReactModal__Overlay--after-open {
+    opacity: 1;
+    transform: scale(1);
+    transition: all 0.3s;
+  }
+
+  .ReactModal__Overlay--before-close {
+    opacity: 0;
+    transform: scale(0.7);
+    transition: all 0.3s;
+  }
 `;
