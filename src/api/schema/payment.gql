@@ -12,8 +12,8 @@ input CreatePaymentPayoutAccountInput {
 }
 
 input CreatePaymentPayoutAccountOnboardingLinkDataInput {
-  failureRedirectUrl: String!
-  successRedirectUrl: String!
+  failureRedirectUrl: URL!
+  successRedirectUrl: URL!
 }
 
 enum PaymentMethodCardBrand {
@@ -107,5 +107,5 @@ extend type Mutation {
     @requireUser(hasPaymentPayoutMethod: true)
   createPaymentPayoutAccountOnboardingUrl(
     data: CreatePaymentPayoutAccountOnboardingLinkDataInput!
-  ): String @requireUser(hasPaymentPayoutMethod: true)
+  ): URL @requireUser(hasPaymentPayoutMethod: true)
 }

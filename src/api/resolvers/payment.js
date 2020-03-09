@@ -241,8 +241,8 @@ const createPaymentPayoutAccountOnboardingUrl = async (data) => {
 
   const link = await stripe.accountLinks.create({
     account: user.stripeAccountId,
-    failure_url: inputData.failureRedirectUrl,
-    success_url: inputData.successRedirectUrl,
+    failure_url: inputData.failureRedirectUrl.href,
+    success_url: inputData.successRedirectUrl.href,
     type,
     collect: 'eventually_due'
   });

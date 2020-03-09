@@ -78,8 +78,8 @@ const CREATE_AUCTION = gql`
 
 const VERIFY_PAYOUT_ACCOUNT = gql`
   # input CreatePaymentPayoutAccountOnboardingLinkDataInput {
-  #   failureRedirectUrl: String!
-  #   successRedirectUrl: String!
+  #   failureRedirectUrl: URL!
+  #   successRedirectUrl: URL!
   # }
   mutation($input: CreatePaymentPayoutAccountOnboardingLinkDataInput!) {
     createPaymentPayoutAccountOnboardingUrl(data: $input)
