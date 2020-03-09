@@ -43,8 +43,6 @@ const Auth = ({ onClose }) => {
         onClose();
       })
       .catch((error) => {
-        console.log('sorry, there was some issue while signing in!', { error });
-
         handleSignInError(error).then((message) => {
           if (!isEmpty(message)) {
             addToast(message, {

@@ -73,7 +73,8 @@ const Bid = ({ onClose, auctionId, topBid }) => {
 
   const [createBid] = useMutation(CREATE_BID, {
     onError: (error) => {
-      addToast(getErrorMessage(error), {
+      const errorMessage = getErrorMessage(error, "Bid couldn't be created");
+      addToast(errorMessage, {
         appearance: 'error'
       });
       onClose();

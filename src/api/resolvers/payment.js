@@ -32,7 +32,7 @@ const mapStripePaymentMethod = (paymentMethod) => {
       : null;
 
   if (!source) {
-    throw new Error('unkown payment source type: ' + object);
+    throw new Error('unknown payment source type: ' + object);
   }
 
   return {

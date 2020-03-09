@@ -5,10 +5,12 @@ import gql from 'graphql-tag';
 import styled from '@emotion/styled';
 import { isEmpty } from 'lodash';
 import Link from 'next/link';
+import { useToasts } from 'react-toast-notifications';
 
 import Layout from '../../components/layout';
 import Loading from '../../components/loading';
 import rem from '../../utils/rem';
+import { getErrorMessage } from '../../utils/error';
 
 import {
   buttonPrimary,
@@ -71,12 +73,17 @@ const Null = () => {
 };
 
 const AuctionList = () => {
+  const { addToast } = useToasts();
   const { loading, error, data, fetchMore } = useQuery(GET_USER_AUCTIONS);
   if (loading) {
     return <Loading />;
   }
   if (error) {
-    console.log({ error });
+    const errorMessage = getErrorMessage(error, "Couldn't get user auctions");
+    addToast(errorMessage, {
+      appearance: 'error'
+    });
+
     return <div>Error</div>;
   }
 

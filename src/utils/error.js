@@ -1,13 +1,19 @@
 import { trim, capitalize } from 'lodash';
 
-const ifGraphQLError = (message) => message.includes('GraphQL error:');
+const graphQLErrorPrefix = 'GraphQL error:';
+const ifGraphQLError = (message) => message.includes(graphQLErrorPrefix);
 
-export const getErrorMessage = (error) => {
+export const getErrorMessage = (
+  error,
+  defaultMessage = 'There was some error'
+) => {
   const { message } = error;
+
   if (ifGraphQLError(message)) {
-    const concernedText = error.message.replace(/GraphQL error:/i, '');
+    const concernedText = error.message.replace(graphQLErrorPrefix, '');
     const trimmedText = trim(concernedText);
     return capitalize(trimmedText);
   }
-  return 'Something failed. Please try again!';
+
+  return defaultMessage;
 };

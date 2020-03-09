@@ -2,8 +2,10 @@ import { useEffect, useReducer } from 'react';
 import { useMutation, useLazyQuery } from '@apollo/react-hooks';
 import gql from 'graphql-tag';
 import { get } from 'lodash';
+import { useToasts } from 'react-toast-notifications';
 
 import { auth } from '../utils/firebase';
+import { getErrorMessage } from '../utils/error';
 
 const CREATE_USER_SESSION = gql`
   mutation {
@@ -124,6 +126,7 @@ const reducer = (state, action) => {
 };
 
 const useAuth = () => {
+  const { addToast } = useToasts();
   const [state, dispatch] = useReducer(reducer, {
     loading: true,
     isUserLoading: true,
@@ -135,20 +138,33 @@ const useAuth = () => {
     onCompleted: (data) => {
       dispatch({ type: actions.USER_FETCHED, payload: get(data, 'me') });
     },
-    onError: () => {
+    onError: (error) => {
+      const errorMessage = getErrorMessage(error, "Couldn't fetch the user");
+      addToast(errorMessage, {
+        appearance: 'error'
+      });
+
       dispatch({ type: actions.USER_FETCH_FAILED });
     }
   });
 
   const [createUserSession] = useMutation(CREATE_USER_SESSION, {
-    onError: () => {
-      console.error('There was some error while logging in!');
+    onError: (error) => {
+      const errorMessage = getErrorMessage(error, "Couldn't login the user");
+      addToast(errorMessage, {
+        appearance: 'error'
+      });
+
       dispatch({ type: actions.LOGGED_OUT });
     }
   });
   const [removeUserSession] = useMutation(REMOVE_USER_SESSION, {
-    onError: () => {
-      console.error('There was some error while logging in!');
+    onError: (error) => {
+      const errorMessage = getErrorMessage(error, "Couldn't login the user");
+      addToast(errorMessage, {
+        appearance: 'error'
+      });
+
       dispatch({ type: actions.LOGGED_OUT });
     }
   });

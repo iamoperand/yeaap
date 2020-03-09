@@ -40,7 +40,7 @@ const handleDifferentCredential = ({ email }) => {
       return stringifyProviders(providers);
     })
     .catch(() => {
-      console.log('You just caught a bug!');
+      console.log('Caught an error while signing in');
     });
 };
 

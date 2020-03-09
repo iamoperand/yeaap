@@ -33,6 +33,7 @@ import { labelBasic, inputBasic, errorBasic } from '../../styles/form';
 
 import rem from '../../utils/rem';
 import { getAddress, validateAddress } from '../../utils/address';
+import { getErrorMessage } from '../../utils/error';
 
 const ATTACH_PAYMENT_METHOD = gql`
   mutation($input: AttachPaymentMethodDataInput!) {
@@ -74,8 +75,11 @@ const PaymentMethod = ({ onClose, user }) => {
 
   const [attachPaymentMethod] = useMutation(ATTACH_PAYMENT_METHOD, {
     onError: (error) => {
-      console.log({ error });
-      addToast('An error occurred while creating the payment method', {
+      const errorMessage = getErrorMessage(
+        error,
+        'An error occurred while creating the payment method'
+      );
+      addToast(errorMessage, {
         appearance: 'error',
         autoDismiss: true
       });
@@ -145,8 +149,7 @@ const PaymentMethod = ({ onClose, user }) => {
     });
 
     if (error) {
-      console.log({ error });
-      addToast(`Couldn't process the card.`, {
+      addToast("Couldn't process the card", {
         appearance: 'error',
         autoDismiss: true
       });

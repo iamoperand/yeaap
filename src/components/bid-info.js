@@ -42,7 +42,6 @@ const BidInfo = ({ name, description, isLeaderboardLoading }) => {
   const bidHandler = () => {
     // check if the user is authenticated
     if (isEmpty(user)) {
-      console.log('user is not authenticated');
       showAuthModal();
       return;
     }
@@ -53,7 +52,6 @@ const BidInfo = ({ name, description, isLeaderboardLoading }) => {
       return;
     }
 
-    console.log('user is authenticated and has payment method, yay!');
     showBidModal();
   };
 

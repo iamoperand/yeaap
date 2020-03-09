@@ -37,6 +37,7 @@ import useSession from '../../hooks/use-session';
 import rem from '../../utils/rem';
 import redirectWithSSR from '../../utils/redirect-with-ssr';
 import { openPopup, pollPopup } from '../../utils/popup';
+import { getErrorMessage } from '../../utils/error';
 
 const dateTimePickerProps = {
   showLeadingZeros: true,
@@ -166,8 +167,10 @@ const New = () => {
   const { addToast } = useToasts();
   const [createAuction] = useMutation(CREATE_AUCTION, {
     onError: (err) => {
-      console.error({ err });
-      addToast('There was some error', { appearance: 'error' });
+      const errorMessage = getErrorMessage(err, "Couldn't create the auction");
+      addToast(errorMessage, {
+        appearance: 'error'
+      });
     },
     onCompleted: ({ createAuction: response }) => {
       addToast('Auction created.', {
@@ -219,8 +222,11 @@ const New = () => {
 
   const [verifyPayoutAccount] = useMutation(VERIFY_PAYOUT_ACCOUNT, {
     onError: (error) => {
-      console.log({ error });
-      addToast('An error occurred while verifying the user', {
+      const errorMessage = getErrorMessage(
+        error,
+        'An error occurred while verifying the user'
+      );
+      addToast(errorMessage, {
         appearance: 'error',
         autoDismiss: true
       });

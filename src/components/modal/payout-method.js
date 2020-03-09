@@ -16,6 +16,7 @@ import Loading from '../loading';
 
 import rem from '../../utils/rem';
 import { getAddress, validateAddress } from '../../utils/address';
+import { getErrorMessage } from '../../utils/error';
 
 import {
   modalBasic,
@@ -85,8 +86,11 @@ const PayoutMethod = ({ onClose, user, showConfirmVerificationModal }) => {
 
   const [createPaymentPayoutAccount] = useMutation(CREATE_PAYOUT_ACCOUNT, {
     onError: (error) => {
-      console.log({ error });
-      addToast('An error occurred while adding the payout method', {
+      const errorMessage = getErrorMessage(
+        error,
+        'An error occurred while adding the payout method'
+      );
+      addToast(errorMessage, {
         appearance: 'error',
         autoDismiss: true
       });
@@ -239,8 +243,7 @@ const PayoutMethod = ({ onClose, user, showConfirmVerificationModal }) => {
     });
 
     if (error) {
-      console.log({ error });
-      addToast(`Couldn't process the card.`, {
+      addToast(`Couldn't process the card`, {
         appearance: 'error',
         autoDismiss: true
       });
