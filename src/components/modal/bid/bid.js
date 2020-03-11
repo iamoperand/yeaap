@@ -148,7 +148,7 @@ const Bid = ({ onClose, auctionId, topBid }) => {
             <Cancel type="button" onClick={onClose}>
               Cancel
             </Cancel>
-            <Continue type="submit">Bid...</Continue>
+            <Continue type="submit">Go ahead, bid</Continue>
           </CTARow>
         </Footer>
       </form>

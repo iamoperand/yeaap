@@ -6,7 +6,6 @@ import gql from 'graphql-tag';
 import { useSubscription, useLazyQuery } from '@apollo/react-hooks';
 import {
   uniqBy,
-  take,
   first,
   isEmpty,
   transform,
@@ -23,7 +22,6 @@ import Leaderboard from '../../components/leaderboard';
 import Loading from '../../components/loading';
 
 import rem from '../../utils/rem';
-import AuctionContext from '../../context/auction-context';
 
 const GET_AUCTION = gql`
   # type AuctionWhereInput {
@@ -71,13 +69,12 @@ const ON_BIDS_CREATED = gql`
     onBidsCreated(where: $where) {
       id
       amount
-      isWinner
       message
       creator {
-        id
         name
         photoUrl
       }
+      createdAt
     }
   }
 `;
@@ -212,27 +209,36 @@ const AuctionView = ({ auction }) => {
     <Layout>
       <SEO title="Auction" />
 
-      <AuctionContext.Provider value={{ id: auction.id, topBid }}>
-        <BidInfo
-          name={auction.creator.name}
-          description={description}
-          isLeaderboardLoading={bidsLoading}
-        />
+      <BidInfo
+        name={auction.creator.name}
+        description={description}
+        isLeaderboardLoading={bidsLoading}
+        auctionId={auction.id}
+        auctionType={auction.type}
+        hasBidsVisible={auction.hasBidsVisible}
+        topBid={topBid}
+      />
 
-        <BidStatsWrapper>
-          <TimeCounter endTime={endsAt} />
-          <TopBid value={topBid} />
-          <BidCount value={bidCount} />
-        </BidStatsWrapper>
+      <BidStatsWrapper>
+        <TimeCounter endTime={endsAt} />
+        <TopBid value={topBid} />
+        <BidCount value={bidCount} />
+      </BidStatsWrapper>
 
+      {auction.hasBidsVisible && (
         <LeaderboardWrapper>
           {bidsLoading ? (
             <Loading />
           ) : (
-            <Leaderboard bids={take(bids, 4)} auctionId={auction.id} />
+            <Leaderboard
+              bids={bids}
+              creatorId={auction.creatorId}
+              winnerCount={auction.winnerCount}
+              auctionType={auction.type}
+            />
           )}
         </LeaderboardWrapper>
-      </AuctionContext.Provider>
+      )}
     </Layout>
   );
 };
@@ -267,7 +273,7 @@ export default AuctionView;
  */
 
 const rowSpacingStyles = css`
-  margin-top: ${rem(70)};
+  margin-top: ${rem(80)};
 `;
 
 const BidStatsWrapper = styled.div`

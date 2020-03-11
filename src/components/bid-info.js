@@ -17,12 +17,24 @@ import ShareIcon from '../assets/icons/share.svg?sprite';
 import BidModal from '../components/modal/bid';
 import AuthModal from '../components/modal/auth';
 import PaymentMethodModal from '../components/modal/payment-method';
+import {
+  BidsHiddenTag,
+  BidsVisibleTag,
+  ClosestBidWinsTag,
+  HighestBidWinsTag
+} from '../components/tag';
 import useSession from '../hooks/use-session';
-import useAuction from '../hooks/use-auction';
 
-const BidInfo = ({ name, description, isLeaderboardLoading }) => {
+const BidInfo = ({
+  name,
+  description,
+  isLeaderboardLoading,
+  auctionId,
+  topBid,
+  auctionType,
+  hasBidsVisible
+}) => {
   const { user, isUserLoading } = useSession();
-  const { id: auctionId, topBid } = useAuction();
 
   const [showAuthModal, hideAuthModal] = useModal(() => (
     <AuthModal onClose={hideAuthModal} />
@@ -55,12 +67,20 @@ const BidInfo = ({ name, description, isLeaderboardLoading }) => {
     showBidModal();
   };
 
+  const isHighestBidWinner = auctionType === 'HIGHEST_BID_WINS';
+
   return (
     <Box>
-      <Row>
-        <Label>Bid by</Label>
-        <Name>{name}</Name>
-      </Row>
+      <RowWrapper>
+        <Row>
+          <Label>Bid by</Label>
+          <Name>{name}</Name>
+        </Row>
+        <Row>
+          {isHighestBidWinner ? <HighestBidWinsTag /> : <ClosestBidWinsTag />}
+          &nbsp;{hasBidsVisible ? <BidsVisibleTag /> : <BidsHiddenTag />}
+        </Row>
+      </RowWrapper>
       <Row>
         <Italic>{description}</Italic>
       </Row>
@@ -99,7 +119,12 @@ const BidInfo = ({ name, description, isLeaderboardLoading }) => {
 BidInfo.propTypes = {
   name: PropTypes.string.isRequired,
   description: PropTypes.string.isRequired,
-  isLeaderboardLoading: PropTypes.bool.isRequired
+  isLeaderboardLoading: PropTypes.bool.isRequired,
+  auctionId: PropTypes.string.isRequired,
+  topBid: PropTypes.number.isRequired,
+  auctionType: PropTypes.oneOf(['HIGHEST_BID_WINS', 'CLOSEST_BID_WINS'])
+    .isRequired,
+  hasBidsVisible: PropTypes.bool.isRequired
 };
 
 export default BidInfo;
@@ -114,6 +139,11 @@ const Box = styled.div`
   ${boxBorder};
   background-color: #f7f9fa;
   padding: ${rem(12)} ${rem(12)} ${rem(40)};
+`;
+
+const RowWrapper = styled.div`
+  display: flex;
+  justify-content: space-between;
 `;
 
 const Row = styled.div`

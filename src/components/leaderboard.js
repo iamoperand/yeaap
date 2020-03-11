@@ -2,16 +2,37 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import styled from '@emotion/styled';
 import { css } from '@emotion/core';
-import Link from 'next/link';
 import formatNum from 'format-num';
-import { isEmpty } from 'lodash';
+import { isEmpty, take } from 'lodash';
+import { useModal } from 'react-modal-hook';
 
 import Avatar from './avatar';
+import LiveBidsModal from './modal/live-bids';
+
 import { boxBorder } from '../styles/box';
+
 import rem from '../utils/rem';
 import theme from '../utils/theme';
 
-const Leaderboard = ({ bids, auctionId }) => {
+import useSession from '../hooks/use-session';
+
+const Leaderboard = ({ bids, creatorId, winnerCount, auctionType }) => {
+  const { user } = useSession();
+
+  const [showLiveBids, hideLiveBids] = useModal(
+    () => (
+      <LiveBidsModal
+        onClose={hideLiveBids}
+        bids={bids}
+        creatorId={creatorId}
+        userId={user.id}
+        winnerCount={winnerCount}
+        auctionType={auctionType}
+      />
+    ),
+    [bids, creatorId, user.id, winnerCount, auctionType]
+  );
+
   if (isEmpty(bids)) {
     return (
       <Box>
@@ -21,14 +42,15 @@ const Leaderboard = ({ bids, auctionId }) => {
     );
   }
 
+  const first5Bids = take(bids, 5);
+
   return (
     <Box>
-      <Label>Leaderboard</Label>
-
+      <Label>Live bids</Label>
       <List>
-        {bids.map((bid, index) => (
+        {first5Bids.map((bid) => (
           <Item key={bid.id}>
-            <Index>#{index + 1}</Index>
+            <Index>#</Index>
             <Avatar src={bid.creator.photoUrl} alt={bid.creator.name} />
             <Name>{bid.creator.name}</Name>
             <span
@@ -44,13 +66,7 @@ const Leaderboard = ({ bids, auctionId }) => {
         ))}
       </List>
 
-      <Link
-        href={`/auction/[auctionId]/bids`}
-        as={`/auction/${auctionId}/bids`}
-        passHref
-      >
-        <Anchor>See all</Anchor>
-      </Link>
+      <Button onClick={showLiveBids}>See all</Button>
     </Box>
   );
 };
@@ -64,13 +80,14 @@ Leaderboard.propTypes = {
       amount: PropTypes.number.isRequired,
       message: PropTypes.string,
       creator: PropTypes.shape({
-        id: PropTypes.string.isRequired,
         name: PropTypes.string.isRequired,
         photoUrl: PropTypes.string
       })
     })
   ),
-  auctionId: PropTypes.string.isRequired
+  creatorId: PropTypes.string.isRequired,
+  winnerCount: PropTypes.number.isRequired,
+  auctionType: PropTypes.oneOf(['HIGHEST_BID_WINS', 'CLOSEST_BID_WINS'])
 };
 
 /*
@@ -92,6 +109,7 @@ const Label = styled.div`
 const List = styled.ul`
   margin: ${rem(15)} 0 ${rem(20)} 0;
   padding-left: 0;
+  min-height: ${rem(100)};
 `;
 
 const Item = styled.li`
@@ -136,8 +154,24 @@ const BidAmount = styled.span`
   font-variant: tabular-nums;
 `;
 
-const Anchor = styled.a`
+const Button = styled.button`
   font-size: ${rem(18)};
+  padding: 0;
+  color: ${theme.colors.links};
+  text-decoration: none;
+  position: relative;
+  cursor: pointer;
+
+  :after {
+    content: '';
+    width: 100%;
+    position: absolute;
+    left: 0;
+    bottom: -1px;
+    border-width: 0 0 2px;
+    border-style: solid;
+    border-color: #c7c3fb;
+  }
 `;
 
 const H3 = styled.div`
