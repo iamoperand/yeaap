@@ -10,7 +10,7 @@ const STYLE_OPTIONS = {
       color: '#ccc'
     },
     ':-webkit-autofill': {
-      color: theme.colors.links
+      color: theme.colors.primary
     }
   },
   invalid: {

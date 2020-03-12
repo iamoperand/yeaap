@@ -206,7 +206,7 @@ export const calendarStyles = css`
     background-color: #e6e6e6;
   }
   .react-calendar__tile--now {
-    color: ${theme.colors.links};
+    color: ${theme.colors.primary};
     background: transparent;
   }
   .react-calendar__tile--now:enabled:hover,
@@ -221,7 +221,7 @@ export const calendarStyles = css`
     color: white;
   }
   .react-calendar__tile--active {
-    background: ${theme.colors.links};
+    background: ${theme.colors.primary};
     color: white;
   }
   .react-calendar__tile--active:enabled:hover,

@@ -167,7 +167,7 @@ const List = styled.div`
 
 const itemStyles = css`
   padding: ${rem(4)} ${rem(12)};
-  color: ${theme.colors.links};
+  color: ${theme.colors.primary};
   cursor: pointer;
 
   :hover {

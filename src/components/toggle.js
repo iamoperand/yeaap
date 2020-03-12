@@ -96,6 +96,6 @@ const HiddenInput = styled.input`
     margin-left: -0.2em;
   }
   :checked ~ ${Switch} {
-    background: ${theme.colors.links};
+    background: ${theme.colors.primary};
   }
 `;
