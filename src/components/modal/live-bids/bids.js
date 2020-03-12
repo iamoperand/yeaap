@@ -1,20 +1,16 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { isEmpty } from 'lodash';
-import formatNum from 'format-num';
 import styled from '@emotion/styled';
-import format from 'date-fns/format';
 
-import Avatar from '../../avatar';
-import { WinnerTag } from '../../tag';
+import Bid from './bid';
 
 import rem from '../../../utils/rem';
-import theme from '../../../utils/theme';
 
-const shouldShowWinningTag = ({ serialNo, winnerCount, auctionType }) => {
+const showWinning = ({ index, winnerCount, auctionType }) => {
   switch (auctionType) {
     case 'HIGHEST_BID_WINS': {
-      return serialNo <= winnerCount;
+      return index + 1 <= winnerCount;
     }
     case 'CLOSEST_BID_WINS': {
       return false;
@@ -29,36 +25,38 @@ const Bids = ({ bids, isUserCreator, winnerCount, auctionType }) => {
     return <div>No bids yet!</div>;
   }
 
-  return bids.map((bid, index) => {
-    const serialNo = index + 1;
-    const showWinningTag = shouldShowWinningTag({
-      serialNo,
-      winnerCount,
-      auctionType
-    });
-    const createdAt = format(new Date(bid.createdAt), 'do LLLL, HH:mm');
+  return (
+    <>
+      <TableHeaderStyles>
+        <table>
+          <thead>
+            <tr>
+              <th></th>
+              <th>Bid</th>
+              <th>User</th>
+              <th></th>
+            </tr>
+          </thead>
+        </table>
+      </TableHeaderStyles>
 
-    return (
-      <Wrapper key={bid.id}>
-        <AmountRow>
-          <AmountTag>
-            <Amount>{`$${formatNum(bid.amount)}`}</Amount>
-            {showWinningTag && <WinnerTag label="Winning" />}
-          </AmountTag>
-          <Time>{createdAt}</Time>
-        </AmountRow>
-
-        <UserRow>
-          <Avatar src={bid.creator.photoUrl} alt={bid.creator.name} />
-          <Name>{bid.creator.name}</Name>
-        </UserRow>
-
-        <UserRow>
-          {isUserCreator && <Message>{`"${bid.message}"`}</Message>}
-        </UserRow>
-      </Wrapper>
-    );
-  });
+      <TableContentStyles>
+        <table>
+          <tbody>
+            {bids.map((bid, index) => (
+              <Bid
+                key={bid.id}
+                bid={bid}
+                index={index}
+                isUserCreator={isUserCreator}
+                isWinning={showWinning({ index, winnerCount, auctionType })}
+              />
+            ))}
+          </tbody>
+        </table>
+      </TableContentStyles>
+    </>
+  );
 };
 
 Bids.propTypes = {
@@ -76,86 +74,45 @@ export default Bids;
  ********************************************
  */
 
-const Wrapper = styled.div`
-  box-shadow: inset 0 -1px #bfc2c5;
-  :last-child {
-    box-shadow: none;
+const TableHeaderStyles = styled.div`
+  thead th {
+    color: #788896;
+    font-size: ${rem(18)};
+    font-weight: normal;
+    padding: ${rem(4)} ${rem(10)};
+    white-space: nowrap;
+    text-align: left;
   }
 
-  padding: ${rem(15)} ${rem(30)};
-
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-
-  img {
-    height: ${rem(40)};
-    width: ${rem(40)};
-    border-radius: 50%;
-    box-shadow: rgba(60, 66, 87, 0.12) 0px 7px 14px 0px,
-      rgba(0, 0, 0, 0.12) 0px 3px 6px 0px;
+  th:nth-child(1) {
+    width: ${rem(50)};
   }
-`;
-
-const AmountRow = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-
-  margin-bottom: ${rem(5)};
-`;
-
-const AmountTag = styled.div`
-  display: flex;
-  align-items: center;
-`;
-
-const UserRow = styled.div`
-  display: flex;
-  align-items: center;
-
-  margin-bottom: ${rem(5)};
-  :last-child {
-    margin-bottom: 0;
+  th:nth-child(2) {
+    width: ${rem(200)};
+  }
+  th:nth-child(3) {
+    padding-left: ${rem(25)};
   }
 `;
 
-const Name = styled.div`
-  margin-left: ${rem(8)};
-
-  position: relative;
-  :after {
-    content: '';
-    width: 100%;
-    position: absolute;
-    left: 0;
-    bottom: -1px;
-    border-width: 0 0 2px;
-    border-style: solid;
-    border-color: #818181;
+const TableContentStyles = styled.div`
+  table {
+    border-collapse: collapse;
+    border-right: 20px solid transparent;
+    table-layout: fixed;
   }
-`;
+  margin-top: ${rem(10)};
+  max-height: ${rem(365)};
+  overflow: overlay;
 
-const Amount = styled.div`
-  font-size: ${rem(25)};
-  font-variant: tabular-nums;
-  color: ${theme.colors.links};
-  margin-right: ${rem(10)};
-  position: relative;
-  top: 1px;
-`;
-
-const Time = styled.small`
-  font-variant: tabular-nums;
-  color: ${theme.colors.label};
-  font-size: ${rem(15)};
-`;
-
-const Message = styled.small`
-  margin-left: ${rem(48)};
-  position: relative;
-  top: -${rem(5)};
-
-  color: ${theme.colors.label};
-  font-size: ${rem(15)};
+  td {
+    padding: ${rem(4)} ${rem(10)};
+    white-space: nowrap;
+  }
+  td:nth-child(3) {
+    padding-left: ${rem(30)};
+  }
+  td:nth-child(4) {
+    padding-left: ${rem(30)};
+  }
 `;

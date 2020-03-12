@@ -66,7 +66,7 @@ const Leaderboard = ({ bids, creatorId, winnerCount, auctionType }) => {
         ))}
       </List>
 
-      <Button onClick={showLiveBids}>See all</Button>
+      <Button onClick={showLiveBids}>See top 20 bids</Button>
     </Box>
   );
 };

@@ -14,11 +14,11 @@ import {
   modalFooter,
   modalCTARow,
   cancelButton,
-  modalTitle,
-  modalNote
+  modalTitle
 } from '../../../styles/modal';
 
 import rem from '../../../utils/rem';
+import theme from '../../../utils/theme';
 
 import Bids from './bids';
 
@@ -40,8 +40,8 @@ const LiveBids = ({
       onRequestClose={onClose}
     >
       <Head>
-        <Title>Live bids</Title>
-        <Note>You can see the top 20 bids until the bid is in progress.</Note>
+        <Title>Bids leaderboard</Title>
+        <CountLabel>Top 20</CountLabel>
       </Head>
 
       <Body>
@@ -83,29 +83,43 @@ const modalContent = css`
   ${modalBasic};
   ${modalCentered};
   ${modalBorder};
-  width: ${rem(500)};
+  min-width: 0;
 `;
 
 const Head = styled.div`
   ${modalHead};
+
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-left: ${rem(30)};
+  padding-right: ${rem(30)};
 `;
 
 const Title = styled.div`
   ${modalTitle};
+  font-size: ${rem(25)};
+  font-weight: 400;
 `;
 
-const Note = styled.small`
-  ${modalNote};
+const CountLabel = styled.div`
+  padding: ${rem(10)} ${rem(20)};
+  border-radius: ${rem(30)};
+  border: 2px solid #c7c3fb;
+  background: none;
+
+  color: ${theme.colors.primary};
 `;
 
 const Body = styled.div`
   ${modalBody};
-  padding: 0;
-  max-height: ${rem(500)};
-  overflow: auto;
+
+  padding: ${rem(30)} ${rem(50)};
 `;
 
 const Footer = styled.div`
+  padding-left: ${rem(30)};
+  padding-right: ${rem(30)};
   ${modalFooter};
 `;
 
