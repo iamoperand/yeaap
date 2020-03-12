@@ -94,11 +94,12 @@ const Head = styled.div`
   ${modalHead};
 `;
 const Title = styled.div`
-  ${modalTitle}
+  ${modalTitle};
 `;
 
 const Content = styled.div`
   ${modalBody};
+  padding: ${rem(25)} ${rem(30)};
 `;
 
 const Footer = styled.div`
@@ -112,6 +113,7 @@ const CTARow = styled.div`
 const Cancel = styled.button`
   ${cancelButton};
 `;
+
 const Continue = styled.button`
   ${continueButton};
 `;

@@ -20,6 +20,7 @@ import BidInfo from '../../components/bid-info';
 import { TimeCounter, TopBid, BidCount } from '../../components/bid-stat';
 import Leaderboard from '../../components/leaderboard';
 import Loading from '../../components/loading';
+import AuctionCancelled from '../../components/auction-cancelled';
 
 import rem from '../../utils/rem';
 
@@ -205,6 +206,9 @@ const AuctionView = ({ auction }) => {
     setTopBid(isEmpty(bids) ? 0 : first(bids).amount);
   }, [bids]);
 
+  if (auction.isCanceled) {
+    return <AuctionCancelled />;
+  }
   return (
     <Layout>
       <SEO title="Auction" />
@@ -217,6 +221,7 @@ const AuctionView = ({ auction }) => {
         auctionType={auction.type}
         hasBidsVisible={auction.hasBidsVisible}
         topBid={topBid}
+        isCancelled={auction.isCanceled}
       />
 
       <BidStatsWrapper>

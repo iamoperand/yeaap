@@ -4,9 +4,14 @@ import styled from '@emotion/styled';
 import { css } from '@emotion/core';
 import { useModal } from 'react-modal-hook';
 import { isEmpty } from 'lodash';
+import { useMutation } from '@apollo/react-hooks';
+import gql from 'graphql-tag';
+import { useToasts } from 'react-toast-notifications';
+import { useRouter } from 'next/router';
 
 import rem from '../utils/rem';
 import theme from '../utils/theme';
+import { getErrorMessage } from '../utils/error';
 
 import { boxBorder } from '../styles/box';
 import { buttonPrimary, buttonRounded, buttonDisabled } from '../styles/button';
@@ -14,17 +19,28 @@ import { buttonPrimary, buttonRounded, buttonDisabled } from '../styles/button';
 import CrossIcon from '../assets/icons/cross.svg?sprite';
 import ShareIcon from '../assets/icons/share.svg?sprite';
 
-import BidModal from '../components/modal/bid';
-import AuthModal from '../components/modal/auth';
-import PaymentMethodModal from '../components/modal/payment-method';
+import BidModal from './modal/bid';
+import AuthModal from './modal/auth';
+import PaymentMethodModal from './modal/payment-method';
+import ConfirmationModal from './modal/confirmation';
 import {
   BidsHiddenTag,
   BidsVisibleTag,
   ClosestBidWinsTag,
   HighestBidWinsTag
-} from '../components/tag';
+} from './tag';
+
 import useSession from '../hooks/use-session';
 
+const CANCEL_AUCTION = gql`
+  mutation cancelAuction($where: AuctionWhereInput!) {
+    cancelAuction(where: $where) {
+      id
+    }
+  }
+`;
+
+// eslint-disable-next-line max-lines-per-function
 const BidInfo = ({
   name,
   description,
@@ -32,7 +48,8 @@ const BidInfo = ({
   auctionId,
   topBid,
   auctionType,
-  hasBidsVisible
+  hasBidsVisible,
+  isCancelled
 }) => {
   const { user, isUserLoading } = useSession();
 
@@ -50,8 +67,64 @@ const BidInfo = ({
     [auctionId, topBid]
   );
 
+  const { addToast } = useToasts();
+  const router = useRouter();
+
+  const [cancelAuction] = useMutation(CANCEL_AUCTION, {
+    onError: (error) => {
+      const errorMessage = getErrorMessage(
+        error,
+        'An error occurred while cancelling the auction'
+      );
+      addToast(errorMessage, {
+        appearance: 'error'
+      });
+      hideCancelConfirmation();
+    },
+    onCompleted: () => {
+      addToast(`The auction has been cancelled`, {
+        appearance: 'success',
+        autoDismiss: true,
+        autoDismissTimeout: 3000,
+        onDismiss: router.reload
+      });
+      hideCancelConfirmation();
+    }
+  });
+
+  const cancelHandler = () => {
+    cancelAuction({
+      variables: {
+        where: {
+          auctionId
+        }
+      }
+    });
+  };
+
+  const [showCancelConfirmation, hideCancelConfirmation] = useModal(() => (
+    <ConfirmationModal
+      onClose={hideCancelConfirmation}
+      title="Cancel auction?"
+      onContinue={cancelHandler}
+      onCancel={hideCancelConfirmation}
+      continueButtonLabel={'Cancel it!'}
+      cancelButtonLabel={'Close'}
+    >
+      <div>Are you sure you want to cancel the auction?</div>
+    </ConfirmationModal>
+  ));
+
   // handler responsible for bidding
   const bidHandler = () => {
+    // check if the auction is cancelled or settled
+    if (isCancelled) {
+      addToast('This auction has been cancelled by the owner', {
+        appearance: 'info'
+      });
+      return;
+    }
+
     // check if the user is authenticated
     if (isEmpty(user)) {
       showAuthModal();
@@ -68,12 +141,13 @@ const BidInfo = ({
   };
 
   const isHighestBidWinner = auctionType === 'HIGHEST_BID_WINS';
+  const isAuctionActive = !isCancelled;
 
   return (
     <Box>
       <RowWrapper>
         <Row>
-          <Label>Bid by</Label>
+          <Label>Auction by</Label>
           <Name>{name}</Name>
         </Row>
         <Row>
@@ -86,31 +160,33 @@ const BidInfo = ({
       </Row>
 
       <CTARowWrapper>
-        <CTARow>
-          <IconButton type="danger">
-            <CrossIcon
-              css={css`
-                color: #e8833a;
-                height: 20px;
-              `}
-            />
-          </IconButton>
-          {/* disable the button until user is fetched, to check if user has payment methods or not */}
-          <Button
-            onClick={bidHandler}
-            disabled={isUserLoading || isLeaderboardLoading}
-          >
-            Bid
-          </Button>
-          <IconButton type="success">
-            <ShareIcon
-              css={css`
-                color: #1aae9f;
-                height: 20px;
-              `}
-            />
-          </IconButton>
-        </CTARow>
+        {isAuctionActive && (
+          <CTARow>
+            <IconButton type="danger" onClick={showCancelConfirmation}>
+              <CrossIcon
+                css={css`
+                  color: #e8833a;
+                  height: 20px;
+                `}
+              />
+            </IconButton>
+            {/* disable the button until user is fetched, to check if user has payment methods or not */}
+            <Button
+              onClick={bidHandler}
+              disabled={isUserLoading || isLeaderboardLoading}
+            >
+              Bid
+            </Button>
+            <IconButton type="success">
+              <ShareIcon
+                css={css`
+                  color: #1aae9f;
+                  height: 20px;
+                `}
+              />
+            </IconButton>
+          </CTARow>
+        )}
       </CTARowWrapper>
     </Box>
   );
@@ -124,7 +200,8 @@ BidInfo.propTypes = {
   topBid: PropTypes.number.isRequired,
   auctionType: PropTypes.oneOf(['HIGHEST_BID_WINS', 'CLOSEST_BID_WINS'])
     .isRequired,
-  hasBidsVisible: PropTypes.bool.isRequired
+  hasBidsVisible: PropTypes.bool.isRequired,
+  isCancelled: PropTypes.bool.isRequired
 };
 
 export default BidInfo;
