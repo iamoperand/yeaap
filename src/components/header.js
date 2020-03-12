@@ -1,4 +1,4 @@
-import React, { useRef } from 'react';
+import React from 'react';
 import PropTypes from 'prop-types';
 import styled from '@emotion/styled';
 import { css } from '@emotion/core';
@@ -74,9 +74,7 @@ Dropdown.propTypes = {
 const Header = () => {
   const { user, isUserLoading } = useSession();
 
-  const containerRef = useRef(null);
-  const dropdownRef = useRef(null);
-  const { ref, isOpen, open, close } = useDropdown(dropdownRef, containerRef);
+  const { ref, isOpen, open, close } = useDropdown();
 
   const toggle = isOpen ? close : open;
 
