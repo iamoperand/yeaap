@@ -8,6 +8,8 @@ import { useMutation } from '@apollo/react-hooks';
 import gql from 'graphql-tag';
 import { useToasts } from 'react-toast-notifications';
 import { useRouter } from 'next/router';
+import { useClipboard } from 'use-clipboard-copy';
+import getConfig from 'next/config';
 
 import rem from '../utils/rem';
 import theme from '../utils/theme';
@@ -40,6 +42,8 @@ const CANCEL_AUCTION = gql`
   }
 `;
 
+const { publicRuntimeConfig } = getConfig();
+
 // eslint-disable-next-line max-lines-per-function
 const BidInfo = ({
   name,
@@ -69,6 +73,8 @@ const BidInfo = ({
 
   const { addToast } = useToasts();
   const router = useRouter();
+
+  const clipboard = useClipboard();
 
   const [cancelAuction] = useMutation(CANCEL_AUCTION, {
     onError: (error) => {
@@ -140,6 +146,15 @@ const BidInfo = ({
     showBidModal();
   };
 
+  const shareHandler = () => {
+    clipboard.copy(`${publicRuntimeConfig.appUrl}${router.asPath}`);
+
+    addToast('Copied to clipboard', {
+      appearance: 'success',
+      autoDismiss: true
+    });
+  };
+
   const isHighestBidWinner = auctionType === 'HIGHEST_BID_WINS';
   const isAuctionActive = !isCancelled;
 
@@ -177,7 +192,7 @@ const BidInfo = ({
             >
               Bid
             </Button>
-            <IconButton type="success">
+            <IconButton type="success" onClick={shareHandler}>
               <ShareIcon
                 css={css`
                   color: #1aae9f;
