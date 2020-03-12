@@ -7,7 +7,7 @@ import { isEmpty } from 'lodash';
 import rem from '../../../utils/rem';
 import theme from '../../../utils/theme';
 
-import { WinnerTag } from '../../tag';
+import { WinnerTag } from '../../tags';
 import Avatar from '../../avatar';
 import Message from './message';
 

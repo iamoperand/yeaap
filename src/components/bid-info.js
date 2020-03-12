@@ -28,7 +28,7 @@ import {
   BidsVisibleTag,
   ClosestBidWinsTag,
   HighestBidWinsTag
-} from './tag';
+} from './tags';
 
 import useSession from '../hooks/use-session';
 
