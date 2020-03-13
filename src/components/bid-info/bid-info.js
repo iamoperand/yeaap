@@ -11,33 +11,53 @@ import { useRouter } from 'next/router';
 import { useClipboard } from 'use-clipboard-copy';
 import getConfig from 'next/config';
 
-import rem from '../utils/rem';
-import theme from '../utils/theme';
-import { getErrorMessage } from '../utils/error';
+import rem from '../../utils/rem';
+import theme from '../../utils/theme';
+import { getErrorMessage } from '../../utils/error';
 
-import { boxBorder } from '../styles/box';
-import { buttonPrimary, buttonRounded, buttonDisabled } from '../styles/button';
+import { boxBorder } from '../../styles/box';
+import {
+  buttonPrimary,
+  buttonRounded,
+  buttonDisabled
+} from '../../styles/button';
 
-import CrossIcon from '../assets/icons/cross.svg?sprite';
-import ShareIcon from '../assets/icons/share.svg?sprite';
+import SettingsIcon from '../../assets/icons/gear.svg?sprite';
+import ShareIcon from '../../assets/icons/share.svg?sprite';
 
-import BidModal from './modal/bid';
-import AuthModal from './modal/auth';
-import PaymentMethodModal from './modal/payment-method';
-import ConfirmationModal from './modal/confirmation';
+import BidModal from '../modal/bid';
+import AuthModal from '../modal/auth';
+import PaymentMethodModal from '../modal/payment-method';
+import ConfirmationModal from '../modal/confirmation';
+import EditAuctionModal from '../modal/edit-auction';
 import {
   BidsHiddenTag,
   BidsVisibleTag,
   ClosestBidWinsTag,
   HighestBidWinsTag
-} from './tags';
+} from '../tags';
+import SettingsDropdown from './settings-dropdown';
 
-import useSession from '../hooks/use-session';
+import useSession from '../../hooks/use-session';
+import useDropdown from '../../hooks/use-dropdown';
 
 const CANCEL_AUCTION = gql`
   mutation cancelAuction($where: AuctionWhereInput!) {
     cancelAuction(where: $where) {
       id
+    }
+  }
+`;
+
+const UPDATE_AUCTION = gql`
+  mutation updateAuction(
+    $where: AuctionWhereInput!
+    $data: AuctionUpdateInput!
+  ) {
+    updateAuction(where: $where, data: $data) {
+      id
+      description
+      endsAt
     }
   }
 `;
@@ -48,6 +68,7 @@ const { publicRuntimeConfig } = getConfig();
 const BidInfo = ({
   name,
   description,
+  endsAt,
   isLeaderboardLoading,
   auctionId,
   topBid,
@@ -73,6 +94,34 @@ const BidInfo = ({
 
   const { addToast } = useToasts();
   const router = useRouter();
+
+  const {
+    ref: settingsRef,
+    isOpen: isSettingsOpen,
+    open: openSettings,
+    close: closeSettings
+  } = useDropdown();
+  const toggleSettings = isSettingsOpen ? closeSettings : openSettings;
+
+  const [updateAuction] = useMutation(UPDATE_AUCTION, {
+    onError: (error) => {
+      const errorMessage = getErrorMessage(
+        error,
+        'An error occurred while updating the auction'
+      );
+      addToast(errorMessage, {
+        appearance: 'error'
+      });
+      hideEditAuctionModal();
+    },
+    onCompleted: () => {
+      addToast(`The auction has been updated`, {
+        appearance: 'success',
+        autoDismiss: true
+      });
+      hideEditAuctionModal();
+    }
+  });
 
   const [cancelAuction] = useMutation(CANCEL_AUCTION, {
     onError: (error) => {
@@ -106,14 +155,37 @@ const BidInfo = ({
     });
   };
 
+  const handleEditAuctionSubmit = (data) => {
+    updateAuction({
+      variables: {
+        where: {
+          auctionId
+        },
+        data
+      }
+    });
+  };
+
+  const [showEditAuctionModal, hideEditAuctionModal] = useModal(
+    () => (
+      <EditAuctionModal
+        onClose={hideEditAuctionModal}
+        onSubmit={handleEditAuctionSubmit}
+        auctionDescription={description}
+        auctionEndsAt={endsAt}
+      />
+    ),
+    [handleEditAuctionSubmit, description, endsAt]
+  );
+
   const [showCancelConfirmation, hideCancelConfirmation] = useModal(() => (
     <ConfirmationModal
       onClose={hideCancelConfirmation}
       title="Cancel auction?"
       onContinue={cancelHandler}
       onCancel={hideCancelConfirmation}
-      continueButtonLabel={'Cancel it!'}
-      cancelButtonLabel={'Close'}
+      continueButtonLabel={'Yes, I want to cancel'}
+      cancelButtonLabel={'Nope'}
     >
       <div>Are you sure you want to cancel the auction?</div>
     </ConfirmationModal>
@@ -176,12 +248,24 @@ const BidInfo = ({
       <CTARowWrapper>
         {isAuctionActive && (
           <CTARow>
-            <IconButton type="danger" onClick={showCancelConfirmation}>
-              <CrossIcon
+            <IconButton
+              type="danger"
+              ref={settingsRef}
+              onClick={toggleSettings}
+            >
+              <SettingsIcon
                 css={css`
-                  color: #e8833a;
+                  fill: #e8833a;
                   height: 20px;
+                  width: 20px;
+                  position: relative;
+                  top: 1px;
                 `}
+              />
+              <SettingsDropdown
+                isOpen={isSettingsOpen}
+                onEditAuction={showEditAuctionModal}
+                onCancelAuction={showCancelConfirmation}
               />
             </IconButton>
             {/* disable the button until user is fetched, to check if user has payment methods or not */}
@@ -194,8 +278,11 @@ const BidInfo = ({
             <IconButton type="success" onClick={shareHandler}>
               <ShareIcon
                 css={css`
-                  color: #1aae9f;
+                  fill: #1aae9f;
                   height: 20px;
+                  width: 20px;
+                  position: relative;
+                  top: 1px;
                 `}
               />
             </IconButton>
@@ -209,6 +296,7 @@ const BidInfo = ({
 BidInfo.propTypes = {
   name: PropTypes.string.isRequired,
   description: PropTypes.string.isRequired,
+  endsAt: PropTypes.string.isRequired,
   isLeaderboardLoading: PropTypes.bool.isRequired,
   auctionId: PropTypes.string.isRequired,
   topBid: PropTypes.number.isRequired,
@@ -269,7 +357,7 @@ const CTARow = styled.div`
 
 const Button = styled.button`
   padding: ${rem(15)} ${rem(65)};
-  font-size: ${rem(22)};
+  font-size: ${rem(24)};
   font-weight: 500;
   margin: 0 ${rem(20)};
 
@@ -279,6 +367,7 @@ const Button = styled.button`
 `;
 
 const IconButton = styled.button`
+  position: relative;
   padding: ${rem(10)};
   background: #fff;
   border: 3px solid

@@ -209,6 +209,7 @@ const AuctionView = ({ auction }) => {
   if (auction.isCanceled) {
     return <AuctionCancelled />;
   }
+
   return (
     <Layout>
       <SEO title="Auction" />
@@ -216,6 +217,7 @@ const AuctionView = ({ auction }) => {
       <BidInfo
         name={auction.creator.name}
         description={description}
+        endsAt={endsAt}
         isLeaderboardLoading={bidsLoading}
         auctionId={auction.id}
         auctionType={auction.type}
