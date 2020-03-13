@@ -74,8 +74,6 @@ const BidInfo = ({
   const { addToast } = useToasts();
   const router = useRouter();
 
-  const clipboard = useClipboard();
-
   const [cancelAuction] = useMutation(CANCEL_AUCTION, {
     onError: (error) => {
       const errorMessage = getErrorMessage(
@@ -146,6 +144,7 @@ const BidInfo = ({
     showBidModal();
   };
 
+  const clipboard = useClipboard();
   const shareHandler = () => {
     clipboard.copy(`${publicRuntimeConfig.appUrl}${router.asPath}`);
 
