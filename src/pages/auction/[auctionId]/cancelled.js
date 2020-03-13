@@ -1,15 +1,30 @@
 import React from 'react';
 import styled from '@emotion/styled';
 import { css } from '@emotion/core';
+import gql from 'graphql-tag';
 
-import rem from '../utils/rem';
+import rem from '../../../utils/rem';
+import redirectWithSSR from '../../../utils/redirect-with-ssr';
 
-import Layout from './layout';
-import SEO from './seo';
+import Layout from '../../../components/layout';
+import SEO from '../../../components/seo';
 
-import BlankCanvasIcon from '../assets/icons/blank-canvas.svg?sprite';
+import BlankCanvasIcon from '../../../assets/icons/blank-canvas.svg?sprite';
 
-const AuctionCancelled = () => {
+const GET_AUCTION = gql`
+  query($where: AuctionWhereInput!) {
+    auctions(where: $where) {
+      edges {
+        node {
+          id
+          isCanceled
+        }
+      }
+    }
+  }
+`;
+
+const Cancelled = () => {
   return (
     <Layout>
       <SEO title="Auction cancelled" />
@@ -28,8 +43,27 @@ const AuctionCancelled = () => {
     </Layout>
   );
 };
+Cancelled.getInitialProps = async ({ query, apolloClient, res }) => {
+  const { auctionId } = query;
 
-export default AuctionCancelled;
+  const { data } = await apolloClient.query({
+    query: GET_AUCTION,
+    variables: {
+      where: {
+        auctionId
+      }
+    }
+  });
+
+  const auction = data.auctions.edges[0].node;
+  if (!auction.isCanceled) {
+    redirectWithSSR({ res, path: `/auction/${auctionId}` });
+  }
+
+  return {};
+};
+
+export default Cancelled;
 
 /*
  ********************************************

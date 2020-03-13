@@ -66,6 +66,7 @@ const { publicRuntimeConfig } = getConfig();
 
 // eslint-disable-next-line max-lines-per-function
 const BidInfo = ({
+  creatorId,
   name,
   description,
   endsAt,
@@ -73,9 +74,7 @@ const BidInfo = ({
   auctionId,
   topBid,
   auctionType,
-  hasBidsVisible,
-  isCancelled,
-  creatorId
+  hasBidsVisible
 }) => {
   const { user, isUserLoading } = useSession();
 
@@ -186,14 +185,6 @@ const BidInfo = ({
 
   // handler responsible for bidding
   const bidHandler = () => {
-    // check if the auction is cancelled or settled
-    if (isCancelled) {
-      addToast('This auction has been cancelled by the owner', {
-        appearance: 'info'
-      });
-      return;
-    }
-
     // check if the user is authenticated
     if (isEmpty(user)) {
       showAuthModal();
@@ -239,7 +230,6 @@ const BidInfo = ({
   };
 
   const isHighestBidWinner = auctionType === 'HIGHEST_BID_WINS';
-  const isAuctionActive = !isCancelled;
 
   return (
     <Box>
@@ -254,64 +244,63 @@ const BidInfo = ({
         </Row>
       </RowWrapper>
       <Row>
-        <Italic>{description}</Italic>
+        <span>{description}</span>
       </Row>
 
       <CTARowWrapper>
-        {isAuctionActive && (
-          <CTARow>
-            <IconButton
-              type="danger"
-              ref={settingsRef}
-              onClick={handleToggleSettings}
-              disabled={isUserLoading}
-            >
-              <SettingsIcon
-                css={css`
-                  fill: ${isUserLoading ? '#ccc' : '#e8833a'};
-                  height: 20px;
-                  width: 20px;
-                  position: relative;
-                  top: 1px;
-                `}
+        <CTARow>
+          <IconButton
+            type="danger"
+            ref={settingsRef}
+            onClick={handleToggleSettings}
+            disabled={isUserLoading}
+          >
+            <SettingsIcon
+              css={css`
+                fill: ${isUserLoading ? '#ccc' : '#e8833a'};
+                height: 20px;
+                width: 20px;
+                position: relative;
+                top: 1px;
+              `}
+            />
+
+            {isUserCreator && (
+              <SettingsDropdown
+                isOpen={isSettingsOpen}
+                onEditAuction={showEditAuctionModal}
+                onCancelAuction={showCancelConfirmation}
               />
+            )}
+          </IconButton>
 
-              {isUserCreator && (
-                <SettingsDropdown
-                  isOpen={isSettingsOpen}
-                  onEditAuction={showEditAuctionModal}
-                  onCancelAuction={showCancelConfirmation}
-                />
-              )}
-            </IconButton>
+          {/* disable the button until user is fetched, to check if user has payment methods or not */}
+          <Button
+            onClick={bidHandler}
+            disabled={isUserLoading || isLeaderboardLoading}
+          >
+            Bid
+          </Button>
 
-            {/* disable the button until user is fetched, to check if user has payment methods or not */}
-            <Button
-              onClick={bidHandler}
-              disabled={isUserLoading || isLeaderboardLoading}
-            >
-              Bid
-            </Button>
-
-            <IconButton type="success" onClick={shareHandler}>
-              <ShareIcon
-                css={css`
-                  fill: #1aae9f;
-                  height: 20px;
-                  width: 20px;
-                  position: relative;
-                  top: 1px;
-                `}
-              />
-            </IconButton>
-          </CTARow>
-        )}
+          <IconButton type="success" onClick={shareHandler}>
+            <ShareIcon
+              css={css`
+                fill: #1aae9f;
+                height: 20px;
+                width: 20px;
+                position: relative;
+                top: 1px;
+              `}
+            />
+          </IconButton>
+        </CTARow>
       </CTARowWrapper>
     </Box>
   );
 };
 
 BidInfo.propTypes = {
+  creatorId: PropTypes.string.isRequired,
   name: PropTypes.string.isRequired,
   description: PropTypes.string.isRequired,
   endsAt: PropTypes.string.isRequired,
@@ -320,9 +309,7 @@ BidInfo.propTypes = {
   topBid: PropTypes.number.isRequired,
   auctionType: PropTypes.oneOf(['HIGHEST_BID_WINS', 'CLOSEST_BID_WINS'])
     .isRequired,
-  hasBidsVisible: PropTypes.bool.isRequired,
-  isCancelled: PropTypes.bool.isRequired,
-  creatorId: PropTypes.string.isRequired
+  hasBidsVisible: PropTypes.bool.isRequired
 };
 
 export default BidInfo;
@@ -408,10 +395,6 @@ const IconButton = styled.button`
     cursor: not-allowed;
     border: 3px solid #ccc;
   }
-`;
-
-const Italic = styled.span`
-  font-style: italic;
 `;
 
 const Label = styled.span`

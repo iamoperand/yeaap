@@ -13,6 +13,8 @@ import {
   isObject,
   pick
 } from 'lodash';
+import { useRouter } from 'next/router';
+import { differenceInMilliseconds } from 'date-fns';
 
 import Layout from '../../components/layout';
 import SEO from '../../components/seo';
@@ -20,9 +22,12 @@ import BidInfo from '../../components/bid-info';
 import { TimeCounter, TopBid, BidCount } from '../../components/bid-stat';
 import Leaderboard from '../../components/leaderboard';
 import Loading from '../../components/loading';
-import AuctionCancelled from '../../components/auction-cancelled';
+import AuctionSettling from '../../components/auction-settling';
 
 import rem from '../../utils/rem';
+import redirectWithSSR from '../../utils/redirect-with-ssr';
+
+import useInterval from '../../hooks/use-interval';
 
 const GET_AUCTION = gql`
   # type AuctionWhereInput {
@@ -86,6 +91,8 @@ const ON_AUCTION_UPDATED = gql`
       id
       description
       endsAt
+      isCanceled
+      isSettled
     }
   }
 `;
@@ -106,7 +113,13 @@ const actions = {
   AUCTION_CHANGED: 'AUCTION_CHANGED'
 };
 
-const modifiableAuctionProps = ['description', 'endsAt', 'bidCount'];
+const modifiableAuctionProps = [
+  'description',
+  'endsAt',
+  'bidCount',
+  'isCanceled',
+  'isSettled'
+];
 
 const reducer = (state, action) => {
   switch (action.type) {
@@ -122,30 +135,30 @@ const reducer = (state, action) => {
         bids: uniqueBids
       };
     }
-
     case actions.AUCTION_CHANGED: {
       const newAuction = pick(action.payload, modifiableAuctionProps);
-
       if (isEmpty(newAuction)) {
         return state;
       }
 
       const diff = difference(newAuction, pick(state, modifiableAuctionProps));
-
       if (isEmpty(diff)) {
         return state;
       }
-
       return {
         ...state,
         ...diff
       };
     }
-
     default:
       return state;
   }
 };
+
+const getTimeLeftInMs = (endTime) =>
+  differenceInMilliseconds(endTime, new Date());
+
+const lessThanOrEqual = (input, value) => input === value || input < value;
 
 // eslint-disable-next-line max-lines-per-function
 const AuctionView = ({ auction }) => {
@@ -200,15 +213,44 @@ const AuctionView = ({ auction }) => {
     }) => dispatch({ type: actions.AUCTION_CHANGED, payload: onAuctionUpdated })
   });
 
-  const { description, bidCount, endsAt, bids } = state;
+  const { description, bidCount, endsAt, bids, isCanceled, isSettled } = state;
 
   const [topBid, setTopBid] = useState(0);
   useEffect(() => {
     setTopBid(isEmpty(bids) ? 0 : first(bids).amount);
   }, [bids]);
 
-  if (auction.isCanceled) {
-    return <AuctionCancelled />;
+  const router = useRouter();
+  useEffect(() => {
+    if (isCanceled) {
+      router.replace({
+        pathname: `${router.asPath}/cancelled`
+      });
+      return;
+    }
+    if (isSettled) {
+      router.replace({
+        pathname: `${router.asPath}/ended`
+      });
+    }
+  }, [isCanceled, isSettled, router]);
+
+  const endTime = new Date(endsAt);
+  const [timeLeftInMs, setTimeLeftInMs] = useState(getTimeLeftInMs(endTime));
+
+  const [isSettling, setSettling] = useState(false);
+
+  useInterval(() => {
+    const timeLeftFromNow = getTimeLeftInMs(endTime);
+    setTimeLeftInMs(timeLeftFromNow);
+
+    if (lessThanOrEqual(timeLeftFromNow, 0) && !isSettled && !isSettling) {
+      setSettling(true);
+    }
+  }, 1000);
+
+  if (isSettling) {
+    return <AuctionSettling />;
   }
 
   return (
@@ -225,11 +267,10 @@ const AuctionView = ({ auction }) => {
         auctionType={auction.type}
         hasBidsVisible={auction.hasBidsVisible}
         topBid={topBid}
-        isCancelled={auction.isCanceled}
       />
 
       <BidStatsWrapper>
-        <TimeCounter endTime={endsAt} />
+        <TimeCounter timeLeftInMs={timeLeftInMs} />
         <TopBid value={topBid} />
         <BidCount value={bidCount} />
       </BidStatsWrapper>
@@ -252,7 +293,7 @@ const AuctionView = ({ auction }) => {
   );
 };
 
-AuctionView.getInitialProps = async ({ query, apolloClient }) => {
+AuctionView.getInitialProps = async ({ query, apolloClient, res }) => {
   const { auctionId } = query;
 
   const { data } = await apolloClient.query({
@@ -264,9 +305,17 @@ AuctionView.getInitialProps = async ({ query, apolloClient }) => {
     }
   });
 
-  return {
-    auction: data.auctions.edges[0].node
-  };
+  const auction = data.auctions.edges[0].node;
+  if (auction.isCanceled) {
+    redirectWithSSR({ res, path: `/auction/${auctionId}/cancelled` });
+    return {};
+  }
+  if (auction.isSettled) {
+    redirectWithSSR({ res, path: `/auction/${auctionId}/ended` });
+    return {};
+  }
+
+  return { auction };
 };
 
 AuctionView.propTypes = {
