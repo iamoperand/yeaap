@@ -8,6 +8,7 @@ import { useModal } from 'react-modal-hook';
 
 import Avatar from './avatar';
 import LiveBidsModal from './modal/live-bids';
+import { WinnerTag } from './tags';
 
 import { boxBorder } from '../styles/box';
 
@@ -15,6 +16,19 @@ import rem from '../utils/rem';
 import theme from '../utils/theme';
 
 import useSession from '../hooks/use-session';
+
+const showWinning = ({ index, winnerCount, auctionType }) => {
+  switch (auctionType) {
+    case 'HIGHEST_BID_WINS': {
+      return index + 1 <= winnerCount;
+    }
+    case 'CLOSEST_BID_WINS': {
+      return false;
+    }
+    default:
+      return false;
+  }
+};
 
 const Leaderboard = ({ bids, creatorId, winnerCount, auctionType }) => {
   const { user } = useSession();
@@ -42,13 +56,13 @@ const Leaderboard = ({ bids, creatorId, winnerCount, auctionType }) => {
     );
   }
 
-  const first5Bids = take(bids, 5);
+  const first4Bids = take(bids, 4);
 
   return (
     <Box>
       <Label>Live bids</Label>
       <List>
-        {first5Bids.map((bid) => (
+        {first4Bids.map((bid, index) => (
           <Item key={bid.id}>
             <Index>#</Index>
             <Avatar src={bid.creator.photoUrl} alt={bid.creator.name} />
@@ -62,6 +76,11 @@ const Leaderboard = ({ bids, creatorId, winnerCount, auctionType }) => {
               bid
             </span>
             <BidAmount>${formatNum(bid.amount)}</BidAmount>
+            {showWinning({ index, winnerCount, auctionType }) && (
+              <TagWrapper>
+                <WinnerTag label="Winning" />
+              </TagWrapper>
+            )}
           </Item>
         ))}
       </List>
@@ -177,4 +196,10 @@ const Button = styled.button`
 const H3 = styled.div`
   font-size: ${rem(18)};
   margin-top: ${rem(15)};
+`;
+
+const TagWrapper = styled.div`
+  margin-left: ${rem(8)};
+  position: relative;
+  top: -2px;
 `;
