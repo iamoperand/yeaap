@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import styled from '@emotion/styled';
 import { css } from '@emotion/core';
 import { useModal } from 'react-modal-hook';
-import { isEmpty } from 'lodash';
+import { isEmpty, get } from 'lodash';
 import { useMutation } from '@apollo/react-hooks';
 import gql from 'graphql-tag';
 import { useToasts } from 'react-toast-notifications';
@@ -74,7 +74,8 @@ const BidInfo = ({
   topBid,
   auctionType,
   hasBidsVisible,
-  isCancelled
+  isCancelled,
+  creatorId
 }) => {
   const { user, isUserLoading } = useSession();
 
@@ -94,14 +95,6 @@ const BidInfo = ({
 
   const { addToast } = useToasts();
   const router = useRouter();
-
-  const {
-    ref: settingsRef,
-    isOpen: isSettingsOpen,
-    open: openSettings,
-    close: closeSettings
-  } = useDropdown();
-  const toggleSettings = isSettingsOpen ? closeSettings : openSettings;
 
   const [updateAuction] = useMutation(UPDATE_AUCTION, {
     onError: (error) => {
@@ -226,6 +219,25 @@ const BidInfo = ({
     });
   };
 
+  const isUserCreator = get(user, 'id') === creatorId;
+
+  const {
+    ref: settingsRef,
+    isOpen: isSettingsOpen,
+    open: openSettings,
+    close: closeSettings
+  } = useDropdown();
+
+  const toggleSettings = isSettingsOpen ? closeSettings : openSettings;
+  const handleToggleSettings = () => {
+    return isUserCreator
+      ? toggleSettings()
+      : addToast('Only the auction owner can access this', {
+          appearance: 'info',
+          autoDismiss: true
+        });
+  };
+
   const isHighestBidWinner = auctionType === 'HIGHEST_BID_WINS';
   const isAuctionActive = !isCancelled;
 
@@ -251,23 +263,28 @@ const BidInfo = ({
             <IconButton
               type="danger"
               ref={settingsRef}
-              onClick={toggleSettings}
+              onClick={handleToggleSettings}
+              disabled={isUserLoading}
             >
               <SettingsIcon
                 css={css`
-                  fill: #e8833a;
+                  fill: ${isUserLoading ? '#ccc' : '#e8833a'};
                   height: 20px;
                   width: 20px;
                   position: relative;
                   top: 1px;
                 `}
               />
-              <SettingsDropdown
-                isOpen={isSettingsOpen}
-                onEditAuction={showEditAuctionModal}
-                onCancelAuction={showCancelConfirmation}
-              />
+
+              {isUserCreator && (
+                <SettingsDropdown
+                  isOpen={isSettingsOpen}
+                  onEditAuction={showEditAuctionModal}
+                  onCancelAuction={showCancelConfirmation}
+                />
+              )}
             </IconButton>
+
             {/* disable the button until user is fetched, to check if user has payment methods or not */}
             <Button
               onClick={bidHandler}
@@ -275,6 +292,7 @@ const BidInfo = ({
             >
               Bid
             </Button>
+
             <IconButton type="success" onClick={shareHandler}>
               <ShareIcon
                 css={css`
@@ -303,7 +321,8 @@ BidInfo.propTypes = {
   auctionType: PropTypes.oneOf(['HIGHEST_BID_WINS', 'CLOSEST_BID_WINS'])
     .isRequired,
   hasBidsVisible: PropTypes.bool.isRequired,
-  isCancelled: PropTypes.bool.isRequired
+  isCancelled: PropTypes.bool.isRequired,
+  creatorId: PropTypes.string.isRequired
 };
 
 export default BidInfo;
@@ -366,15 +385,29 @@ const Button = styled.button`
   ${buttonDisabled};
 `;
 
+const getIconColor = (type) => {
+  switch (type) {
+    case 'success':
+      return '#a7ded9';
+    case 'danger':
+      return '#f7d2b8';
+    default:
+      return '#ccc';
+  }
+};
+
 const IconButton = styled.button`
   position: relative;
   padding: ${rem(10)};
   background: #fff;
-  border: 3px solid
-    ${({ type }) =>
-      type === 'success' ? '#a7ded9' : type === 'danger' ? '#f7d2b8' : '#ccc'};
+  border: 3px solid ${(props) => getIconColor(props.type)};
 
   ${buttonRounded};
+
+  :disabled {
+    cursor: not-allowed;
+    border: 3px solid #ccc;
+  }
 `;
 
 const Italic = styled.span`

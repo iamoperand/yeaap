@@ -147,6 +147,7 @@ const reducer = (state, action) => {
   }
 };
 
+// eslint-disable-next-line max-lines-per-function
 const AuctionView = ({ auction }) => {
   const [state, dispatch] = useReducer(reducer, {
     ...pick(auction, modifiableAuctionProps),
@@ -215,6 +216,7 @@ const AuctionView = ({ auction }) => {
       <SEO title="Auction" />
 
       <BidInfo
+        creatorId={auction.creatorId}
         name={auction.creator.name}
         description={description}
         endsAt={endsAt}

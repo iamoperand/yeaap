@@ -57,7 +57,7 @@ export const modalFooter = css`
   border-top-left-radius: 4px;
   border-top-right-radius: 4px;
 
-  padding: ${rem(20)} ${rem(30)};
+  padding: ${rem(20)} ${rem(20)};
   box-shadow: inset 0 1px #e3e8ee;
 `;
 
