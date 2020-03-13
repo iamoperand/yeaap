@@ -65,7 +65,7 @@ Confirmation.propTypes = {
   onCancel: PropTypes.func.isRequired,
   continueButtonLabel: PropTypes.string,
   cancelButtonLabel: PropTypes.string,
-  children: PropTypes.oneOf([PropTypes.element, PropTypes.node])
+  children: PropTypes.oneOfType([PropTypes.element, PropTypes.node])
 };
 
 export default Confirmation;
