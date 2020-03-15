@@ -6,7 +6,7 @@ import rem from '../utils/rem';
 const Loading = () => {
   return (
     <Center>
-      <Img src="https://i.ibb.co/Gd5pHQH/loadingimg.gif" alt="loading" />
+      <Img src="/images/loading.gif" alt="loading" />
     </Center>
   );
 };
