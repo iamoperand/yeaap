@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { isEmpty } from 'lodash';
 import styled from '@emotion/styled';
 
-import Bid from './bid';
+import BidRow from '../../bid-row';
 
 import rem from '../../../utils/rem';
 
@@ -43,15 +43,23 @@ const Bids = ({ bids, isUserCreator, winnerCount, auctionType }) => {
       <TableContentStyles>
         <table>
           <tbody>
-            {bids.map((bid, index) => (
-              <Bid
-                key={bid.id}
-                bid={bid}
-                index={index}
-                isUserCreator={isUserCreator}
-                isWinning={showWinning({ index, winnerCount, auctionType })}
-              />
-            ))}
+            {bids.map((bid, index) => {
+              const showWinnerTag = showWinning({
+                index,
+                winnerCount,
+                auctionType
+              });
+              return (
+                <BidRow
+                  key={bid.id}
+                  bid={bid}
+                  index={index}
+                  isUserCreator={isUserCreator}
+                  showWinnerTag={showWinnerTag}
+                  winnerTagLabel="Winning"
+                />
+              );
+            })}
           </tbody>
         </table>
       </TableContentStyles>
@@ -85,10 +93,10 @@ const TableHeaderStyles = styled.div`
   }
 
   th:nth-child(1) {
-    width: ${rem(50)};
+    width: ${rem(47)};
   }
   th:nth-child(2) {
-    width: ${rem(200)};
+    width: ${rem(222)};
   }
   th:nth-child(3) {
     padding-left: ${rem(25)};

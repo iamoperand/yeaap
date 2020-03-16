@@ -4,15 +4,7 @@ import styled from '@emotion/styled';
 import { css } from '@emotion/core';
 import gql from 'graphql-tag';
 import { useSubscription, useLazyQuery } from '@apollo/react-hooks';
-import {
-  uniqBy,
-  first,
-  isEmpty,
-  transform,
-  isEqual,
-  isObject,
-  pick
-} from 'lodash';
+import { uniqBy, first, isEmpty, pick } from 'lodash';
 import { useRouter } from 'next/router';
 import { differenceInMilliseconds } from 'date-fns';
 
@@ -26,6 +18,7 @@ import AuctionSettling from '../../components/auction-settling';
 
 import rem from '../../utils/rem';
 import redirectWithSSR from '../../utils/redirect-with-ssr';
+import { difference } from '../../utils/lodash-extended';
 
 import useInterval from '../../hooks/use-interval';
 
@@ -96,17 +89,6 @@ const ON_AUCTION_UPDATED = gql`
     }
   }
 `;
-
-const difference = (object, base) => {
-  return transform(object, (result, value, key) => {
-    if (!isEqual(value, base[key])) {
-      result[key] =
-        isObject(value) && isObject(base[key])
-          ? difference(value, base[key])
-          : value;
-    }
-  });
-};
 
 const actions = {
   BIDS_CREATED: 'BIDS_CREATED',

@@ -1,25 +1,61 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import styled from '@emotion/styled';
-import formatNum from 'format-num';
 import { isEmpty } from 'lodash';
+import formatNum from 'format-num';
 
-import rem from '../../../utils/rem';
-import theme from '../../../utils/theme';
-
-import { WinnerTag } from '../../tags';
-import Avatar from '../../avatar';
 import Message from './message';
+import { WinnerTag } from '../tags';
+import Avatar from '../avatar';
 
-import SpeechBubbleIcon from '../../../assets/icons/speech-bubble.svg?sprite';
+import rem from '../../utils/rem';
+import theme from '../../utils/theme';
 
-const WinningTag = () => (
+import SpeechBubbleIcon from '../../assets/icons/speech-bubble.svg?sprite';
+
+const WinningTag = ({ winnerTagLabel }) => (
   <WinnerTagStyles>
-    <WinnerTag label="Winning" />
+    <WinnerTag label={winnerTagLabel} />
   </WinnerTagStyles>
 );
+WinningTag.propTypes = {
+  winnerTagLabel: PropTypes.string.isRequired
+};
 
-const Bid = ({ bid, index, isUserCreator, isWinning }) => {
+const getWidth = ({ type, size }) => {
+  switch (type) {
+    case 'index': {
+      if (size === 'large') {
+        return 40;
+      }
+      return 30;
+    }
+    case 'amount': {
+      if (size === 'large') {
+        return 200;
+      }
+      return 200;
+    }
+    case 'user': {
+      if (size === 'large') {
+        return 150;
+      }
+      return 120;
+    }
+    default: {
+      throw new Error('no type specified');
+    }
+  }
+};
+
+const BidRow = ({
+  bid,
+  index,
+  isUserCreator,
+  showWinnerTag,
+  winnerTagLabel,
+  size = 'normal'
+}) => {
   const [showMessage, setShowMessage] = useState(false);
   const toggleShowMessage = () => setShowMessage(!showMessage);
 
@@ -29,16 +65,16 @@ const Bid = ({ bid, index, isUserCreator, isWinning }) => {
     <>
       <tr>
         <td>
-          <Index>{`${index + 1}.`}</Index>
+          <Index size={size}>{`${index + 1}.`}</Index>
         </td>
         <td>
-          <AmountInfo>
+          <AmountInfo size={size}>
             <Amount>{`$${formatNum(bid.amount)}`}</Amount>
-            {isWinning && <WinningTag />}
+            {showWinnerTag && <WinningTag label={winnerTagLabel} />}
           </AmountInfo>
         </td>
         <td>
-          <UserInfo>
+          <UserInfo size={size}>
             <Avatar src={creator.photoUrl} alt={creator.name} />
             <Name>{creator.name}</Name>
           </UserInfo>
@@ -55,7 +91,7 @@ const Bid = ({ bid, index, isUserCreator, isWinning }) => {
         </td>
       </tr>
 
-      <tr>
+      <tr className="no-hover">
         <td colSpan="4">
           <Message isOpen={showMessage} message={bid.message} />
         </td>
@@ -64,14 +100,16 @@ const Bid = ({ bid, index, isUserCreator, isWinning }) => {
   );
 };
 
-Bid.propTypes = {
+BidRow.propTypes = {
   bid: PropTypes.shape().isRequired,
   index: PropTypes.number.isRequired,
   isUserCreator: PropTypes.bool.isRequired,
-  isWinning: PropTypes.bool.isRequired
+  showWinnerTag: PropTypes.bool.isRequired,
+  winnerTagLabel: PropTypes.string,
+  size: PropTypes.oneOf(['normal', 'large'])
 };
 
-export default Bid;
+export default BidRow;
 
 /*
  ********************************************
@@ -80,6 +118,7 @@ export default Bid;
  */
 
 const UserInfo = styled.div`
+  width: ${(props) => rem(getWidth({ type: 'user', size: props.size }))};
   display: flex;
   align-items: center;
   img {
@@ -99,12 +138,12 @@ const Index = styled.div`
   color: #3a3a3a;
   font-size: ${rem(18)};
   user-select: none;
-  width: ${rem(30)};
+  width: ${(props) => rem(getWidth({ type: 'index', size: props.size }))};
 `;
 
 const AmountInfo = styled.div`
   display: block;
-  width: ${rem(180)};
+  width: ${(props) => rem(getWidth({ type: 'amount', size: props.size }))};
 `;
 
 const Name = styled.div`

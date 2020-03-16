@@ -38,7 +38,10 @@ const Results = ({ auction }) => (
       <BigFont>{"Time's up!"}</BigFont>
       <NormalFont>Auction has ended.</NormalFont>
 
-      <Link href="/auction/[auctionId]/bids" as={`/auction/${auction.id}/bids`}>
+      <Link
+        href="/auction/[auctionId]/results"
+        as={`/auction/${auction.id}/results`}
+      >
         <AnchorButton>Checkout results</AnchorButton>
       </Link>
     </Wrapper>

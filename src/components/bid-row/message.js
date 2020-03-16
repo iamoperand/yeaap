@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import styled from '@emotion/styled';
 
-import rem from '../../../utils/rem';
+import rem from '../../utils/rem';
 
 const Message = ({ isOpen, message }) => {
   return (
