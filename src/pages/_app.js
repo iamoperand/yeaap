@@ -9,6 +9,7 @@ import theme from '../utils/theme';
 import { initApollo } from '../utils/apollo-client';
 import normalizeStyles from '../styles/normalize';
 import fonts from '../styles/fonts';
+import { buttonFeedback } from '../styles/button';
 import AppProviders from '../context';
 
 class App extends NextApp {
@@ -111,6 +112,10 @@ const globalStyles = css`
   ul,
   ol {
     list-style-type: none;
+  }
+
+  button {
+    ${buttonFeedback};
   }
 
   /* google maps autocomplete */

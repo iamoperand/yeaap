@@ -13,13 +13,13 @@ import theme from '../../utils/theme';
 
 import SpeechBubbleIcon from '../../assets/icons/speech-bubble.svg?sprite';
 
-const WinningTag = ({ winnerTagLabel }) => (
+const WinningTag = ({ label }) => (
   <WinnerTagStyles>
-    <WinnerTag label={winnerTagLabel} />
+    <WinnerTag label={label} />
   </WinnerTagStyles>
 );
 WinningTag.propTypes = {
-  winnerTagLabel: PropTypes.string.isRequired
+  label: PropTypes.string.isRequired
 };
 
 const getWidth = ({ type, size }) => {

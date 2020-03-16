@@ -11,6 +11,8 @@ import { useToasts } from 'react-toast-notifications';
 
 import rem from '../../utils/rem';
 
+import LoadingText from '../loading-text';
+
 import {
   modalBasic,
   modalCentered,
@@ -85,7 +87,8 @@ const EditAuction = ({
   onClose,
   onSubmit,
   auctionDescription,
-  auctionEndsAt
+  auctionEndsAt,
+  isUpdatingAuction
 }) => {
   const [description, setDescription] = useState(auctionDescription);
   const [expiryDate, setExpiryDate] = useState(new Date(auctionEndsAt));
@@ -139,7 +142,7 @@ const EditAuction = ({
     });
   };
 
-  const isCTADisabled = hasError;
+  const isCTADisabled = hasError || isUpdatingAuction;
 
   return (
     <ReactModal
@@ -187,7 +190,11 @@ const EditAuction = ({
         <CTARow>
           <Cancel onClick={onClose}>Cancel</Cancel>
           <Continue onClick={handleSubmit} disabled={isCTADisabled}>
-            Update auction
+            {!isUpdatingAuction ? (
+              'Update auction'
+            ) : (
+              <LoadingText text="Updating" />
+            )}
           </Continue>
         </CTARow>
       </Footer>
@@ -198,7 +205,8 @@ EditAuction.propTypes = {
   onClose: PropTypes.func.isRequired,
   onSubmit: PropTypes.func.isRequired,
   auctionDescription: PropTypes.string.isRequired,
-  auctionEndsAt: PropTypes.string.isRequired
+  auctionEndsAt: PropTypes.string.isRequired,
+  isUpdatingAuction: PropTypes.bool.isRequired
 };
 
 export default EditAuction;

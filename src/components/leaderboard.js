@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import styled from '@emotion/styled';
 import { css } from '@emotion/core';
 import formatNum from 'format-num';
-import { isEmpty, take } from 'lodash';
+import { isEmpty, take, get } from 'lodash';
 import { useModal } from 'react-modal-hook';
 
 import Avatar from './avatar';
@@ -39,12 +39,12 @@ const Leaderboard = ({ bids, creatorId, winnerCount, auctionType }) => {
         onClose={hideLiveBids}
         bids={bids}
         creatorId={creatorId}
-        userId={user.id}
+        userId={get(user, 'id')}
         winnerCount={winnerCount}
         auctionType={auctionType}
       />
     ),
-    [bids, creatorId, user.id, winnerCount, auctionType]
+    [bids, creatorId, user, winnerCount, auctionType]
   );
 
   if (isEmpty(bids)) {

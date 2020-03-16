@@ -19,6 +19,8 @@ import {
   cancelButton
 } from '../../styles/modal';
 
+import LoadingText from '../loading-text';
+
 const Confirmation = ({
   onClose,
   title,
@@ -26,6 +28,7 @@ const Confirmation = ({
   onCancel,
   continueButtonLabel = 'Continue',
   cancelButtonLabel = 'Cancel',
+  isSubmitting,
   children
 }) => {
   const handleCancel = () => {
@@ -50,7 +53,13 @@ const Confirmation = ({
         <Footer>
           <CTARow>
             <Cancel onClick={handleCancel}>{cancelButtonLabel}</Cancel>
-            <Continue onClick={onContinue}>{continueButtonLabel}</Continue>
+            <Continue onClick={onContinue} disabled={isSubmitting}>
+              {!isSubmitting ? (
+                continueButtonLabel
+              ) : (
+                <LoadingText text="Submitting" />
+              )}
+            </Continue>
           </CTARow>
         </Footer>
       </Wrapper>
@@ -65,6 +74,7 @@ Confirmation.propTypes = {
   onCancel: PropTypes.func.isRequired,
   continueButtonLabel: PropTypes.string,
   cancelButtonLabel: PropTypes.string,
+  isSubmitting: PropTypes.bool.isRequired,
   children: PropTypes.oneOfType([PropTypes.element, PropTypes.node])
 };
 

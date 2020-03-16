@@ -28,3 +28,17 @@ export const buttonDisabled = css`
     cursor: not-allowed;
   }
 `;
+
+export const buttonFeedback = css`
+  transition: all 0.3s;
+  :hover {
+    transform: scale(1.03);
+  }
+  :active {
+    transform: scale(0.98);
+  }
+  :disabled:hover,
+  :disabled:active {
+    transform: none;
+  }
+`;

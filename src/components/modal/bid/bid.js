@@ -7,7 +7,7 @@ import { useMutation } from '@apollo/react-hooks';
 import gql from 'graphql-tag';
 import { useToasts } from 'react-toast-notifications';
 import { useForm } from 'react-hook-form';
-import { get, isInteger } from 'lodash';
+import { get, isInteger, isEmpty } from 'lodash';
 import formatNum from 'format-num';
 
 import {
@@ -31,6 +31,7 @@ import rem from '../../../utils/rem';
 import { getErrorMessage } from '../../../utils/error';
 
 import TopBid from './top-bid';
+import LoadingText from '../../loading-text';
 
 const CREATE_BID = gql`
   # input BidCreateInput {
@@ -71,7 +72,7 @@ const schema = {
 const Bid = ({ onClose, auctionId, topBid }) => {
   const { addToast } = useToasts();
 
-  const [createBid] = useMutation(CREATE_BID, {
+  const [createBid, { loading: isCreatingBid }] = useMutation(CREATE_BID, {
     onError: (error) => {
       const errorMessage = getErrorMessage(error, "Bid couldn't be created");
       addToast(errorMessage, {
@@ -102,6 +103,8 @@ const Bid = ({ onClose, auctionId, topBid }) => {
       }
     });
   };
+
+  const isCTADisabled = !isEmpty(errors) || isCreatingBid;
 
   return (
     <ReactModal
@@ -148,7 +151,13 @@ const Bid = ({ onClose, auctionId, topBid }) => {
             <Cancel type="button" onClick={onClose}>
               Cancel
             </Cancel>
-            <Continue type="submit">Go ahead, bid</Continue>
+            <Continue type="submit" disabled={isCTADisabled}>
+              {!isCreatingBid ? (
+                'Go ahead, bid'
+              ) : (
+                <LoadingText text="Bidding" />
+              )}
+            </Continue>
           </CTARow>
         </Footer>
       </form>

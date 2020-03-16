@@ -7,7 +7,7 @@ import { useForm } from 'react-hook-form';
 import { useMutation } from '@apollo/react-hooks';
 import gql from 'graphql-tag';
 import { useToasts } from 'react-toast-notifications';
-import { toNumber, get, noop } from 'lodash';
+import { toNumber, get, noop, isEmpty } from 'lodash';
 import * as yup from 'yup';
 import addMinutes from 'date-fns/addMinutes';
 import { useModal } from 'react-modal-hook';
@@ -20,6 +20,7 @@ import Toggle from '../../components/toggle';
 import AuctionType from '../../components/auction-type';
 import PayoutMethodModal from '../../components/modal/payout-method';
 import ConfirmationModal from '../../components/modal/confirmation';
+import LoadingText from '../../components/loading-text';
 
 import {
   dateTimePickerStyles,
@@ -165,22 +166,28 @@ const New = () => {
   const toggle = () => setBidsPublic(!hasBidsPublic);
 
   const { addToast } = useToasts();
-  const [createAuction] = useMutation(CREATE_AUCTION, {
-    onError: (err) => {
-      const errorMessage = getErrorMessage(err, "Couldn't create the auction");
-      addToast(errorMessage, {
-        appearance: 'error'
-      });
-    },
-    onCompleted: ({ createAuction: response }) => {
-      addToast('Auction created.', {
-        appearance: 'success',
-        autoDismiss: true,
-        autoDismissTimeout: 3000,
-        onDismiss: () => router.push(`/auction/${response.id}`)
-      });
+  const [createAuction, { loading: isCreatingAuction }] = useMutation(
+    CREATE_AUCTION,
+    {
+      onError: (error) => {
+        const errorMessage = getErrorMessage(
+          error,
+          "Couldn't create the auction"
+        );
+        addToast(errorMessage, {
+          appearance: 'error'
+        });
+      },
+      onCompleted: ({ createAuction: response }) => {
+        addToast('Auction created.', {
+          appearance: 'success',
+          autoDismiss: true,
+          autoDismissTimeout: 3000,
+          onDismiss: () => router.push(`/auction/${response.id}`)
+        });
+      }
     }
-  });
+  );
 
   const handleContinue = () => {
     // fire out the mutation
@@ -210,6 +217,7 @@ const New = () => {
         onContinue={handleContinue}
         onCancel={handleCancel}
         continueButtonLabel="Verify user"
+        isSubmitting={isVerifyingAccount}
       >
         <Text>
           {`Stripe needs to verify the user in order to carry out smooth out-flow
@@ -220,59 +228,62 @@ const New = () => {
     [handleContinue, handleCancel]
   );
 
-  const [verifyPayoutAccount] = useMutation(VERIFY_PAYOUT_ACCOUNT, {
-    onError: (error) => {
-      const errorMessage = getErrorMessage(
-        error,
-        'An error occurred while verifying the user'
-      );
-      addToast(errorMessage, {
-        appearance: 'error',
-        autoDismiss: true
-      });
-
-      hideConfirmVerificationModal();
-    },
-    onCompleted: ({ createPaymentPayoutAccountOnboardingUrl: url }) => {
-      if (!url) {
-        addToast(`Invalid URL sent by stripe.`, {
+  const [verifyPayoutAccount, { loading: isVerifyingAccount }] = useMutation(
+    VERIFY_PAYOUT_ACCOUNT,
+    {
+      onError: (error) => {
+        const errorMessage = getErrorMessage(
+          error,
+          'An error occurred while verifying the user'
+        );
+        addToast(errorMessage, {
           appearance: 'error',
-          autoDismiss: true,
-          autoDismissTimeout: 3000,
-          onDismiss: router.reload
+          autoDismiss: true
         });
+
         hideConfirmVerificationModal();
-        return;
-      }
-
-      const popup = openPopup({ url });
-      pollPopup(popup, {
-        pollTimeout: 2000,
-        successUrl: successRedirectUrl,
-        failureUrl: failureRedirectUrl,
-        onSuccess: () => {
-          addToast(`Woohoo, you can now create the auction.`, {
-            appearance: 'success',
-            autoDismiss: true,
-            autoDismissTimeout: 3000,
-            onDismiss: router.reload
-          });
-
-          hideConfirmVerificationModal();
-        },
-        onFailure: (message) => {
-          addToast(message, {
+      },
+      onCompleted: ({ createPaymentPayoutAccountOnboardingUrl: url }) => {
+        if (!url) {
+          addToast(`Invalid URL sent by stripe.`, {
             appearance: 'error',
             autoDismiss: true,
             autoDismissTimeout: 3000,
             onDismiss: router.reload
           });
-
           hideConfirmVerificationModal();
+          return;
         }
-      });
+
+        const popup = openPopup({ url });
+        pollPopup(popup, {
+          pollTimeout: 2000,
+          successUrl: successRedirectUrl,
+          failureUrl: failureRedirectUrl,
+          onSuccess: () => {
+            addToast(`Woohoo, you can now create the auction.`, {
+              appearance: 'success',
+              autoDismiss: true,
+              autoDismissTimeout: 3000,
+              onDismiss: router.reload
+            });
+
+            hideConfirmVerificationModal();
+          },
+          onFailure: (message) => {
+            addToast(message, {
+              appearance: 'error',
+              autoDismiss: true,
+              autoDismissTimeout: 3000,
+              onDismiss: router.reload
+            });
+
+            hideConfirmVerificationModal();
+          }
+        });
+      }
     }
-  });
+  );
 
   const [showPayoutMethodModal, hidePayoutMethodModal] = useModal(
     () => (
@@ -344,6 +355,12 @@ const New = () => {
       }
     });
   };
+
+  const isCTADisabled =
+    !isEmpty(errors) ||
+    !isEmpty(validationErrors) ||
+    isCreatingAuction ||
+    isUserLoading;
 
   return (
     <Layout>
@@ -439,8 +456,12 @@ const New = () => {
         </Field>
 
         <ActionRow>
-          <PrimaryButton type="submit" disabled={isUserLoading}>
-            Create auction
+          <PrimaryButton type="submit" disabled={isCTADisabled}>
+            {!isCreatingAuction ? (
+              'Create auction'
+            ) : (
+              <LoadingText text="Creating" />
+            )}
           </PrimaryButton>
         </ActionRow>
       </form>
@@ -554,7 +575,7 @@ const ActionRow = styled.div`
   display: flex;
   justify-content: space-between;
 
-  margin-top: ${rem(30)};
+  margin-top: ${rem(20)};
 `;
 
 const PrimaryButton = styled.button`

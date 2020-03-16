@@ -95,47 +95,53 @@ const BidInfo = ({
   const { addToast } = useToasts();
   const router = useRouter();
 
-  const [updateAuction] = useMutation(UPDATE_AUCTION, {
-    onError: (error) => {
-      const errorMessage = getErrorMessage(
-        error,
-        'An error occurred while updating the auction'
-      );
-      addToast(errorMessage, {
-        appearance: 'error'
-      });
-      hideEditAuctionModal();
-    },
-    onCompleted: () => {
-      addToast(`The auction has been updated`, {
-        appearance: 'success',
-        autoDismiss: true
-      });
-      hideEditAuctionModal();
+  const [updateAuction, { loading: isUpdatingAuction }] = useMutation(
+    UPDATE_AUCTION,
+    {
+      onError: (error) => {
+        const errorMessage = getErrorMessage(
+          error,
+          'An error occurred while updating the auction'
+        );
+        addToast(errorMessage, {
+          appearance: 'error'
+        });
+        hideEditAuctionModal();
+      },
+      onCompleted: () => {
+        addToast(`The auction has been updated`, {
+          appearance: 'success',
+          autoDismiss: true
+        });
+        hideEditAuctionModal();
+      }
     }
-  });
+  );
 
-  const [cancelAuction] = useMutation(CANCEL_AUCTION, {
-    onError: (error) => {
-      const errorMessage = getErrorMessage(
-        error,
-        'An error occurred while cancelling the auction'
-      );
-      addToast(errorMessage, {
-        appearance: 'error'
-      });
-      hideCancelConfirmation();
-    },
-    onCompleted: () => {
-      addToast(`The auction has been cancelled`, {
-        appearance: 'success',
-        autoDismiss: true,
-        autoDismissTimeout: 3000,
-        onDismiss: router.reload
-      });
-      hideCancelConfirmation();
+  const [cancelAuction, { loading: isCancellingAuction }] = useMutation(
+    CANCEL_AUCTION,
+    {
+      onError: (error) => {
+        const errorMessage = getErrorMessage(
+          error,
+          'An error occurred while cancelling the auction'
+        );
+        addToast(errorMessage, {
+          appearance: 'error'
+        });
+        hideCancelConfirmation();
+      },
+      onCompleted: () => {
+        addToast(`The auction has been cancelled`, {
+          appearance: 'success',
+          autoDismiss: true,
+          autoDismissTimeout: 3000,
+          onDismiss: router.reload
+        });
+        hideCancelConfirmation();
+      }
     }
-  });
+  );
 
   const cancelHandler = () => {
     cancelAuction({
@@ -165,6 +171,7 @@ const BidInfo = ({
         onSubmit={handleEditAuctionSubmit}
         auctionDescription={description}
         auctionEndsAt={endsAt}
+        isUpdatingAuction={isUpdatingAuction}
       />
     ),
     [handleEditAuctionSubmit, description, endsAt]
@@ -178,6 +185,7 @@ const BidInfo = ({
       onCancel={hideCancelConfirmation}
       continueButtonLabel={'Yes, I want to cancel'}
       cancelButtonLabel={'Nope'}
+      isSubmitting={isCancellingAuction}
     >
       <div>Are you sure you want to cancel the auction?</div>
     </ConfirmationModal>
@@ -290,6 +298,7 @@ const BidInfo = ({
                 width: 20px;
                 position: relative;
                 top: 1px;
+                left: -1px;
               `}
             />
           </IconButton>

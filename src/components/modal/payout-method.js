@@ -13,6 +13,7 @@ import { get, some } from 'lodash';
 import { useRouter } from 'next/router';
 
 import Loading from '../loading';
+import LoadingText from '../loading-text';
 
 import rem from '../../utils/rem';
 import { getAddress, validateAddress } from '../../utils/address';
@@ -84,7 +85,10 @@ const PayoutMethod = ({ onClose, user, showConfirmVerificationModal }) => {
     address: false
   });
 
-  const [createPaymentPayoutAccount] = useMutation(CREATE_PAYOUT_ACCOUNT, {
+  const [
+    createPaymentPayoutAccount,
+    { loading: isCreatingAccount }
+  ] = useMutation(CREATE_PAYOUT_ACCOUNT, {
     onError: (error) => {
       const errorMessage = getErrorMessage(
         error,
@@ -265,7 +269,7 @@ const PayoutMethod = ({ onClose, user, showConfirmVerificationModal }) => {
     return <Loading />;
   }
 
-  const isCTADisabled = hasError(formError);
+  const isCTADisabled = hasError(formError) || isCreatingAccount;
 
   return (
     <ReactModal
@@ -304,7 +308,11 @@ const PayoutMethod = ({ onClose, user, showConfirmVerificationModal }) => {
         <CTARow>
           <Cancel onClick={onClose}>Cancel</Cancel>
           <Continue onClick={handleSubmit} disabled={isCTADisabled}>
-            Add card
+            {!isCreatingAccount ? (
+              'Add card'
+            ) : (
+              <LoadingText text="Adding card" />
+            )}
           </Continue>
         </CTARow>
       </Footer>

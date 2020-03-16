@@ -13,6 +13,7 @@ import Script from 'react-load-script';
 import getConfig from 'next/config';
 
 import Loading from '../../components/loading';
+import LoadingText from '../../components/loading-text';
 
 import { CARD_OPTIONS } from '../../styles/stripe';
 import {
@@ -73,7 +74,10 @@ const PaymentMethod = ({ onClose, user }) => {
     address: false
   });
 
-  const [attachPaymentMethod] = useMutation(ATTACH_PAYMENT_METHOD, {
+  const [
+    attachPaymentMethod,
+    { loading: isAttachingPaymentMethod }
+  ] = useMutation(ATTACH_PAYMENT_METHOD, {
     onError: (error) => {
       const errorMessage = getErrorMessage(
         error,
@@ -244,7 +248,7 @@ const PaymentMethod = ({ onClose, user }) => {
     return <Loading />;
   }
 
-  const isCTADisabled = hasError(formError);
+  const isCTADisabled = hasError(formError) || isAttachingPaymentMethod;
 
   return (
     <ReactModal
@@ -283,7 +287,11 @@ const PaymentMethod = ({ onClose, user }) => {
         <CTARow>
           <Cancel onClick={onClose}>Cancel</Cancel>
           <Continue onClick={handleSubmit} disabled={isCTADisabled}>
-            Add card
+            {!isAttachingPaymentMethod ? (
+              'Add card'
+            ) : (
+              <LoadingText text="Adding card" />
+            )}
           </Continue>
         </CTARow>
       </Footer>

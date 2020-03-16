@@ -13,6 +13,7 @@ import {
   modalOverlay
 } from '../../styles/modal';
 import { labelBasic } from '../../styles/form';
+import { buttonRounded } from '../../styles/button';
 
 import rem from '../../utils/rem';
 import { auth } from '../../utils/firebase';
@@ -110,57 +111,11 @@ const Title = styled.div`
 `;
 
 const buttonStyles = css`
+  ${buttonRounded};
+  padding: ${rem(15)} 0;
+  margin: ${rem(8)} 0;
   color: #fff;
-  background-color: transparent;
-  border-radius: 3px;
-  box-sizing: border-box;
-  position: relative;
-  top: -2px;
-  left: -2px;
-  transition: transform 0.2s;
-  z-index: 0;
-
-  :before {
-    content: '';
-    background: #fff;
-    border: 3px solid #313131;
-    border-radius: 3px;
-    position: absolute;
-    top: -2px;
-    left: -2px;
-    height: 100%;
-    width: 100%;
-    z-index: -1;
-  }
-
-  :after {
-    content: '';
-    display: block;
-    background: #ccc;
-    border: 3px solid #313131;
-    border-radius: 3px;
-    height: 100%;
-    width: 100%;
-    position: absolute;
-    top: 2px;
-    left: 2px;
-    right: 0;
-    z-index: -2;
-    transition: transform 0.2s;
-  }
-
-  :focus:after,
-  :hover:after {
-    transform: translate(-1px, -1.5px);
-  }
-  :focus,
-  :hover {
-    transform: translate(1px, 1px);
-  }
-
-  padding: ${rem(15)} ${rem(40)};
-  margin: ${rem(10)} 0;
-  min-width: ${rem(220)};
+  width: 100%;
 
   display: flex;
   justify-content: center;
@@ -176,21 +131,15 @@ const ButtonWrapper = styled.div`
 
 const Google = styled.button`
   ${buttonStyles};
-  ::before {
-    background-color: #dd4b39;
-  }
+  background-color: #dd4b39;
 `;
 const Facebook = styled.button`
   ${buttonStyles};
-  ::before {
-    background-color: #4c69ba;
-  }
+  background-color: #4c69ba;
 `;
 const Twitter = styled.button`
   ${buttonStyles};
-  ::before {
-    background-color: #00acee;
-  }
+  background-color: #00acee;
 `;
 
 const iconStyles = css`
