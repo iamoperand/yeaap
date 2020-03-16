@@ -116,6 +116,11 @@ const globalStyles = css`
 
   button {
     ${buttonFeedback};
+
+    :disabled {
+      cursor: not-allowed;
+      color: ${theme.colors.disabledButton};
+    }
   }
 
   /* google maps autocomplete */

@@ -8,6 +8,7 @@ import { useModal } from 'react-modal-hook';
 
 import Avatar from './avatar';
 import LiveBidsModal from './modal/live-bids';
+import AuthModal from './modal/auth';
 import { WinnerTag } from './tags';
 
 import { boxBorder } from '../styles/box';
@@ -31,7 +32,7 @@ const showWinning = ({ index, winnerCount, auctionType }) => {
 };
 
 const Leaderboard = ({ bids, creatorId, winnerCount, auctionType }) => {
-  const { user } = useSession();
+  const { user, isUserLoading } = useSession();
 
   const [showLiveBids, hideLiveBids] = useModal(
     () => (
@@ -46,6 +47,18 @@ const Leaderboard = ({ bids, creatorId, winnerCount, auctionType }) => {
     ),
     [bids, creatorId, user, winnerCount, auctionType]
   );
+  const [showAuthModal, hideAuthModal] = useModal(() => (
+    <AuthModal onClose={hideAuthModal} />
+  ));
+
+  const handleShowBids = () => {
+    if (!user) {
+      showAuthModal();
+      return;
+    }
+
+    showLiveBids();
+  };
 
   if (isEmpty(bids)) {
     return (
@@ -85,7 +98,9 @@ const Leaderboard = ({ bids, creatorId, winnerCount, auctionType }) => {
         ))}
       </List>
 
-      <Button onClick={showLiveBids}>See top 20 bids</Button>
+      <Button onClick={handleShowBids} disabled={isUserLoading}>
+        See top 20 bids
+      </Button>
     </Box>
   );
 };
