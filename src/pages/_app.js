@@ -119,7 +119,6 @@ const globalStyles = css`
 
     :disabled {
       cursor: not-allowed;
-      color: ${theme.colors.disabledButton};
     }
   }
 
