@@ -97,9 +97,17 @@ const buttonStyles = css`
 const NextButton = styled.button`
   ${buttonStyles};
   transform: rotate(-2deg);
+  :disabled:hover,
+  :disabled:active {
+    transform: rotate(-2deg);
+  }
 `;
 
 const BackButton = styled.button`
   ${buttonStyles};
   transform: rotate(2deg);
+  :disabled:hover,
+  :disabled:active {
+    transform: rotate(2deg);
+  }
 `;
