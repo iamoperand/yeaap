@@ -35,6 +35,7 @@ import {
 import { errorBasic, labelBasic, inputBasic } from '../../styles/form';
 
 import useSession from '../../hooks/use-session';
+import { auth } from '../../utils/firebase';
 import rem from '../../utils/rem';
 import redirectWithSSR from '../../utils/redirect-with-ssr';
 import { openPopup, pollPopup } from '../../utils/popup';
@@ -470,7 +471,13 @@ const New = () => {
 };
 
 New.getInitialProps = ({ req, res }) => {
-  const user = req && req.session ? req.session.user : null;
+  const isServer = !process.browser;
+
+  const user = isServer
+    ? req && req.session
+      ? req.session.user
+      : null
+    : auth.currentUser;
   if (!user) {
     redirectWithSSR({ res, path: '/' });
   }
