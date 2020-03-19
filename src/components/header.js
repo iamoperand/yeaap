@@ -174,6 +174,10 @@ const itemStyles = css`
     background-color: #f7fafc;
     color: #1a1f36;
   }
+  :hover,
+  :active {
+    transform: none;
+  }
 `;
 
 const StyledLink = styled.a`
