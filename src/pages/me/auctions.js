@@ -1,36 +1,21 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { useQuery } from '@apollo/react-hooks';
 import gql from 'graphql-tag';
 import styled from '@emotion/styled';
 import { isEmpty } from 'lodash';
-import Link from 'next/link';
+
 import { useToasts } from 'react-toast-notifications';
 
 import Layout from '../../components/layout';
+import SEO from '../../components/seo';
 import Loading from '../../components/loading';
+import AuctionList from '../../components/auction-list';
+
+import theme from '../../utils/theme';
 import rem from '../../utils/rem';
 import { getErrorMessage } from '../../utils/error';
 
-import {
-  buttonPrimary,
-  buttonRounded,
-  buttonCTAPadding,
-  buttonWhite,
-  buttonDisabled
-} from '../../styles/button';
-import { box3DBorder } from '../../styles/box';
-
 const GET_USER_AUCTIONS = gql`
-  # enum PageOrder {
-  #   ASC
-  #   DESC
-  # }
-  #
-  # input PageInput {
-  #   cursor: String!
-  #   order: PageOrder
-  # }
   query getUserAuctions($page: PageInput) {
     me {
       id
@@ -39,6 +24,11 @@ const GET_USER_AUCTIONS = gql`
           node {
             id
             description
+            isCanceled
+            isSettled
+            endsAt
+            type
+            hasBidsVisible
           }
         }
 
@@ -51,103 +41,46 @@ const GET_USER_AUCTIONS = gql`
   }
 `;
 
-const Auction = ({ auction: { id, description } }) => {
-  return (
-    <Box>
-      <Description>{description}</Description>
-      <Link href="/auction/[auctionId]" as={`/auction/${id}`} passHref>
-        <LinkButton>Check out</LinkButton>
-      </Link>
-    </Box>
-  );
-};
-Auction.propTypes = {
-  auction: PropTypes.shape({
-    id: PropTypes.string.isRequired,
-    description: PropTypes.string.isRequired
-  }).isRequired
-};
-
-const Null = () => {
-  return <div>Nothing found.</div>;
-};
-
-const AuctionList = () => {
+const Auctions = () => {
   const { addToast } = useToasts();
-  const { loading, error, data, fetchMore } = useQuery(GET_USER_AUCTIONS);
+  const { loading, data } = useQuery(GET_USER_AUCTIONS, {
+    onError: (error) => {
+      const errorMessage = getErrorMessage(error, "Couldn't get user auctions");
+      addToast(errorMessage, {
+        appearance: 'error'
+      });
+    }
+  });
+
   if (loading) {
     return <Loading />;
   }
-  if (error) {
-    const errorMessage = getErrorMessage(error, "Couldn't get user auctions");
-    addToast(errorMessage, {
-      appearance: 'error'
-    });
-
-    return <div>Error</div>;
-  }
 
   const {
-    me: {
-      auctions: { edges, pageInfo }
-    }
+    me: { auctions: auctionConnection }
   } = data;
 
-  const loadMore = () => {
-    fetchMore({
-      query: GET_USER_AUCTIONS,
-      variables: {
-        page: {
-          cursor: pageInfo.endCursor
-        }
-      },
-      updateQuery: (previousResult, { fetchMoreResult }) => {
-        const previousAuctions = previousResult.me.auctions.edges;
-        const newAuctions = fetchMoreResult.me.auctions.edges;
-        const newPageInfo = fetchMoreResult.me.auctions.pageInfo;
+  if (isEmpty(auctionConnection)) {
+    return <NullWarning>{"You don't have any auctions to show."}</NullWarning>;
+  }
 
-        return {
-          ...previousResult,
-          me: {
-            ...previousResult.me,
-            auctions: {
-              ...previousResult.me.auctions,
-              edges: [...previousAuctions, ...newAuctions],
-              pageInfo: newPageInfo
-            }
-          }
-        };
-      }
-    });
-  };
-
-  return (
-    <Center>
-      <List>
-        {!isEmpty(edges) ? (
-          edges.map(({ node }) => <Auction key={node.id} auction={node} />)
-        ) : (
-          <Null />
-        )}
-      </List>
-
-      <LoadMore disabled={!pageInfo.hasNextPage} onClick={loadMore}>
-        Get me more auctions...
-      </LoadMore>
-    </Center>
-  );
+  return <AuctionList auctionConnection={auctionConnection} />;
 };
 
-const Auctions = () => {
+const AuctionsPage = () => {
   return (
     <Layout>
-      <Title>Your Auctions</Title>
-      <AuctionList />
+      <SEO title="Your auctions" />
+      <TitleWrapper>
+        <Title>Last 20 auctions</Title>
+      </TitleWrapper>
+
+      <Auctions />
     </Layout>
   );
 };
 
-export default Auctions;
+export default AuctionsPage;
 
 /*
  ********************************************
@@ -155,56 +88,32 @@ export default Auctions;
  ********************************************
  */
 
-const Title = styled.div`
-  font-size: ${rem(35)};
-  font-weight: 500;
-  text-align: center;
-
-  margin-bottom: ${rem(20)};
-`;
-
-const List = styled.div`
-  text-align: center;
-
-  display: flex;
-  flex-wrap: wrap;
-`;
-
-const LoadMore = styled.button`
-  ${buttonWhite};
-  ${buttonRounded};
-  ${buttonDisabled};
-
-  margin-top: ${rem(20)};
-  font-size: ${rem(20)};
-  padding: ${rem(15)} ${rem(20)};
-`;
-
-const Center = styled.div`
+const TitleWrapper = styled.div`
   display: flex;
   justify-content: center;
-  align-items: center;
-
-  flex-direction: column;
 `;
 
-const Box = styled.div`
+const Title = styled.div`
+  color: ${theme.colors.links};
+  font-size: ${rem(30)};
+  font-weight: 500;
+  margin-bottom: ${rem(20)};
+
+  position: relative;
+  :after {
+    content: '';
+    width: 100%;
+    position: absolute;
+    left: 0;
+    bottom: -1px;
+    border-width: 0 0 2px;
+    border-style: solid;
+    border-color: #aba5ff;
+  }
+`;
+
+const NullWarning = styled.div`
   margin-top: ${rem(10)};
-  padding: ${rem(15)};
-
-  color: #fff;
-  ${box3DBorder};
-
-  flex: 1 1 ${rem(300)};
-  margin: ${rem(10)};
-`;
-
-const Description = styled.div`
-  font-size: ${rem(22)};
-  color: #222;
-`;
-const LinkButton = styled.button`
-  ${buttonPrimary};
-  ${buttonRounded};
-  ${buttonCTAPadding};
+  color: #303f4b;
+  font-size: ${rem(18)};
 `;
