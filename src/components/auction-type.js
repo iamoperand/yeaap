@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import styled from '@emotion/styled';
 
 import rem from '../utils/rem';
+
 import CheckCircleIcon from '../assets/icons/check-circle.svg';
 import { box3DBorder } from '../styles/box';
 
@@ -86,6 +87,6 @@ const Input = styled.input`
   :checked ~ label ${Content} {
   }
   :checked ~ label ${Content}:after {
-    background: #111;
+    transform: translate(-2px, -3px);
   }
 `;
