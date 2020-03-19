@@ -33,6 +33,7 @@ const GET_AUCTION = gql`
           id
           creatorId
           creator {
+            id
             name
           }
 
