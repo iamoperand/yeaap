@@ -2,6 +2,7 @@
 scalar URL
 scalar DateTime
 scalar Email
+scalar UnsignedFloat
 
 type Query {
   _: Boolean

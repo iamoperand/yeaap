@@ -19,7 +19,7 @@ const REMOVE_USER_SESSION = gql`
 `;
 
 const GET_ME = gql`
-  query currentUser {
+  query currentUser($auctionPage: PageInput, $bidPage: PageInput) {
     me {
       id
       name
@@ -67,6 +67,63 @@ const GET_ME = gql`
           }
         }
         isVerificationRequired
+      }
+      accountBalance {
+        pending {
+          amount
+          currency
+        }
+        available {
+          amount
+          currency
+        }
+      }
+      auctionCount
+      bidCount
+      auctions(page: $auctionPage) {
+        edges {
+          node {
+            id
+            description
+            isCanceled
+            isSettled
+            endsAt
+            type
+            hasBidsVisible
+          }
+        }
+
+        pageInfo {
+          endCursor
+          hasNextPage
+        }
+      }
+      bids(page: $bidPage) {
+        edges {
+          node {
+            id
+            auctionId
+
+            amount
+            message
+            isWinner
+
+            auction {
+              id
+              creator {
+                id
+                name
+              }
+            }
+
+            createdAt
+          }
+        }
+
+        pageInfo {
+          endCursor
+          hasNextPage
+        }
       }
     }
   }
@@ -130,11 +187,19 @@ const useAuth = () => {
   const [state, dispatch] = useReducer(reducer, {
     loading: true,
     isUserLoading: true,
-    user: null
+    user: {}
   });
 
   const [getCurrentUser] = useLazyQuery(GET_ME, {
     fetchPolicy: 'cache-and-network',
+    variables: {
+      auctionPage: {
+        limit: 4
+      },
+      bidPage: {
+        limit: 6
+      }
+    },
     onCompleted: (data) => {
       dispatch({ type: actions.USER_FETCHED, payload: get(data, 'me') });
     },

@@ -58,6 +58,14 @@ const CREATE_PAYOUT_ACCOUNT = gql`
   }
 `;
 
+const ATTACH_PAYOUT_METHOD = gql`
+  mutation($input: AttachPaymentMethodDataInput!) {
+    attachPayoutPaymentMethod(data: $input) {
+      id
+    }
+  }
+`;
+
 const hasError = (formError) => some(formError, Boolean);
 
 // eslint-disable-next-line max-lines-per-function
@@ -85,21 +93,23 @@ const PayoutMethod = ({ onClose, user, showConfirmVerificationModal }) => {
     address: false
   });
 
+  const handleError = (error) => {
+    const errorMessage = getErrorMessage(
+      error,
+      'An error occurred while adding the payout method'
+    );
+    addToast(errorMessage, {
+      appearance: 'error',
+      autoDismiss: true
+    });
+    onClose();
+  };
+
   const [
     createPaymentPayoutAccount,
     { loading: isCreatingAccount }
   ] = useMutation(CREATE_PAYOUT_ACCOUNT, {
-    onError: (error) => {
-      const errorMessage = getErrorMessage(
-        error,
-        'An error occurred while adding the payout method'
-      );
-      addToast(errorMessage, {
-        appearance: 'error',
-        autoDismiss: true
-      });
-      onClose();
-    },
+    onError: handleError,
     onCompleted: (data) => {
       const { isVerificationRequired } = data.createPaymentPayoutAccount;
       if (!isVerificationRequired) {
@@ -116,6 +126,23 @@ const PayoutMethod = ({ onClose, user, showConfirmVerificationModal }) => {
 
       onClose();
       setTimeout(showConfirmVerificationModal, 1000);
+    }
+  });
+
+  const [
+    attachPayoutMethod,
+    { loading: isAttachingPayoutMethod }
+  ] = useMutation(ATTACH_PAYOUT_METHOD, {
+    onError: handleError,
+    onCompleted: () => {
+      addToast(`Woohoo, you can now create the auction.`, {
+        appearance: 'success',
+        autoDismiss: true,
+        autoDismissTimeout: 3000,
+        onDismiss: router.reload
+      });
+
+      onClose();
     }
   });
 
@@ -255,10 +282,22 @@ const PayoutMethod = ({ onClose, user, showConfirmVerificationModal }) => {
       return;
     }
 
-    createPaymentPayoutAccount({
+    if (!user.paymentPayoutAccount) {
+      createPaymentPayoutAccount({
+        variables: {
+          input: {
+            country: address.address_country,
+            paymentMethodId: token.id
+          }
+        }
+      });
+
+      return;
+    }
+
+    attachPayoutMethod({
       variables: {
         input: {
-          country: address.address_country,
           paymentMethodId: token.id
         }
       }
@@ -269,7 +308,10 @@ const PayoutMethod = ({ onClose, user, showConfirmVerificationModal }) => {
     return <Loading />;
   }
 
-  const isCTADisabled = hasError(formError) || isCreatingAccount;
+  const isSubmitting = user.paymentPayoutAccount
+    ? isAttachingPayoutMethod
+    : isCreatingAccount;
+  const isCTADisabled = hasError(formError) || isSubmitting;
 
   return (
     <ReactModal
@@ -277,6 +319,7 @@ const PayoutMethod = ({ onClose, user, showConfirmVerificationModal }) => {
       css={modalContent}
       isOpen={true}
       onRequestClose={onClose}
+      shouldCloseOnOverlayClick={false}
     >
       <Head>
         <Title>Add payout method</Title>
@@ -308,11 +351,7 @@ const PayoutMethod = ({ onClose, user, showConfirmVerificationModal }) => {
         <CTARow>
           <Cancel onClick={onClose}>Cancel</Cancel>
           <Continue onClick={handleSubmit} disabled={isCTADisabled}>
-            {!isCreatingAccount ? (
-              'Add card'
-            ) : (
-              <LoadingText text="Adding card" />
-            )}
+            {!isSubmitting ? 'Add card' : <LoadingText text="Adding card" />}
           </Continue>
         </CTARow>
       </Footer>
@@ -330,7 +369,8 @@ const PayoutMethod = ({ onClose, user, showConfirmVerificationModal }) => {
 PayoutMethod.propTypes = {
   onClose: PropTypes.func.isRequired,
   user: PropTypes.shape({
-    name: PropTypes.string.isRequired
+    name: PropTypes.string.isRequired,
+    paymentPayoutAccount: PropTypes.shape()
   }),
   showConfirmVerificationModal: PropTypes.func.isRequired
 };

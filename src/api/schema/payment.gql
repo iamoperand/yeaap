@@ -88,9 +88,20 @@ type PaymentPayoutAccount {
   createdAt: DateTime!
 }
 
+type Balance {
+  amount: UnsignedFloat!
+  currency: String!
+}
+
+type AccountBalance {
+  pending: [Balance!]
+  available: [Balance!]
+}
+
 extend type UserPrivate {
   paymentPayoutAccount: PaymentPayoutAccount
   paymentMethods: [PaymentMethod]
+  accountBalance: AccountBalance
 }
 
 extend type Mutation {

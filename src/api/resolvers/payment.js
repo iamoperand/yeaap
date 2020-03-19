@@ -1,4 +1,4 @@
-const { toUpper } = require('lodash');
+const { toUpper, pick } = require('lodash');
 const moment = require('moment');
 
 const mapSourceCard = (card) => ({
@@ -112,6 +112,26 @@ const userPaymentMethods = async (data) => {
   const customer = await stripe.customers.retrieve(user.stripeCustomerId);
 
   return customer.sources.data.map(mapStripePaymentMethod);
+};
+
+const userAccountBalance = async (data) => {
+  const {
+    context: { user, stripe }
+  } = data;
+
+  if (!user.stripeAccountId) {
+    return 0;
+  }
+
+  const accountBalance = await stripe.balance.retrieve({
+    stripeAccount: user.stripeAccountId
+  });
+
+  const { pending, available } = accountBalance;
+  return {
+    pending: pending.map((balance) => pick(balance, ['amount', 'currency'])),
+    available: available.map((balance) => pick(balance, ['amount', 'currency']))
+  };
 };
 
 const attachPaymentMethod = async (data) => {
@@ -256,7 +276,8 @@ module.exports = {
   },
   UserPrivate: {
     paymentPayoutAccount: userPaymentPayoutAccount,
-    paymentMethods: userPaymentMethods
+    paymentMethods: userPaymentMethods,
+    accountBalance: userAccountBalance
   },
   Mutation: {
     attachPaymentMethod,

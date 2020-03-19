@@ -44,6 +44,19 @@ const userAuctionCount = async (data) => {
   );
 };
 
+const bidAuction = async (data) => {
+  const {
+    context: { db },
+    parent
+  } = data;
+
+  return db
+    .collection('auctions')
+    .doc(parent.auctionId)
+    .get()
+    .then((doc) => serializeFirestoreAuction(doc.data()));
+};
+
 const queryAuctions = async (data) => {
   const {
     context: { db },
@@ -184,6 +197,9 @@ module.exports = {
   UserPrivate: {
     auctions: userAuctions,
     auctionCount: userAuctionCount
+  },
+  Bid: {
+    auction: bidAuction
   },
   Query: {
     auctions: queryAuctions

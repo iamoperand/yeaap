@@ -52,6 +52,10 @@ extend type UserPrivate {
   auctionCount: Int!
 }
 
+extend type Bid {
+  auction: Auction!
+}
+
 extend type Query {
   auctions(where: AuctionWhereInput!, page: PageInput): ConnectionAuction
 }

@@ -12,14 +12,13 @@ import * as yup from 'yup';
 import addMinutes from 'date-fns/addMinutes';
 import { useModal } from 'react-modal-hook';
 import { useRouter } from 'next/router';
-import getConfig from 'next/config';
 
 import Layout from '../../components/layout';
 import SEO from '../../components/seo';
 import Toggle from '../../components/toggle';
 import AuctionType from '../../components/auction-type';
 import PayoutMethodModal from '../../components/modal/payout-method';
-import ConfirmationModal from '../../components/modal/confirmation';
+import VerifyPayoutAccountModal from '../../components/modal/verify-payout-account';
 import LoadingText from '../../components/loading-text';
 
 import {
@@ -38,7 +37,6 @@ import useSession from '../../hooks/use-session';
 import { auth } from '../../utils/firebase';
 import rem from '../../utils/rem';
 import redirectWithSSR from '../../utils/redirect-with-ssr';
-import { openPopup, pollPopup } from '../../utils/popup';
 import { getErrorMessage } from '../../utils/error';
 
 const dateTimePickerProps = {
@@ -75,16 +73,6 @@ const CREATE_AUCTION = gql`
       createdAt
       updatedAt
     }
-  }
-`;
-
-const VERIFY_PAYOUT_ACCOUNT = gql`
-  # input CreatePaymentPayoutAccountOnboardingLinkDataInput {
-  #   failureRedirectUrl: URL!
-  #   successRedirectUrl: URL!
-  # }
-  mutation($input: CreatePaymentPayoutAccountOnboardingLinkDataInput!) {
-    createPaymentPayoutAccountOnboardingUrl(data: $input)
   }
 `;
 
@@ -149,12 +137,6 @@ const schema = {
   }
 };
 
-const { publicRuntimeConfig } = getConfig();
-const { apiUrl } = publicRuntimeConfig;
-
-const failureRedirectUrl = `${apiUrl}/user-verification?status=failure`;
-const successRedirectUrl = `${apiUrl}/user-verification?status=success`;
-
 // eslint-disable-next-line max-lines-per-function
 const New = () => {
   const { user, isUserLoading } = useSession();
@@ -190,100 +172,31 @@ const New = () => {
     }
   );
 
-  const handleContinue = () => {
-    // fire out the mutation
-    verifyPayoutAccount({
-      variables: {
-        input: {
-          failureRedirectUrl,
-          successRedirectUrl
-        }
-      }
-    });
-  };
-  const handleCancel = () => {
-    addToast(`User couldn't be verified`, {
+  const [
+    reloadOnCancellingVerification,
+    setReloadOnCancellingVerification
+  ] = useState(true);
+
+  const handleVerifyAccountCancel = () => {
+    addToast("User couldn't be verified", {
       appearance: 'error',
       autoDismiss: true,
       autoDismissTimeout: 3000,
-      onDismiss: router.reload
+      onDismiss: reloadOnCancellingVerification ? router.reload : noop
     });
   };
 
-  const [showConfirmVerificationModal, hideConfirmVerificationModal] = useModal(
+  const [
+    showVerifyPayoutAccountModal,
+    hideVerifyPayoutAccountModal
+  ] = useModal(
     () => (
-      <ConfirmationModal
-        onClose={hideConfirmVerificationModal}
-        title="Verify user"
-        onContinue={handleContinue}
-        onCancel={handleCancel}
-        continueButtonLabel="Verify user"
-        isSubmitting={isVerifyingAccount}
-      >
-        <Text>
-          {`Stripe needs to verify the user in order to carry out smooth out-flow
-          of payments. This won't take long, I promise!`}
-        </Text>
-      </ConfirmationModal>
+      <VerifyPayoutAccountModal
+        onClose={hideVerifyPayoutAccountModal}
+        onCancel={handleVerifyAccountCancel}
+      />
     ),
-    [handleContinue, handleCancel]
-  );
-
-  const [verifyPayoutAccount, { loading: isVerifyingAccount }] = useMutation(
-    VERIFY_PAYOUT_ACCOUNT,
-    {
-      onError: (error) => {
-        const errorMessage = getErrorMessage(
-          error,
-          'An error occurred while verifying the user'
-        );
-        addToast(errorMessage, {
-          appearance: 'error',
-          autoDismiss: true
-        });
-
-        hideConfirmVerificationModal();
-      },
-      onCompleted: ({ createPaymentPayoutAccountOnboardingUrl: url }) => {
-        if (!url) {
-          addToast(`Invalid URL sent by stripe.`, {
-            appearance: 'error',
-            autoDismiss: true,
-            autoDismissTimeout: 3000,
-            onDismiss: router.reload
-          });
-          hideConfirmVerificationModal();
-          return;
-        }
-
-        const popup = openPopup({ url });
-        pollPopup(popup, {
-          pollTimeout: 2000,
-          successUrl: successRedirectUrl,
-          failureUrl: failureRedirectUrl,
-          onSuccess: () => {
-            addToast(`Woohoo, you can now create the auction.`, {
-              appearance: 'success',
-              autoDismiss: true,
-              autoDismissTimeout: 3000,
-              onDismiss: router.reload
-            });
-
-            hideConfirmVerificationModal();
-          },
-          onFailure: (message) => {
-            addToast(message, {
-              appearance: 'error',
-              autoDismiss: true,
-              autoDismissTimeout: 3000,
-              onDismiss: router.reload
-            });
-
-            hideConfirmVerificationModal();
-          }
-        });
-      }
-    }
+    [handleVerifyAccountCancel]
   );
 
   const [showPayoutMethodModal, hidePayoutMethodModal] = useModal(
@@ -291,10 +204,13 @@ const New = () => {
       <PayoutMethodModal
         onClose={hidePayoutMethodModal}
         user={user}
-        showConfirmVerificationModal={showConfirmVerificationModal}
+        showConfirmVerificationModal={() => {
+          setReloadOnCancellingVerification(true);
+          showVerifyPayoutAccountModal();
+        }}
       />
     ),
-    [user, showConfirmVerificationModal]
+    [user, showVerifyPayoutAccountModal]
   );
 
   const [validationErrors, setValidationErrors] = useState(null);
@@ -333,7 +249,7 @@ const New = () => {
 
   const onSubmit = async (inputData) => {
     if (!user.paymentPayoutAccount) {
-      addToast(`Oops. You don't have any payout method.`, {
+      addToast(`Oops. You haven't setup a payout account`, {
         appearance: 'info',
         autoDismiss: true
       });
@@ -341,12 +257,27 @@ const New = () => {
       return;
     }
 
-    if (user.paymentPayoutAccount.isVerificationRequired) {
-      addToast(`Oops. You haven't been verified yet.`, {
+    const {
+      isVerificationRequired,
+      paymentMethods: payoutMethods
+    } = user.paymentPayoutAccount;
+
+    if (isVerificationRequired) {
+      addToast(`Oops. You haven't been verified yet`, {
         appearance: 'info',
         autoDismiss: true
       });
-      showConfirmVerificationModal();
+      setReloadOnCancellingVerification(false);
+      showVerifyPayoutAccountModal();
+      return;
+    }
+
+    if (isEmpty(payoutMethods)) {
+      addToast(`Oops. You don't have any payout method`, {
+        appearance: 'info',
+        autoDismiss: true
+      });
+      showPayoutMethodModal();
       return;
     }
 
@@ -592,11 +523,4 @@ const PrimaryButton = styled.button`
 
   font-size: ${rem(18)};
   padding: ${rem(10)} ${rem(30)};
-`;
-
-const Text = styled.div`
-  margin-bottom: ${rem(5)};
-  :last-child {
-    margin-bottom: 0;
-  }
 `;

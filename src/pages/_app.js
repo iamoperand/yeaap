@@ -4,6 +4,8 @@ import { css, Global } from '@emotion/core';
 import ReactModal from 'react-modal';
 import withApollo from 'next-with-apollo';
 import { ApolloProvider } from '@apollo/react-hooks';
+import NProgress from 'nprogress';
+import Router from 'next/router';
 
 import theme from '../utils/theme';
 import { initApollo } from '../utils/apollo-client';
@@ -11,6 +13,12 @@ import normalizeStyles from '../styles/normalize';
 import fonts from '../styles/fonts';
 import { buttonFeedback } from '../styles/button';
 import AppProviders from '../context';
+
+Router.events.on('routeChangeStart', () => {
+  NProgress.start();
+});
+Router.events.on('routeChangeComplete', () => NProgress.done());
+Router.events.on('routeChangeError', () => NProgress.done());
 
 class App extends NextApp {
   componentDidMount() {
@@ -85,6 +93,11 @@ const globalStyles = css`
     border: none;
     outline: none;
     cursor: pointer;
+    ${buttonFeedback};
+
+    :disabled {
+      cursor: not-allowed;
+    }
   }
 
   a {
@@ -103,6 +116,14 @@ const globalStyles = css`
       border-style: solid;
       border-color: #c7c3fb;
     }
+
+    transition: all 0.15s ease-in-out;
+    :hover {
+      transform: scale(1.05);
+    }
+    :active {
+      transform: scale(0.95);
+    }
   }
 
   small {
@@ -112,14 +133,6 @@ const globalStyles = css`
   ul,
   ol {
     list-style-type: none;
-  }
-
-  button {
-    ${buttonFeedback};
-
-    :disabled {
-      cursor: not-allowed;
-    }
   }
 
   /* google maps autocomplete */
