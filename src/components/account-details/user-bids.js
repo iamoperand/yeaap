@@ -21,7 +21,7 @@ const UserBids = ({ bidConnection }) => {
     return (
       <Wrapper>
         <Title>Bids</Title>
-        <NullWarning>{"You don't have any auctions to show."}</NullWarning>
+        <NullWarning>{"You don't have any bids to show."}</NullWarning>
       </Wrapper>
     );
   }
