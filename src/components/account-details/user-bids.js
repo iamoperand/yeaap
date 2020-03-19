@@ -153,7 +153,7 @@ const AmountValue = styled.div`
 
 const Description = styled.div`
   color: #303f4b;
-  font-size: ${rem(18)};
+  font-size: ${rem(17)};
   margin: ${rem(6)} 0 ${rem(20)};
 `;
 
