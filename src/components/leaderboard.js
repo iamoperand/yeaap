@@ -194,7 +194,12 @@ const Button = styled.button`
   color: ${theme.colors.links};
   text-decoration: none;
   position: relative;
-  cursor: pointer;
+
+  :hover,
+  :active {
+    transform: none;
+    box-shadow: none;
+  }
 
   :after {
     content: '';

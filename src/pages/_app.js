@@ -12,6 +12,7 @@ import { initApollo } from '../utils/apollo-client';
 import normalizeStyles from '../styles/normalize';
 import fonts from '../styles/fonts';
 import { buttonFeedback } from '../styles/button';
+import { anchorFeedback } from '../styles/anchor';
 import AppProviders from '../context';
 
 Router.events.on('routeChangeStart', () => {
@@ -117,13 +118,7 @@ const globalStyles = css`
       border-color: #c7c3fb;
     }
 
-    transition: all 0.15s ease-in-out;
-    :hover {
-      transform: scale(1.05);
-    }
-    :active {
-      transform: scale(0.95);
-    }
+    ${anchorFeedback};
   }
 
   small {
