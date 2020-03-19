@@ -40,7 +40,7 @@ const getWidth = ({ type, size }) => {
       if (size === 'large') {
         return 150;
       }
-      return 120;
+      return 150;
     }
     default: {
       throw new Error('no type specified');
@@ -121,6 +121,7 @@ const UserInfo = styled.div`
   width: ${(props) => rem(getWidth({ type: 'user', size: props.size }))};
   display: flex;
   align-items: center;
+  white-space: normal;
   img {
     height: ${rem(30)};
     width: ${rem(30)};
@@ -168,10 +169,10 @@ const IconStyles = styled.div`
 
 const StyledSpeechBubbleIcon = styled(SpeechBubbleIcon)`
   position: relative;
-  top: 1px;
+  top: 2px;
   cursor: pointer;
-  height: ${rem(20)};
-  width: ${rem(20)};
+  height: ${rem(17)};
+  width: ${rem(17)};
   fill: ${(props) => (props.isMessageShown ? theme.colors.primary : '#788896')};
   :hover {
     fill: ${theme.colors.primary};

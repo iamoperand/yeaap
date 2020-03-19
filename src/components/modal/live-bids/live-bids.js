@@ -118,9 +118,9 @@ const Body = styled.div`
 `;
 
 const Footer = styled.div`
+  ${modalFooter};
   padding-left: ${rem(30)};
   padding-right: ${rem(30)};
-  ${modalFooter};
 `;
 
 const CTARow = styled.div`
@@ -129,4 +129,5 @@ const CTARow = styled.div`
 
 const Cancel = styled.button`
   ${cancelButton};
+  padding: ${rem(9)} ${rem(25)};
 `;
