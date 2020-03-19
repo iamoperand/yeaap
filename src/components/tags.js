@@ -77,7 +77,7 @@ export const ClosestBidWinsTag = () => {
 const commonStyles = css`
   display: inline-block;
   padding: ${rem(3)} ${rem(5)};
-  font-size: ${rem(14)};
+  font-size: ${rem(13)};
   text-transform: uppercase;
   color: #fff;
 `;
