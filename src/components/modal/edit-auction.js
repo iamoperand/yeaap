@@ -150,6 +150,7 @@ const EditAuction = ({
       onRequestClose={onClose}
       style={{ overlay: modalOverlay }}
       css={modalContent}
+      shouldCloseOnOverlayClick={false}
     >
       <Head>
         <Title>Edit auction</Title>

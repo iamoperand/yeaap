@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import styled from '@emotion/styled';
 import { css } from '@emotion/core';
 import ReactModal from 'react-modal';
+import { noop } from 'lodash';
 
 import rem from '../../utils/rem';
 import {
@@ -25,7 +26,7 @@ const Confirmation = ({
   onClose,
   title,
   onContinue,
-  onCancel,
+  onCancel = noop,
   continueButtonLabel = 'Continue',
   cancelButtonLabel = 'Cancel',
   isSubmitting,
@@ -42,6 +43,7 @@ const Confirmation = ({
       css={modalContent}
       isOpen={true}
       onRequestClose={handleCancel}
+      shouldCloseOnOverlayClick={false}
     >
       <Wrapper>
         <Head>
@@ -71,7 +73,7 @@ Confirmation.propTypes = {
   onClose: PropTypes.func.isRequired,
   title: PropTypes.string.isRequired,
   onContinue: PropTypes.func.isRequired,
-  onCancel: PropTypes.func.isRequired,
+  onCancel: PropTypes.func,
   continueButtonLabel: PropTypes.string,
   cancelButtonLabel: PropTypes.string,
   isSubmitting: PropTypes.bool.isRequired,

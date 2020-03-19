@@ -256,6 +256,7 @@ const PaymentMethod = ({ onClose, user }) => {
       css={modalContent}
       isOpen={true}
       onRequestClose={onClose}
+      shouldCloseOnOverlayClick={false}
     >
       <Head>
         <Title>Add payment method</Title>

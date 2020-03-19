@@ -112,6 +112,7 @@ const Bid = ({ onClose, auctionId, topBid }) => {
       css={modalContent}
       isOpen={true}
       onRequestClose={onClose}
+      shouldCloseOnOverlayClick={false}
     >
       <Head>
         <Title>Bid now!</Title>
