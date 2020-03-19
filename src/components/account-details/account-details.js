@@ -21,7 +21,7 @@ const AccountDetails = () => {
   }
 
   if (!user) {
-    return <NotFound text="User not found." />;
+    return <NotFound text="User not found." showLoginButton={true} />;
   }
   return (
     <div>

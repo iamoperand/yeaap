@@ -3,14 +3,33 @@ import PropTypes from 'prop-types';
 import styled from '@emotion/styled';
 import { css } from '@emotion/core';
 import Link from 'next/link';
+import { useModal } from 'react-modal-hook';
+
+import AuthModal from './modal/auth';
 
 import rem from '../utils/rem';
-
 import BlankCanvasIcon from '../assets/icons/blank-canvas.svg?sprite';
-
 import { buttonWhite, buttonRounded, buttonCTAPadding } from '../styles/button';
 
-const NotFound = ({ text = 'Not found.' }) => {
+const HomeButton = () => (
+  <Link href="/">
+    <button css={buttonStyles}>Go to home</button>
+  </Link>
+);
+
+const LoginButton = () => {
+  const [showAuthModal, hideAuthModal] = useModal(() => (
+    <AuthModal onClose={hideAuthModal} />
+  ));
+
+  return (
+    <button onClick={showAuthModal} css={buttonStyles}>
+      Login
+    </button>
+  );
+};
+
+const NotFound = ({ text = 'Not found.', showLoginButton = false }) => {
   return (
     <Center>
       <BlankCanvasIcon
@@ -22,15 +41,16 @@ const NotFound = ({ text = 'Not found.' }) => {
       <BigFontDiv>Oops!</BigFontDiv>
       <NormalFontDiv>{text}</NormalFontDiv>
 
-      <Link href="/">
-        <AnchorButton>Go to home</AnchorButton>
-      </Link>
+      <CTAWrapper>
+        {showLoginButton ? <LoginButton /> : <HomeButton />}
+      </CTAWrapper>
     </Center>
   );
 };
 
 NotFound.propTypes = {
-  text: PropTypes.string
+  text: PropTypes.string,
+  showLoginButton: PropTypes.bool
 };
 
 export default NotFound;
@@ -65,8 +85,11 @@ const NormalFontDiv = styled.div`
   width: ${rem(300)};
 `;
 
-const AnchorButton = styled.button`
+const CTAWrapper = styled.div`
   margin: ${rem(40)} auto ${rem(20)};
+`;
+
+const buttonStyles = css`
   ${buttonWhite};
   ${buttonRounded};
   ${buttonCTAPadding};

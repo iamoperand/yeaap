@@ -10,10 +10,12 @@ import Layout from '../../components/layout';
 import SEO from '../../components/seo';
 import Loading from '../../components/loading';
 import AuctionList from '../../components/auction-list';
+import NotFound from '../../components/not-found';
 
 import theme from '../../utils/theme';
 import rem from '../../utils/rem';
 import { getErrorMessage } from '../../utils/error';
+import useSession from '../../hooks/use-session';
 
 import ChevronsRightIcon from '../../assets/icons/chevrons-right.svg?sprite';
 
@@ -70,6 +72,20 @@ const Auctions = () => {
 };
 
 const AuctionsPage = () => {
+  const { user, isUserLoading } = useSession();
+
+  if (isUserLoading) {
+    return <Loading />;
+  }
+  if (!user) {
+    return (
+      <Layout>
+        <SEO title="Your bids" />
+        <NotFound text="User not found." showLoginButton={true} />
+      </Layout>
+    );
+  }
+
   return (
     <Layout>
       <SEO title="Your auctions" />

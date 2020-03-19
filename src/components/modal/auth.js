@@ -61,7 +61,6 @@ const Auth = ({ onClose }) => {
       onRequestClose={onClose}
       style={{ overlay: modalOverlay }}
       css={modalContent}
-      shouldCloseOnOverlayClick={false}
     >
       <Title>Continue with:</Title>
 
