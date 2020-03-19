@@ -55,7 +55,7 @@ const Dropdown = ({ isOpen, isLoggedIn, name }) => {
     <DropdownWrapper>
       <Name>{name}</Name>
       <List>
-        <Link href="/account" passHref>
+        <Link href="/me" passHref>
           <StyledLink>Account</StyledLink>
         </Link>
 

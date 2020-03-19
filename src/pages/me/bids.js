@@ -9,7 +9,7 @@ import { useToasts } from 'react-toast-notifications';
 import Layout from '../../components/layout';
 import SEO from '../../components/seo';
 import Loading from '../../components/loading';
-import AuctionList from '../../components/auction-list';
+import BidList from '../../components/bid-list';
 
 import theme from '../../utils/theme';
 import rem from '../../utils/rem';
@@ -17,20 +17,29 @@ import { getErrorMessage } from '../../utils/error';
 
 import ChevronsRightIcon from '../../assets/icons/chevrons-right.svg?sprite';
 
-const GET_USER_AUCTIONS = gql`
-  query getUserAuctions($page: PageInput) {
+const GET_USER_BIDS = gql`
+  query getUserBids($page: PageInput) {
     me {
       id
-      auctions(page: $page) {
+      bids(page: $page) {
         edges {
           node {
             id
-            description
-            isCanceled
-            isSettled
-            endsAt
-            type
-            hasBidsVisible
+            auctionId
+
+            amount
+            message
+            isWinner
+
+            auction {
+              id
+              creator {
+                id
+                name
+              }
+            }
+
+            createdAt
           }
         }
 
@@ -43,11 +52,11 @@ const GET_USER_AUCTIONS = gql`
   }
 `;
 
-const Auctions = () => {
+const Bids = () => {
   const { addToast } = useToasts();
-  const { loading, data } = useQuery(GET_USER_AUCTIONS, {
+  const { loading, data } = useQuery(GET_USER_BIDS, {
     onError: (error) => {
-      const errorMessage = getErrorMessage(error, "Couldn't get user auctions");
+      const errorMessage = getErrorMessage(error, "Couldn't get user bids");
       addToast(errorMessage, {
         appearance: 'error'
       });
@@ -59,20 +68,20 @@ const Auctions = () => {
   }
 
   const {
-    me: { auctions: auctionConnection }
+    me: { bids: bidConnection }
   } = data;
 
-  if (isEmpty(auctionConnection.edges)) {
-    return <NullWarning>{"You don't have any auctions to show."}</NullWarning>;
+  if (isEmpty(bidConnection.edges)) {
+    return <NullWarning>{"You don't have any bids to show."}</NullWarning>;
   }
 
-  return <AuctionList auctionConnection={auctionConnection} />;
+  return <BidList bidConnection={bidConnection} />;
 };
 
-const AuctionsPage = () => {
+const BidsPage = () => {
   return (
     <Layout>
-      <SEO title="Your auctions" />
+      <SEO title="Your bids" />
 
       <Title>
         <ChevronsRightIcon
@@ -83,15 +92,15 @@ const AuctionsPage = () => {
             top: -2.5px;
           `}
         />
-        Your last 20 auctions
+        Your last 20 bids
       </Title>
 
-      <Auctions />
+      <Bids />
     </Layout>
   );
 };
 
-export default AuctionsPage;
+export default BidsPage;
 
 /*
  ********************************************

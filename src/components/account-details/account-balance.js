@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import styled from '@emotion/styled';
 import getSymbolFromCurrency from 'currency-symbol-map';
-import { map } from 'lodash';
+import { map, isEmpty } from 'lodash';
 import formatNum from 'format-num';
 import { css } from '@emotion/core';
 
@@ -21,6 +21,11 @@ const groupByCurrency = (object) =>
 
 const AccountBalance = ({ balance }) => {
   const { pending, available } = balance;
+
+  if (isEmpty(pending) && isEmpty(available)) {
+    return null;
+  }
+
   const groupedPendingBalance = groupByCurrency(pending);
   const groupedAvailableBalance = groupByCurrency(available);
 

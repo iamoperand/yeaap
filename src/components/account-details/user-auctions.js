@@ -2,6 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import styled from '@emotion/styled';
 import Link from 'next/link';
+import { isEmpty } from 'lodash';
 
 import theme from '../../utils/theme';
 import rem from '../../utils/rem';
@@ -9,7 +10,7 @@ import rem from '../../utils/rem';
 import AuctionList from '../auction-list';
 
 const UserAuctions = ({ auctionConnection }) => {
-  if (!auctionConnection) {
+  if (isEmpty(auctionConnection.edges)) {
     return (
       <Wrapper>
         <Title>Auctions</Title>
