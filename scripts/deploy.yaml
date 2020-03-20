@@ -3,7 +3,8 @@ substitutions:
   _FIREBASE_DATABASE_URL: 'https://yeaap-1.firebaseio.com'
   _FIREBASE_APP_CONFIG: '{}'
   _REDIS_URL: 'redis://localhost:6379'
-  _API_URL: 'http://localhost:5000'
+  _API_URL: 'http://localhost:5000/graphql'
+  _WEBSOCKET_URL: 'ws://localhost:5000/graphql'
   _APP_URL: 'http://localhost:5000'
 steps:
   - id: 'create .env file'
@@ -18,6 +19,7 @@ steps:
         echo "FIREBASE_APP_CONFIG=$_FIREBASE_APP_CONFIG" >> .env &&
         echo "REDIS_URL=$_REDIS_URL" >> .env &&
         echo "API_URL=$_API_URL" >> .env &&
+        echo "WEBSOCKET_URL=$_WEBSOCKET_URL" >> .env &&
         echo "APP_URL=$_APP_URL" >> .env &&
         echo "FIREBASE_CREDENTIALS=$$FIREBASE_CREDENTIALS" >> .env &&
         echo "FIREBASE_WEBAPI_KEY=$$FIREBASE_WEBAPI_KEY" >> .env &&

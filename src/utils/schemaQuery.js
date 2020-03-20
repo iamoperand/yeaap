@@ -4,7 +4,7 @@ const fs = require('fs');
 
 const { API_URL } = process.env;
 
-fetch(`${API_URL}/graphql`, {
+fetch(API_URL, {
   method: 'POST',
   headers: { 'Content-Type': 'application/json' },
   body: JSON.stringify({

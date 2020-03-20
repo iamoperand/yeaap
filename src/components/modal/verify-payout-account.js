@@ -20,10 +20,10 @@ const VERIFY_PAYOUT_ACCOUNT = gql`
 `;
 
 const { publicRuntimeConfig } = getConfig();
-const { apiUrl } = publicRuntimeConfig;
+const { appUrl } = publicRuntimeConfig;
 
-const failureRedirectUrl = `${apiUrl}/user-verification?status=failure`;
-const successRedirectUrl = `${apiUrl}/user-verification?status=success`;
+const failureRedirectUrl = `${appUrl}/user-verification?status=failure`;
+const successRedirectUrl = `${appUrl}/user-verification?status=success`;
 
 // eslint-disable-next-line max-lines-per-function
 const VerifyPayoutAccount = ({ onClose, onCancel }) => {

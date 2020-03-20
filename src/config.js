@@ -21,8 +21,14 @@ module.exports = convict({
   apiUrl: {
     doc: 'URL where the API lives.',
     format: String,
-    default: 'http://localhost:5000',
+    default: 'http://localhost:5000/graphql',
     env: 'API_URL'
+  },
+  websocketUrl: {
+    doc: 'URL where websocket lives.',
+    format: String,
+    default: 'ws://localhost:5000/graphql',
+    env: 'WEBSOCKET_URL'
   },
   appUrl: {
     doc: 'URL where the App lives.',

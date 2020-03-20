@@ -10,7 +10,6 @@ import {
   IntrospectionFragmentMatcher
 } from 'apollo-cache-inmemory';
 import getConfig from 'next/config';
-import { first } from 'lodash';
 
 import { auth } from '../utils/firebase';
 import introspectionQueryResultData from '../fragmentTypes.json';
@@ -55,21 +54,17 @@ const authLink = setContext(async (_, { headers }) => {
 });
 
 const { publicRuntimeConfig } = getConfig();
-const { apiUrl } = publicRuntimeConfig;
+const { apiUrl, websocketUrl } = publicRuntimeConfig;
 
 const httpLink = new HttpLink({
-  uri: `${apiUrl}/graphql`,
+  uri: apiUrl,
   credentials: 'include'
 });
-
-const apiHost = first(
-  apiUrl.replace(/^(?:https?:\/\/)?(?:www\.)?/i, '').split('/')
-);
 
 // Make sure the wsLink is only created on the browser. The server doesn't have a native implemention for websockets
 const wsLink = process.browser
   ? new WebSocketLink({
-      uri: `ws://${apiHost}/graphql`,
+      uri: websocketUrl,
       options: {
         reconnect: true,
         lazy: true,
