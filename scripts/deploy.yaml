@@ -3,6 +3,8 @@ substitutions:
   _FIREBASE_DATABASE_URL: 'https://yeaap-1.firebaseio.com'
   _FIREBASE_APP_CONFIG: '{}'
   _REDIS_URL: 'redis://localhost:6379'
+  _API_URL: 'http://localhost:5000'
+  _APP_URL: 'http://localhost:5000'
 steps:
   - id: 'create .env file'
     name: 'ubuntu'
@@ -15,13 +17,19 @@ steps:
         echo "FIREBASE_DATABASE_URL=$_FIREBASE_DATABASE_URL" >> .env &&
         echo "FIREBASE_APP_CONFIG=$_FIREBASE_APP_CONFIG" >> .env &&
         echo "REDIS_URL=$_REDIS_URL" >> .env &&
+        echo "API_URL=$_API_URL" >> .env &&
+        echo "APP_URL=$_APP_URL" >> .env &&
         echo "FIREBASE_CREDENTIALS=$$FIREBASE_CREDENTIALS" >> .env &&
         echo "FIREBASE_WEBAPI_KEY=$$FIREBASE_WEBAPI_KEY" >> .env &&
-        echo "STRIPE_API_KEY=$$STRIPE_API_KEY" >> .env
+        echo "GOOGLE_MAPS_KEY=$$GOOGLE_MAPS_KEY" >> .env
+        echo "STRIPE_API_PUBLISHABLE_KEY=$$STRIPE_API_PUBLISHABLE_KEY" >> .env
+        echo "STRIPE_API_SECRET_KEY=$$STRIPE_API_SECRET_KEY" >> .env
     secretEnv:
       - FIREBASE_CREDENTIALS
       - FIREBASE_WEBAPI_KEY
-      - STRIPE_API_KEY
+      - GOOGLE_MAPS_KEY
+      - STRIPE_API_PUBLISHABLE_KEY
+      - STRIPE_API_SECRET_KEY
   - id: 'deploy to app engine'
     name: 'gcr.io/cloud-builders/gcloud'
     args:
@@ -34,7 +42,13 @@ secrets:
   - kmsKeyName: projects/yeaap-1/locations/global/keyRings/env-variables/cryptoKeys/firebase-webapi-key
     secretEnv:
       FIREBASE_WEBAPI_KEY: CiQARCaVke2VlmpqEsx2ZYIdDay9OWYGc4rzqWCT+iZ9JpEjUn4SUABZpZ8EJGOCkThOWUBP1fBGSrJn9ST5aoKRRj4d2e2o8KlEBLhZ4J6UVz1w1WCb3YUCuOtKd/53xMTYwJXlWtl8rVcWStDtrt3mWdLExaG5
-  - kmsKeyName: projects/yeaap-1/locations/global/keyRings/env-variables/cryptoKeys/stripe-api-key
+  - kmsKeyName: projects/yeaap-1/locations/global/keyRings/env-variables/cryptoKeys/google-maps-key
     secretEnv:
-      STRIPE_API_KEY: CiQAVHgGGS/+kMWSoFIsCT97dxpghYnBvp5D4ZsSl5m/JD23Uq8SSQAdb+RGqgHQNvSm+9ogcF5lhFoOkdXtSvzd2ZXuvvbc3X3zf2emgHuJtO+C68QsqvOD0TtE5WD+UAkMv4hfDdRPV1XksMaA6Tc=
+      GOOGLE_MAPS_KEY: CiQAnP1gZeUPkX5HTxwI7DD8vhOFqF07+KxS6fbcxCF9QssMsuoSUAAmCfnp9AZ91gfluM3i0XsxJdkOJxIKwbQtwNEG844C02n7MhbrT3vFIU70+lEPzkx1haWM8/BCJNz2bnmkcwgayKyAI+ZQgdzJQR/y5evy
+  - kmsKeyName: projects/yeaap-1/locations/global/keyRings/env-variables/cryptoKeys/stripe-api-publishable-key
+    secretEnv:
+      STRIPE_API_PUBLISHABLE_KEY: CiQAstlE+bXdV8z4mi6hpQSxpQnSHDgZParY96BX4bzxgzxxvU0SSQAOkSvmKBvm+zBGoJbet6H0Fc8dQyf8mBqSh70gkluzhOnIb3M0P6t0kO4dlv1ohz0TSHENglqIbybUXiimwR5O++YbglQsda4=
+  - kmsKeyName: projects/yeaap-1/locations/global/keyRings/env-variables/cryptoKeys/stripe-api-secret-key
+    secretEnv:
+      STRIPE_API_SECRET_KEY: CiQAx/bbl99aOTbC1yKo8wSpTXTQhWWYo3ed7gznl303/Np3pGoSSQCJdZflh227DqUV1Z6Oq1WuWWhxLPsU8bFTytDUbzS2ShmKBoqTIRBnKHW3OjiSpTIpC+BxskgyFSgAyU+nkRDuKf30woCiRoQ=
 timeout: 1840s
