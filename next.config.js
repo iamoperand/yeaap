@@ -10,6 +10,7 @@ module.exports = withPlugins([
       stripePublishableKey: config.get('stripe').publishableKey,
       googleMapsKey: config.get('maps'),
       apiUrl: config.get('apiUrl'),
+      websocketUrl: config.get('websocketUrl'),
       appUrl: config.get('appUrl')
     }
   },
