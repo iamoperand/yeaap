@@ -35,6 +35,8 @@ steps:
     args:
       - app
       - deploy
+      - --promote
+      - --stop-previous-version
 secrets:
   - kmsKeyName: projects/yeaap-1/locations/global/keyRings/env-variables/cryptoKeys/firebase-credentials
     secretEnv:
