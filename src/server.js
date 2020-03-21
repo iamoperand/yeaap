@@ -2,9 +2,13 @@ const { ary, startsWith, trimStart } = require('lodash');
 const http = require('http');
 const createExpressApp = require('express');
 const createNextApp = require('next');
+const redis = require('redis');
 const session = require('express-session');
 const { attachApi } = require('./api');
 const config = require('./config');
+
+const RedisStore = require('connect-redis')(session);
+const redisClient = redis.createClient(config.get('redis').url);
 
 const handleListen = (err) => {
   if (err) {
@@ -43,8 +47,10 @@ const exec = async () => {
   expressApp.use(
     session({
       name: 'yeaap-session',
+      store: new RedisStore({ client: redisClient }),
       secret: config.get('session_secret'),
       saveUninitialized: true,
+      resave: false,
       rolling: true,
       cookie: { maxAge: 24 * 7 * 60 * 60 * 1000, httpOnly: true }
     })
