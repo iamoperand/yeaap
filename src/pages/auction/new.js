@@ -404,6 +404,13 @@ const New = () => {
 New.getInitialProps = ({ req, res }) => {
   const isServer = !process.browser;
 
+  console.log({
+    isServer,
+    user: isServer && req.session.user,
+    session: isServer && req.session,
+    req: isServer && req
+  });
+
   const user = isServer
     ? req && req.session
       ? req.session.user
