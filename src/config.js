@@ -42,6 +42,12 @@ module.exports = convict({
     default: 5000,
     env: 'PORT'
   },
+  session_secret: {
+    doc: 'Secret for express-session.',
+    format: String,
+    default: 'something',
+    env: 'SESSION_SECRET'
+  },
   enable: {
     playground: {
       doc: 'Enable GraphQL playground.',

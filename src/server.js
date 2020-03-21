@@ -42,11 +42,11 @@ const exec = async () => {
   expressApp.set('trust proxy', true);
   expressApp.use(
     session({
-      secret: 'geheimnis',
+      name: 'yeaap-session',
+      secret: config.get('session_secret'),
       saveUninitialized: true,
-      resave: false,
       rolling: true,
-      cookie: { maxAge: 604800000, httpOnly: true } // week
+      cookie: { maxAge: 24 * 7 * 60 * 60 * 1000, httpOnly: true }
     })
   );
 
