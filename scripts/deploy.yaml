@@ -6,6 +6,7 @@ substitutions:
   _API_URL: 'http://localhost:5000/graphql'
   _WEBSOCKET_URL: 'ws://localhost:5000/graphql'
   _APP_URL: 'http://localhost:5000'
+  _SESSION_SECRET: 'something'
 steps:
   - id: 'create .env file'
     name: 'ubuntu'
@@ -21,6 +22,7 @@ steps:
         echo "API_URL=$_API_URL" >> .env &&
         echo "WEBSOCKET_URL=$_WEBSOCKET_URL" >> .env &&
         echo "APP_URL=$_APP_URL" >> .env &&
+        echo "SESSION_SECRET=$_SESSION_SECRET" >> .env &&
         echo "FIREBASE_CREDENTIALS=$$FIREBASE_CREDENTIALS" >> .env &&
         echo "FIREBASE_WEBAPI_KEY=$$FIREBASE_WEBAPI_KEY" >> .env &&
         echo "GOOGLE_MAPS_KEY=$$GOOGLE_MAPS_KEY" >> .env
