@@ -5,11 +5,14 @@ import { useQuery } from '@apollo/react-hooks';
 import gql from 'graphql-tag';
 import { useToasts } from 'react-toast-notifications';
 import { isEmpty } from 'lodash';
+import { useModal } from 'react-modal-hook';
+import { useRouter } from 'next/router';
 
 import Layout from '../components/layout';
 import SEO from '../components/seo';
 import ActiveAuctions from '../components/active-auctions';
 import Loading from '../components/loading';
+import AuthModal from '../components/modal/auth';
 
 import WalletIcon from '../assets/icons/wallet.svg?sprite';
 import BirthdayIcon from '../assets/icons/birthday.svg?sprite';
@@ -20,7 +23,9 @@ import ChevronsRightIcon from '../assets/icons/chevrons-right.svg?sprite';
 import rem from '../utils/rem';
 import { getErrorMessage } from '../utils/error';
 
-import { buttonPrimary, buttonRounded } from '../styles/button';
+import useSession from '../hooks/use-session';
+
+import { buttonPrimary, buttonRounded, buttonDisabled } from '../styles/button';
 
 const GET_ACTIVE_AUCTIONS = gql`
   query getActiveAuctions {
@@ -43,6 +48,8 @@ const GET_ACTIVE_AUCTIONS = gql`
 
 // eslint-disable-next-line max-lines-per-function
 const Index = () => {
+  const { user, isUserLoading } = useSession();
+
   const { addToast } = useToasts();
   const { loading: isAuctionLoading, data } = useQuery(GET_ACTIVE_AUCTIONS, {
     onError: (error) => {
@@ -55,6 +62,22 @@ const Index = () => {
       });
     }
   });
+
+  const [showAuthModal, hideAuthModal] = useModal(() => (
+    <AuthModal onClose={hideAuthModal} />
+  ));
+
+  const router = useRouter();
+
+  const handleCreateAuctionClick = () => {
+    if (!user) {
+      showAuthModal();
+      return;
+    }
+    router.push('/auction/new');
+  };
+
+  const isCTADisabled = isUserLoading;
 
   return (
     <Layout>
@@ -131,7 +154,9 @@ const Index = () => {
         >
           {'In absolutely no time.'}
         </Text>
-        <CTAButton>Create auction</CTAButton>
+        <CTAButton disabled={isCTADisabled} onClick={handleCreateAuctionClick}>
+          Create auction
+        </CTAButton>
       </CTASection>
       <AuctionsSection>
         {isAuctionLoading ? (
@@ -259,6 +284,7 @@ const CTASection = styled.div`
 const CTAButton = styled.button`
   ${buttonPrimary};
   ${buttonRounded};
+  ${buttonDisabled};
 
   margin-top: ${rem(20)};
   padding: ${rem(10)} ${rem(30)};
