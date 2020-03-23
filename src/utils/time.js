@@ -1,5 +1,5 @@
-export const msToTime = (duration) => {
-  if (duration < 0) {
+export const msToTime = (milliseconds) => {
+  if (milliseconds < 0) {
     return {
       hours: '00',
       minutes: '00',
@@ -7,9 +7,9 @@ export const msToTime = (duration) => {
     };
   }
 
-  let seconds = Math.floor((duration / 1000) % 60);
-  let minutes = Math.floor((duration / (1000 * 60)) % 60);
-  let hours = Math.floor((duration / (1000 * 60 * 60)) % 24);
+  let seconds = Math.floor((milliseconds / 1000) % 60);
+  let minutes = Math.floor((milliseconds / (1000 * 60)) % 60);
+  let hours = Math.floor(milliseconds / (1000 * 60 * 60));
 
   hours = hours < 10 ? '0' + hours : hours;
   minutes = minutes < 10 ? '0' + minutes : minutes;

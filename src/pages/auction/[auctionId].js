@@ -138,8 +138,8 @@ const reducer = (state, action) => {
   }
 };
 
-const getTimeLeftInMs = (endTime) =>
-  differenceInMilliseconds(endTime, new Date());
+const getTimeLeftInMs = (endsAt) =>
+  differenceInMilliseconds(new Date(endsAt), new Date());
 
 const lessThanOrEqual = (input, value) => input === value || input < value;
 
@@ -218,13 +218,12 @@ const AuctionView = ({ auction }) => {
     }
   }, [isCanceled, isSettled, router]);
 
-  const endTime = new Date(endsAt);
-  const [timeLeftInMs, setTimeLeftInMs] = useState(getTimeLeftInMs(endTime));
+  const [timeLeftInMs, setTimeLeftInMs] = useState(getTimeLeftInMs(endsAt));
 
   const [isSettling, setSettling] = useState(false);
 
   useInterval(() => {
-    const timeLeftFromNow = getTimeLeftInMs(endTime);
+    const timeLeftFromNow = getTimeLeftInMs(endsAt);
     setTimeLeftInMs(timeLeftFromNow);
 
     if (lessThanOrEqual(timeLeftFromNow, 0) && !isSettled && !isSettling) {
