@@ -98,6 +98,26 @@ const queryAuctions = async (data) => {
   };
 };
 
+const queryActiveAuctions = async (data) => {
+  const {
+    context: { db }
+  } = data;
+
+  const ref = db
+    .collection('auctions')
+    .where('isCanceled', '==', false)
+    .where('endsAt', '>', new Date());
+
+  const auctions = await ref
+    .orderBy('endsAt', 'DESC')
+    .get()
+    .then((snap) =>
+      snap.docs.map((doc) => serializeFirestoreAuction(doc.data()))
+    );
+
+  return auctions;
+};
+
 const onAuctionUpdated = {
   resolve(data) {
     const { parent: snap } = data;
@@ -202,7 +222,8 @@ module.exports = {
     auction: bidAuction
   },
   Query: {
-    auctions: queryAuctions
+    auctions: queryAuctions,
+    activeAuctions: queryActiveAuctions
   },
   Subscription: {
     onAuctionUpdated

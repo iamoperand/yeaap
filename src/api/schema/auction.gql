@@ -58,6 +58,7 @@ extend type Bid {
 
 extend type Query {
   auctions(where: AuctionWhereInput!, page: PageInput): ConnectionAuction
+  activeAuctions: [Auction!]
 }
 
 extend type Mutation {
