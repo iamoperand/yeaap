@@ -57,7 +57,7 @@ const Links = styled.div`
 `;
 
 const Anchor = styled.a`
-  margin: 0 ${rem(10)};
+  margin: ${rem(6)} ${rem(10)};
 
   :first-child {
     margin-left: 0;
