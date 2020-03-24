@@ -9,9 +9,6 @@ const Footer = () => {
   return (
     <Wrapper>
       <Links>
-        <Link href="/about" passHref>
-          <Anchor>About</Anchor>
-        </Link>
         <Link href="/help" passHref>
           <Anchor>Help</Anchor>
         </Link>
