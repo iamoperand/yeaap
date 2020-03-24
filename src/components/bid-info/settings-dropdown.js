@@ -36,7 +36,13 @@ export default SettingsDropdown;
 
 const DropdownWrapper = styled.div`
   position: absolute;
-  right: 18px;
+
+  left: 18px;
+  right: inherit;
+  @media screen and (min-width: ${theme.breakpoints.tablet}) {
+    left: inherit;
+    right: 18px;
+  }
   top: 20px;
   z-index: 10;
   background-color: #fff;
