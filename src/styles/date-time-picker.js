@@ -37,7 +37,7 @@ export const dateTimePickerStyles = css`
     white-space: pre;
   }
   .react-datetime-picker__inputGroup__input {
-    min-width: 0.54em;
+    min-width: 0.54rem;
     height: calc(98%);
     position: relative;
     padding: 1px;
@@ -56,7 +56,7 @@ export const dateTimePickerStyles = css`
     background: rgba(255, 0, 0, 0.1);
   }
   .react-datetime-picker__inputGroup__input--hasLeadingZero {
-    margin-left: -0.54em;
+    margin-left: -0.54rem;
     padding-left: calc(1px + 0.54em);
   }
   .react-datetime-picker__inputGroup__amPm {
@@ -119,18 +119,18 @@ export const calendarStyles = css`
     max-width: 100%;
     background: white;
     border: 1px solid #a0a096;
-    line-height: 1.125em;
+    line-height: 1.125rem;
   }
   .react-calendar--doubleView {
     width: 700px;
   }
   .react-calendar--doubleView .react-calendar__viewContainer {
     display: flex;
-    margin: -0.5em;
+    margin: -0.5rem;
   }
   .react-calendar--doubleView .react-calendar__viewContainer > * {
     width: 50%;
-    margin: 0.5em;
+    margin: 0.5rem;
   }
   .react-calendar,
   .react-calendar *,
@@ -166,10 +166,10 @@ export const calendarStyles = css`
     text-align: center;
     text-transform: uppercase;
     font-weight: bold;
-    font-size: 0.75em;
+    font-size: 0.75rem;
   }
   .react-calendar__month-view__weekdays__weekday {
-    padding: 0.5em;
+    padding: 0.5rem;
   }
   .react-calendar__month-view__weekNumbers {
     font-weight: bold;
@@ -178,7 +178,7 @@ export const calendarStyles = css`
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 0.75em;
+    font-size: 0.75rem;
     padding: calc(1em) calc(0.6666666666666666em);
   }
   .react-calendar__month-view__days__day--weekend {
@@ -190,7 +190,7 @@ export const calendarStyles = css`
   .react-calendar__year-view .react-calendar__tile,
   .react-calendar__decade-view .react-calendar__tile,
   .react-calendar__century-view .react-calendar__tile {
-    padding: 1em 0em;
+    padding: 1em 0rem;
   }
   .react-calendar__tile {
     max-width: 100%;
