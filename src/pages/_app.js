@@ -71,9 +71,9 @@ const globalStyles = css`
 
   html,
   body {
-    font-size: 12.5px;
+    font-size: 14px;
     @media screen and (min-width: ${theme.breakpoints.tablet}) {
-      font-size: 14px;
+      font-size: 15px;
     }
     @media screen and (min-width: ${theme.breakpoints.desktop}) {
       font-size: 16px;
