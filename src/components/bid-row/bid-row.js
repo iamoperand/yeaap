@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import styled from '@emotion/styled';
 import { isEmpty } from 'lodash';
 import formatNum from 'format-num';
+import { css } from '@emotion/core';
 
 import Message from './message';
 import { WinnerTag } from '../tags';
@@ -81,12 +82,16 @@ const BidRow = ({
         </td>
         <td>
           {isUserCreator && !isEmpty(bid.message) && (
-            <IconStyles>
-              <StyledSpeechBubbleIcon
-                onClick={toggleShowMessage}
-                isMessageShown={showMessage}
-              />
-            </IconStyles>
+            <SpeechBubbleIcon
+              onClick={toggleShowMessage}
+              css={css`
+                ${speechBubbleIconStyles};
+                fill: ${showMessage ? theme.colors.primary : '#788896'};
+                :hover {
+                  fill: ${theme.colors.primary};
+                }
+              `}
+            />
           )}
         </td>
       </tr>
@@ -163,19 +168,11 @@ const Amount = styled.span`
   top: 1px;
 `;
 
-const IconStyles = styled.div`
-  position: relative;
-`;
-
-const StyledSpeechBubbleIcon = styled(SpeechBubbleIcon)`
+const speechBubbleIconStyles = css`
   position: relative;
   top: 2px;
   cursor: pointer;
   height: ${rem(17)};
   width: ${rem(17)};
-  fill: ${(props) => (props.isMessageShown ? theme.colors.primary : '#788896')};
-  :hover {
-    fill: ${theme.colors.primary};
-  }
   user-select: none;
 `;
