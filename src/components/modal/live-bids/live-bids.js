@@ -83,7 +83,6 @@ const modalContent = css`
   ${modalBasic};
   ${modalCentered};
   ${modalBorder};
-  min-width: 0;
 `;
 
 const Head = styled.div`
@@ -92,8 +91,11 @@ const Head = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding-left: ${rem(30)};
-  padding-right: ${rem(30)};
+
+  @media screen and (min-width: ${theme.breakpoints.tablet}) {
+    padding-left: ${rem(30)};
+    padding-right: ${rem(30)};
+  }
 `;
 
 const Title = styled.div`
@@ -114,13 +116,18 @@ const CountLabel = styled.div`
 const Body = styled.div`
   ${modalBody};
 
-  padding: ${rem(30)} ${rem(50)};
+  @media screen and (min-width: ${theme.breakpoints.tablet}) {
+    padding: ${rem(30)} ${rem(50)};
+  }
 `;
 
 const Footer = styled.div`
   ${modalFooter};
-  padding-left: ${rem(30)};
-  padding-right: ${rem(30)};
+
+  @media screen and (min-width: ${theme.breakpoints.tablet}) {
+    padding-left: ${rem(30)};
+    padding-right: ${rem(30)};
+  }
 `;
 
 const CTARow = styled.div`

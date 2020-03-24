@@ -23,32 +23,6 @@ WinningTag.propTypes = {
   label: PropTypes.string.isRequired
 };
 
-const getWidth = ({ type, size }) => {
-  switch (type) {
-    case 'index': {
-      if (size === 'large') {
-        return 40;
-      }
-      return 30;
-    }
-    case 'amount': {
-      if (size === 'large') {
-        return 200;
-      }
-      return 200;
-    }
-    case 'user': {
-      if (size === 'large') {
-        return 150;
-      }
-      return 150;
-    }
-    default: {
-      throw new Error('no type specified');
-    }
-  }
-};
-
 const BidRow = ({
   bid,
   index,
@@ -123,7 +97,7 @@ export default BidRow;
  */
 
 const UserInfo = styled.div`
-  width: ${(props) => rem(getWidth({ type: 'user', size: props.size }))};
+  width: ${rem(150)};
   display: flex;
   align-items: center;
   white-space: normal;
@@ -144,12 +118,12 @@ const Index = styled.div`
   color: #3a3a3a;
   font-size: ${rem(18)};
   user-select: none;
-  width: ${(props) => rem(getWidth({ type: 'index', size: props.size }))};
+  width: ${rem(40)};
 `;
 
 const AmountInfo = styled.div`
   display: block;
-  width: ${(props) => rem(getWidth({ type: 'amount', size: props.size }))};
+  width: ${rem(200)};
 `;
 
 const Name = styled.div`

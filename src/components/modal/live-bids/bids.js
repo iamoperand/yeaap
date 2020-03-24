@@ -6,6 +6,7 @@ import styled from '@emotion/styled';
 import BidRow from '../../bid-row';
 
 import rem from '../../../utils/rem';
+import theme from '../../../utils/theme';
 
 const showWinning = ({ index, winnerCount, auctionType }) => {
   switch (auctionType) {
@@ -27,20 +28,7 @@ const Bids = ({ bids, isUserCreator, winnerCount, auctionType }) => {
 
   return (
     <>
-      <TableHeaderStyles>
-        <table>
-          <thead>
-            <tr>
-              <th></th>
-              <th>Bid</th>
-              <th>User</th>
-              <th></th>
-            </tr>
-          </thead>
-        </table>
-      </TableHeaderStyles>
-
-      <TableContentStyles>
+      <TableStyles>
         <table>
           <tbody>
             {bids.map((bid, index) => {
@@ -62,7 +50,7 @@ const Bids = ({ bids, isUserCreator, winnerCount, auctionType }) => {
             })}
           </tbody>
         </table>
-      </TableContentStyles>
+      </TableStyles>
     </>
   );
 };
@@ -82,28 +70,7 @@ export default Bids;
  ********************************************
  */
 
-const TableHeaderStyles = styled.div`
-  thead th {
-    color: #788896;
-    font-size: ${rem(18)};
-    font-weight: normal;
-    padding: ${rem(4)} ${rem(10)};
-    white-space: nowrap;
-    text-align: left;
-  }
-
-  th:nth-child(1) {
-    width: ${rem(47)};
-  }
-  th:nth-child(2) {
-    width: ${rem(222)};
-  }
-  th:nth-child(3) {
-    padding-left: ${rem(25)};
-  }
-`;
-
-const TableContentStyles = styled.div`
+const TableStyles = styled.div`
   table {
     border-collapse: collapse;
     border-right: 20px solid transparent;
@@ -114,13 +81,18 @@ const TableContentStyles = styled.div`
   overflow: overlay;
 
   td {
-    padding: ${rem(4)} ${rem(10)};
+    padding: ${rem(4)};
+    @media screen and (min-width: ${theme.breakpoints.tablet}) {
+      padding: ${rem(4)} ${rem(10)};
+    }
+
     white-space: nowrap;
   }
-  td:nth-child(3) {
-    padding-left: ${rem(30)};
-  }
+  td:nth-child(3),
   td:nth-child(4) {
-    padding-left: ${rem(30)};
+    padding-left: ${rem(10)};
+    @media screen and (min-width: ${theme.breakpoints.tablet}) {
+      padding-left: ${rem(30)};
+    }
   }
 `;
