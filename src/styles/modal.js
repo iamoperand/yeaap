@@ -1,6 +1,7 @@
 import { css } from '@emotion/core';
 
 import rem from '../utils/rem';
+import theme from '../utils/theme';
 import {
   buttonWhite,
   buttonPrimary,
@@ -16,7 +17,11 @@ export const modalBasic = css`
   outline: none;
   background: #fff;
   border-radius: ${rem(5)};
-  min-width: ${rem(400)};
+
+  min-width: 95%;
+  @media screen and (min-width: ${theme.breakpoints.tablet}) {
+    min-width: ${rem(400)};
+  }
 `;
 
 export const modalCentered = css`
@@ -34,7 +39,10 @@ export const modalHead = css`
   border-top-left-radius: 4px;
   border-top-right-radius: 4px;
 
-  padding: ${rem(20)} ${rem(30)};
+  padding: ${rem(20)} ${rem(15)};
+  @media screen and (min-width: ${theme.breakpoints.tablet}) {
+    padding: ${rem(20)} ${rem(30)};
+  }
   box-shadow: inset 0 -1px #e3e8ee;
 `;
 
@@ -48,7 +56,11 @@ export const modalNote = css`
 `;
 
 export const modalBody = css`
-  padding: ${rem(22)} ${rem(30)} ${rem(18)};
+  padding: ${rem(20)} ${rem(15)};
+  @media screen and (min-width: ${theme.breakpoints.tablet}) {
+    padding: ${rem(22)} ${rem(30)} ${rem(18)};
+  }
+
   box-shadow: inset 0 -1px #e3e8ee;
   background-color: #f7fafc;
 `;
@@ -57,7 +69,10 @@ export const modalFooter = css`
   border-top-left-radius: 4px;
   border-top-right-radius: 4px;
 
-  padding: ${rem(20)} ${rem(20)};
+  padding: ${rem(20)} ${rem(15)};
+  @media screen and (min-width: ${theme.breakpoints.tablet}) {
+    padding: ${rem(20)} ${rem(20)};
+  }
   box-shadow: inset 0 1px #e3e8ee;
 `;
 

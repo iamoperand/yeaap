@@ -6,6 +6,7 @@ import ReactModal from 'react-modal';
 import { noop } from 'lodash';
 
 import rem from '../../utils/rem';
+import theme from '../../utils/theme';
 import {
   modalBasic,
   modalCentered,
@@ -92,7 +93,11 @@ const modalContent = css`
   ${modalBasic};
   ${modalCentered};
   ${modalBorder};
-  width: ${rem(500)};
+
+  width: 95%;
+  @media screen and (min-width: ${theme.breakpoints.tablet}) {
+    width: ${rem(500)};
+  }
 `;
 
 const Wrapper = styled.div`
@@ -111,7 +116,6 @@ const Title = styled.div`
 
 const Content = styled.div`
   ${modalBody};
-  padding: ${rem(25)} ${rem(30)};
 `;
 
 const Footer = styled.div`
