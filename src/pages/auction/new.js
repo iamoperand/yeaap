@@ -36,6 +36,7 @@ import { errorBasic, labelBasic, inputBasic } from '../../styles/form';
 import useSession from '../../hooks/use-session';
 import { auth } from '../../utils/firebase';
 import rem from '../../utils/rem';
+import theme from '../../utils/theme';
 import redirectWithSSR from '../../utils/redirect-with-ssr';
 import { getErrorMessage } from '../../utils/error';
 
@@ -486,6 +487,17 @@ const DateTimeWrapper = styled.div`
 
 const Row = styled.div`
   display: flex;
+
+  flex-direction: column;
+  > div:nth-child(2) {
+    margin-top: ${rem(20)};
+  }
+  @media screen and (min-width: ${theme.breakpoints.tablet}) {
+    flex-direction: row;
+    > div:nth-child(2) {
+      margin-top: 0;
+    }
+  }
 
   ${DateTimeWrapper} {
     margin-right: ${rem(70)};

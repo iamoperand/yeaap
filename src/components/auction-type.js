@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import styled from '@emotion/styled';
 
 import rem from '../utils/rem';
+import theme from '../utils/theme';
 
 import CheckCircleIcon from '../assets/icons/check-circle.svg';
 import { box3DBorder } from '../styles/box';
@@ -47,7 +48,11 @@ const Card = styled.div`
   text-align: center;
   position: relative;
   border-radius: 4px;
-  width: ${rem(200)};
+
+  width: ${rem(160)};
+  @media screen and (min-width: ${theme.breakpoints.tablet}) {
+    width: ${rem(200)};
+  }
 
   margin: 0 ${rem(10)};
   :first-child {
@@ -59,7 +64,11 @@ const Card = styled.div`
 `;
 
 const Content = styled.div`
-  padding: ${rem(30)};
+  padding: ${rem(30)} ${rem(13)} ${rem(30)} ${rem(10)};
+  @media screen and (min-width: ${theme.breakpoints.tablet}) {
+    padding: ${rem(30)};
+  }
+
   height: 100%;
   width: 100%;
   border-radius: 4px;
