@@ -175,4 +175,13 @@ const globalStyles = css`
     transform: scale(0.7);
     transition: all 0.3s;
   }
+
+  /* react-toast-notifications */
+  .react-toast-notifications__toast {
+    max-width: 80%;
+    margin-left: auto;
+    @media screen and (min-width: ${theme.breakpoints.tablet}) {
+      max-width: inherit;
+    }
+  }
 `;
