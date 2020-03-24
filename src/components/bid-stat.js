@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import styled from '@emotion/styled';
 import formatDistanceToNow from 'date-fns/formatDistanceToNow';
 import formatNum from 'format-num';
+import { css } from '@emotion/core';
 
 import { boxBorder } from '../styles/box';
 import rem from '../utils/rem';
@@ -20,7 +21,7 @@ const renderTime = (timeLeftInMs) => {
 };
 
 export const TimeCounter = ({ timeLeftInMs }) => (
-  <Box>
+  <Box css={smallBoxStyles}>
     <Label>Time left:</Label>
     <Value>{renderTime(timeLeftInMs)}</Value>
   </Box>
@@ -44,7 +45,7 @@ TopBid.propTypes = {
 
 export const BidCount = ({ value }) => {
   return (
-    <Box>
+    <Box css={smallBoxStyles}>
       <Label>Bid count:</Label>
       <Value>{formatNum(value)}</Value>
     </Box>
@@ -60,6 +61,14 @@ BidCount.propTypes = {
  ********************************************
  */
 
+const smallBoxStyles = css`
+  width: 70%;
+  justify-self: center;
+  @media screen and (min-width: ${theme.breakpoints.tablet}) {
+    width: 100%;
+  }
+`;
+
 const Label = styled.div`
   color: ${theme.colors.label};
   font-size: ${rem(15)};
@@ -67,7 +76,11 @@ const Label = styled.div`
 `;
 
 const Value = styled.div`
-  font-size: ${rem(40)};
+  font-size: ${rem(35)};
+  @media screen and (min-width: ${theme.breakpoints.tablet}) {
+    font-size: ${rem(40)};
+  }
+
   flex: 3;
   text-align: center;
 

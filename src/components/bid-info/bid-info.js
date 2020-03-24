@@ -241,7 +241,7 @@ const BidInfo = ({
 
   return (
     <Box>
-      <RowWrapper>
+      <InfoRowWrapper>
         <Row>
           <Label>Auction by</Label>
           <Name>{name}</Name>
@@ -250,8 +250,15 @@ const BidInfo = ({
           {isHighestBidWinner ? <HighestBidWinsTag /> : <ClosestBidWinsTag />}
           &nbsp;{hasBidsVisible ? <BidsVisibleTag /> : <BidsHiddenTag />}
         </Row>
-      </RowWrapper>
-      <Row>
+      </InfoRowWrapper>
+      <Row
+        css={css`
+          margin-top: ${rem(10)};
+          @media screen and (min-width: ${theme.breakpoints.tablet}) {
+            margin-top: 0;
+          }
+        `}
+      >
         <span>{description}</span>
       </Row>
 
@@ -265,9 +272,8 @@ const BidInfo = ({
           >
             <SettingsIcon
               css={css`
+                ${iconStyles};
                 fill: ${isUserLoading ? '#ccc' : '#e8833a'};
-                height: 20px;
-                width: 20px;
                 position: relative;
                 top: 1px;
               `}
@@ -293,9 +299,8 @@ const BidInfo = ({
           <IconButton type="success" onClick={shareHandler}>
             <ShareIcon
               css={css`
+                ${iconStyles};
                 fill: #1aae9f;
-                height: 20px;
-                width: 20px;
                 position: relative;
                 top: 1px;
                 left: -1px;
@@ -335,9 +340,14 @@ const Box = styled.div`
   padding: ${rem(12)} ${rem(12)} ${rem(40)};
 `;
 
-const RowWrapper = styled.div`
+const InfoRowWrapper = styled.div`
   display: flex;
   justify-content: space-between;
+  flex-direction: column;
+
+  @media screen and (min-width: ${theme.breakpoints.tablet}) {
+    flex-direction: row;
+  }
 `;
 
 const Row = styled.div`
@@ -353,7 +363,7 @@ const Name = styled.div`
   color: #293845;
   font-weight: bold;
 
-  margin-left: ${rem(10)};
+  margin-left: ${rem(6)};
 `;
 
 const CTARowWrapper = styled.div`
@@ -371,14 +381,20 @@ const CTARow = styled.div`
 `;
 
 const Button = styled.button`
-  padding: ${rem(15)} ${rem(65)};
-  font-size: ${rem(24)};
   font-weight: 500;
   margin: 0 ${rem(20)};
 
   ${buttonPrimary};
   ${buttonRounded};
   ${buttonDisabled};
+
+  padding: ${rem(15)} ${rem(50)};
+  font-size: ${rem(21)};
+
+  @media screen and (min-width: ${theme.breakpoints.tablet}) {
+    padding: ${rem(15)} ${rem(65)};
+    font-size: ${rem(24)};
+  }
 `;
 
 const getIconColor = (type) => {
@@ -394,9 +410,12 @@ const getIconColor = (type) => {
 
 const IconButton = styled.button`
   position: relative;
-  padding: ${rem(10)};
   background: #fff;
   border: 3px solid ${(props) => getIconColor(props.type)};
+  padding: ${rem(8)};
+  @media screen and (min-width: ${theme.breakpoints.tablet}) {
+    padding: ${rem(10)};
+  }
 
   ${buttonRounded};
 
@@ -404,6 +423,11 @@ const IconButton = styled.button`
     cursor: not-allowed;
     border: 3px solid #ccc;
   }
+`;
+
+const iconStyles = css`
+  height: ${rem(20)};
+  width: ${rem(20)};
 `;
 
 const Label = styled.span`

@@ -193,6 +193,7 @@ const Button = styled.button`
   padding: 0;
   color: ${theme.colors.links};
   text-decoration: none;
+  background: transparent;
   position: relative;
 
   :hover,
@@ -219,7 +220,12 @@ const H3 = styled.div`
 `;
 
 const TagWrapper = styled.div`
-  margin-left: ${rem(8)};
-  position: relative;
-  top: -2px;
+  display: none;
+
+  @media screen and (min-width: ${theme.breakpoints.tablet}) {
+    display: block;
+    margin-left: ${rem(8)};
+    position: relative;
+    top: -2px;
+  }
 `;

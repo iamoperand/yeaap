@@ -17,6 +17,7 @@ import Loading from '../../components/loading';
 import AuctionSettling from '../../components/auction-settling';
 
 import rem from '../../utils/rem';
+import theme from '../../utils/theme';
 import redirectWithSSR from '../../utils/redirect-with-ssr';
 import { difference } from '../../utils/lodash-extended';
 
@@ -318,9 +319,17 @@ const rowSpacingStyles = css`
 
 const BidStatsWrapper = styled.div`
   display: grid;
-  grid-template-areas: 'timeLeft topBid BidCount';
-  grid-template-columns: ${rem(200)} 1fr ${rem(200)};
-  grid-column-gap: ${rem(25)};
+  grid-template-areas: 'timeLeft' 'topBid' 'bidCount';
+  grid-template-columns: 80%;
+  grid-row-gap: ${rem(25)};
+  justify-content: center;
+  align-items: center;
+
+  @media screen and (min-width: ${theme.breakpoints.tablet}) {
+    grid-template-areas: 'timeLeft topBid bidCount';
+    grid-template-columns: ${rem(200)} 1fr ${rem(200)};
+    grid-column-gap: ${rem(25)};
+  }
 
   ${rowSpacingStyles};
 `;
