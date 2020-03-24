@@ -396,7 +396,7 @@ const removeButtonStyles = css`
   color: ${theme.colors.error};
   width: ${rem(15)};
   height: ${rem(15)};
-  margin-left: ${rem(20)};
+  margin-left: ${rem(10)};
   position: relative;
   top: -1px;
   cursor: pointer;
