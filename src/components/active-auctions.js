@@ -107,8 +107,9 @@ export default ActiveAuctions;
 
 const Auctions = styled.div`
   margin-top: ${rem(40)};
+  width: 100%;
   display: grid;
-  grid-template-columns: ${rem(400)};
+  grid-template-columns: 1fr;
   grid-row-gap: ${rem(30)};
   justify-content: center;
 `;

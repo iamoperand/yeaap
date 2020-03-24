@@ -78,18 +78,22 @@ export default BidList;
 
 const Bids = styled.div`
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
   grid-gap: ${rem(20)} ${rem(50)};
+
+  grid-template-columns: 1fr;
+  @media screen and (min-width: ${theme.breakpoints.tablet}) {
+    grid-template-columns: repeat(2, 1fr);
+  }
 
   margin-top: ${rem(20)};
 `;
 
 const Bid = styled.div`
   ${boxBorder};
-  padding: ${rem(10)};
   display: flex;
   flex-direction: column;
   justify-content: space-between;
+  padding: ${rem(10)};
 `;
 
 const AmountRow = styled.div`

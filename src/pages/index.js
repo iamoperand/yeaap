@@ -4,7 +4,7 @@ import { css } from '@emotion/core';
 import { useQuery } from '@apollo/react-hooks';
 import gql from 'graphql-tag';
 import { useToasts } from 'react-toast-notifications';
-import { isEmpty } from 'lodash';
+import { isEmpty, get } from 'lodash';
 import { useModal } from 'react-modal-hook';
 import { useRouter } from 'next/router';
 
@@ -185,7 +185,7 @@ const Index = () => {
         {isAuctionLoading ? (
           <Loading />
         ) : (
-          !isEmpty(data.activeAuctions) && (
+          !isEmpty(get(data, 'activeAuctions')) && (
             <>
               <H3 css={underlineStyles}>Still not convinced?</H3>
               <Text
