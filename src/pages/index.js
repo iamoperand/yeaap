@@ -22,6 +22,7 @@ import ChevronsRightIcon from '../assets/icons/chevrons-right.svg?sprite';
 
 import rem from '../utils/rem';
 import { getErrorMessage } from '../utils/error';
+import theme from '../utils/theme';
 
 import useSession from '../hooks/use-session';
 
@@ -83,10 +84,19 @@ const Index = () => {
     <Layout>
       <SEO />
       <InfoGrid>
-        <div>
+        <div
+          css={css`
+            grid-area: text;
+          `}
+        >
           <div
             css={css`
               margin-bottom: ${rem(10)};
+              text-align: center;
+
+              @media screen and (min-width: ${theme.breakpoints.tablet}) {
+                text-align: left;
+              }
             `}
           >
             <H1>Seamless</H1>
@@ -97,11 +107,23 @@ const Index = () => {
             running within a few minutes.
           </Text>
         </div>
-        <WalletIcon
+        <div
           css={css`
-            width: 100%;
+            grid-area: image;
+            text-align: center;
+
+            @media screen and (min-width: ${theme.breakpoints.tablet}) {
+              text-align: left;
+            }
           `}
-        />
+        >
+          <WalletIcon
+            css={css`
+              width: ${rem(330)};
+              order: 1;
+            `}
+          />
+        </div>
       </InfoGrid>
       <div
         css={css`
@@ -158,6 +180,7 @@ const Index = () => {
           Create auction
         </CTAButton>
       </CTASection>
+
       <AuctionsSection>
         {isAuctionLoading ? (
           <Loading />
@@ -192,9 +215,18 @@ export default Index;
 
 const InfoGrid = styled.div`
   display: grid;
-  grid-template-columns: 1fr ${rem(330)};
-  grid-column-gap: ${rem(70)};
-  align-items: flex-end;
+  grid-template-areas: 'image' 'text';
+  grid-template-columns: 1fr;
+  grid-row-gap: ${rem(40)};
+  justify-content: center;
+
+  @media screen and (min-width: ${theme.breakpoints.tablet}) {
+    grid-template-areas: 'text image';
+    grid-template-columns: 1fr ${rem(330)};
+    grid-column-gap: ${rem(70)};
+    align-items: flex-end;
+    justify-content: start;
+  }
 `;
 
 const H1 = styled.div`
@@ -224,6 +256,11 @@ const H3 = styled.div`
 const Text = styled.div`
   color: #788896;
   font-size: ${rem(18)};
+  text-align: center;
+
+  @media screen and (min-width: ${theme.breakpoints.tablet}) {
+    text-align: inherit;
+  }
 `;
 
 const arrowIconStyles = css`
@@ -239,16 +276,25 @@ const featureIconStyles = css`
 
 const IconText = styled.div`
   color: #293845cc;
-  font-size: ${rem(22)};
   margin-top: ${rem(10)};
   font-weight: 500;
   text-align: center;
+
+  font-size: ${rem(18)};
+  @media screen and (min-width: ${theme.breakpoints.tablet}) {
+    font-size: ${rem(22)};
+  }
 `;
 
 const IconParagraph = styled.div`
-  color: #788896;
-  margin-top: ${rem(5)};
-  text-align: center;
+  display: none;
+
+  @media screen and (min-width: ${theme.breakpoints.tablet}) {
+    display: block;
+    color: #788896;
+    margin-top: ${rem(5)};
+    text-align: center;
+  }
 `;
 
 const FeaturesRow = styled.div`

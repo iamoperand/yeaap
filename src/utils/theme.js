@@ -8,12 +8,9 @@ const colors = {
 };
 
 const breakpoints = {
-  xxs: '350px',
-  xs: '560px',
-  md: '768px',
-  lg: '992px',
-  xl: '1200px',
-  xxl: '1700px'
+  mobile: '576px',
+  tablet: '768px',
+  desktop: '992px'
 };
 
 const theme = { colors, breakpoints };

@@ -62,12 +62,22 @@ const globalStyles = css`
   body {
     margin: 0;
     height: 100%;
-    font-size: 16px;
     box-sizing: border-box;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
 
     font-family: 'DIN Next LT Pro';
+  }
+
+  html,
+  body {
+    font-size: 12.5px;
+    @media screen and (min-width: ${theme.breakpoints.tablet}) {
+      font-size: 14px;
+    }
+    @media screen and (min-width: ${theme.breakpoints.desktop}) {
+      font-size: 16px;
+    }
   }
 
   *,

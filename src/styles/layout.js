@@ -9,13 +9,12 @@ export const bodyStyles = css`
 `;
 
 export const centerStyles = css`
-  max-width: ${rem(700)};
-  width: calc(100% - ${rem(30)});
   margin: 0 auto;
-
-  @media (min-width: ${theme.breakpoints.xs}) {
-    width: calc(100% - ${rem(350)});
-  }
-
+  padding: 0 ${rem(32)};
   min-height: 100vh;
+  width: 100vw;
+
+  @media screen and (min-width: ${theme.breakpoints.tablet}) {
+    max-width: ${rem(830)};
+  }
 `;
