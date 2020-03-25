@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import formatDistance from 'date-fns/formatDistance';
+import { isPast, formatDistance } from 'date-fns';
 import { capitalize } from 'lodash';
 import styled from '@emotion/styled';
 import Link from 'next/link';
@@ -20,14 +20,15 @@ import {
 const statusEnum = {
   active: 'active',
   cancelled: 'cancelled',
-  ended: 'ended'
+  ended: 'ended',
+  processing: 'processing'
 };
 
 const computeTimeLeft = (endsAt) =>
-  formatDistance(new Date(endsAt), new Date());
+  formatDistance(new Date(endsAt), new Date(), { addSuffix: true });
 
 const getAuctionStatus = ({ auction }) => {
-  const { isCanceled, isSettled } = auction;
+  const { isCanceled, isSettled, endsAt } = auction;
 
   if (isCanceled) {
     return statusEnum.cancelled;
@@ -35,6 +36,11 @@ const getAuctionStatus = ({ auction }) => {
   if (isSettled) {
     return statusEnum.ended;
   }
+
+  if (isPast(new Date(endsAt))) {
+    return statusEnum.processing;
+  }
+
   return statusEnum.active;
 };
 
@@ -66,8 +72,8 @@ const AuctionList = ({ auctionConnection }) => {
             <Row>
               <div>
                 <Status status={status}>{capitalize(status)}</Status>
-                {isActive && <TimeLeft>{`ends in ${timeLeft}`}</TimeLeft>}
-                {isSettled && <TimeLeft>{`${timeLeft} ago`}</TimeLeft>}
+                {isActive && <TimeLeft>{timeLeft}</TimeLeft>}
+                {isSettled && <TimeLeft>{timeLeft}</TimeLeft>}
               </div>
               <Link href="/auction/[auctionId]" as={`/auction/${id}`} passHref>
                 <a>View auction</a>
