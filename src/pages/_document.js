@@ -41,7 +41,26 @@ export default class MyDocument extends Document {
             dangerouslySetInnerHTML={{ __html: this.props.css }}
           />
 
-          <link rel="shortcut icon" href="/images/favicon.ico" />
+          <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" />
+          <link
+            rel="icon"
+            type="image/png"
+            href="/favicon-16x16.png"
+            sizes="16x16"
+          />
+          <link
+            rel="icon"
+            type="image/png"
+            href="/favicon-32x32.png"
+            sizes="32x32"
+          />
+          <link
+            rel="icon"
+            type="image/png"
+            href="/favicon-96x96.png"
+            sizes="96x96"
+          />
+
           {/* Import CSS for nprogress */}
           <link rel="stylesheet" type="text/css" href="/css/nprogress.css" />
         </Head>
