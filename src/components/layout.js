@@ -44,7 +44,7 @@ const Center = styled.div`
     'content'
     'footer';
   grid-template-rows: ${rem(70)} 1fr ${rem(100)};
-  grid-template-columns: 1fr;
+  grid-template-columns: 100%;
   grid-row-gap: ${rem(30)};
 `;
 

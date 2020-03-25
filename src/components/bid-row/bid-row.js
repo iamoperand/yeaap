@@ -6,29 +6,20 @@ import formatNum from 'format-num';
 import { css } from '@emotion/core';
 
 import Message from './message';
-import { WinnerTag } from '../tags';
+
 import Avatar from '../avatar';
 
 import rem from '../../utils/rem';
 import theme from '../../utils/theme';
 
 import SpeechBubbleIcon from '../../assets/icons/speech-bubble.svg?sprite';
-
-const WinningTag = ({ label }) => (
-  <WinnerTagStyles>
-    <WinnerTag label={label} />
-  </WinnerTagStyles>
-);
-WinningTag.propTypes = {
-  label: PropTypes.string.isRequired
-};
+import TrophyIcon from '../../assets/icons/trophy.svg?sprite';
 
 const BidRow = ({
   bid,
   index,
   isUserCreator,
   showWinnerTag,
-  winnerTagLabel,
   size = 'normal'
 }) => {
   const [showMessage, setShowMessage] = useState(false);
@@ -38,14 +29,14 @@ const BidRow = ({
 
   return (
     <>
-      <tr>
+      <tr className="data-row">
         <td>
           <Index size={size}>{`${index + 1}.`}</Index>
         </td>
         <td>
           <AmountInfo size={size}>
             <Amount>{`$${formatNum(bid.amount)}`}</Amount>
-            {showWinnerTag && <WinningTag label={winnerTagLabel} />}
+            {showWinnerTag && <TrophyIcon css={trophyIconStyles} />}
           </AmountInfo>
         </td>
         <td>
@@ -84,7 +75,6 @@ BidRow.propTypes = {
   index: PropTypes.number.isRequired,
   isUserCreator: PropTypes.bool.isRequired,
   showWinnerTag: PropTypes.bool.isRequired,
-  winnerTagLabel: PropTypes.string,
   size: PropTypes.oneOf(['normal', 'large'])
 };
 
@@ -108,22 +98,34 @@ const UserInfo = styled.div`
   }
 `;
 
-const WinnerTagStyles = styled.div`
-  display: inline-block;
+const trophyIconStyles = css`
   position: relative;
-  top: -4px;
+  top: -1px;
+  width: ${rem(15)};
+  height: ${rem(15)};
+  @media screen and (min-width: ${theme.breakpoints.tablet}) {
+    width: ${rem(30)};
+    height: ${rem(30)};
+  }
 `;
 
 const Index = styled.div`
   color: #3a3a3a;
-  font-size: ${rem(18)};
   user-select: none;
-  width: ${rem(40)};
+  font-size: ${rem(14)};
+  @media screen and (min-width: ${theme.breakpoints.tablet}) {
+    font-size: ${rem(18)};
+  }
 `;
 
 const AmountInfo = styled.div`
-  display: block;
-  width: ${rem(200)};
+  display: flex;
+  align-items: center;
+
+  width: ${rem(120)};
+  @media screen and (min-width: ${theme.breakpoints.tablet}) {
+    width: ${rem(150)};
+  }
 `;
 
 const Name = styled.div`
@@ -134,7 +136,10 @@ const Name = styled.div`
 `;
 
 const Amount = styled.span`
-  font-size: ${rem(28)};
+  font-size: ${rem(22)};
+  @media screen and (min-width: ${theme.breakpoints.tablet}) {
+    font-size: ${rem(28)};
+  }
   font-variant: tabular-nums;
   color: ${theme.colors.primary};
   margin-right: ${rem(10)};

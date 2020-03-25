@@ -11502,6 +11502,11 @@ url@0.11.0, url@^0.11.0:
     punycode "1.3.2"
     querystring "0.2.0"
 
+use-breakpoint@^1.1.1:
+  version "1.1.1"
+  resolved "https://registry.yarnpkg.com/use-breakpoint/-/use-breakpoint-1.1.1.tgz#b8279e3053c0e021f3d421c0a8d1b75da6fba4f6"
+  integrity sha512-ZhUH/6N7U+VJd3c6c2FQc1Dn7eRkExURuCtPPr83dDK74noFVYLtKk6M+NEIZAG0EGvW96dLsQv4UsWmwz881Q==
+
 use-clipboard-copy@^0.1.2:
   version "0.1.2"
   resolved "https://registry.yarnpkg.com/use-clipboard-copy/-/use-clipboard-copy-0.1.2.tgz#83b16292dfa8ea262be714252022a8b4ad1c28c5"

@@ -4,6 +4,9 @@ import styled from '@emotion/styled';
 import { css } from '@emotion/core';
 
 import rem from '../utils/rem';
+import theme from '../utils/theme';
+
+import useDeviceBreakpoint from '../hooks/use-device-breakpoint';
 
 import LeftArrowIcon from '../assets/icons/arrow-left.svg?sprite';
 import RightArrowIcon from '../assets/icons/arrow-right.svg?sprite';
@@ -18,6 +21,9 @@ const Pagination = ({
   const isBackButtonDisabled = isFetchingData || currentPage <= 0;
   const isNextButtonDisabled = isFetchingData || currentPage >= totalPages;
 
+  const { breakpoint } = useDeviceBreakpoint();
+  const isMobile = breakpoint === 'mobile';
+
   return (
     <Wrapper>
       <BackButton onClick={onPrev} disabled={isBackButtonDisabled}>
@@ -29,13 +35,15 @@ const Pagination = ({
             top: -2px;
           `}
         />
-        &nbsp;Previous
+        &nbsp;Prev
       </BackButton>
       <Content>
-        You are on page {currentPage} of {totalPages}
+        {isMobile
+          ? `Page ${currentPage} of ${totalPages}`
+          : `You are on page ${currentPage} of ${totalPages}`}
       </Content>
       <NextButton onClick={onNext} disabled={isNextButtonDisabled}>
-        Next, please&nbsp;
+        Next&nbsp;
         <RightArrowIcon
           css={css`
             width: ${rem(15)};
@@ -77,17 +85,27 @@ const Wrapper = styled.div`
 
 const Content = styled.div`
   background-color: white;
-  padding: ${rem(10)} ${rem(20)};
   transform: rotate(-2deg);
-  font-size: ${rem(20)};
+
+  font-size: ${rem(18)};
+  padding: ${rem(10)};
+  @media screen and (min-width: ${theme.breakpoints.tablet}) {
+    font-size: ${rem(20)};
+    padding: ${rem(10)} ${rem(20)};
+  }
 `;
 
 const buttonStyles = css`
   background-color: white;
   display: flex;
   align-items: center;
-  font-size: ${rem(18)};
-  padding: ${rem(5)} ${rem(20)};
+
+  font-size: ${rem(16)};
+  padding: ${rem(5)};
+  @media screen and (min-width: ${theme.breakpoints.tablet}) {
+    font-size: ${rem(18)};
+    padding: ${rem(5)} ${rem(20)};
+  }
 
   :disabled {
     cursor: not-allowed;

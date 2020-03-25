@@ -44,7 +44,6 @@ const Bids = ({ bids, isUserCreator, winnerCount, auctionType }) => {
                   index={index}
                   isUserCreator={isUserCreator}
                   showWinnerTag={showWinnerTag}
-                  winnerTagLabel="Winning"
                 />
               );
             })}
@@ -74,6 +73,7 @@ const TableStyles = styled.div`
   table {
     border-collapse: collapse;
     border-right: 20px solid transparent;
+    border-bottom: 20px solid transparent;
     table-layout: fixed;
   }
   margin-top: ${rem(10)};
@@ -88,6 +88,14 @@ const TableStyles = styled.div`
 
     white-space: nowrap;
   }
+
+  td:nth-child(2) {
+    padding-right: ${rem(5)};
+    @media screen and (min-width: ${theme.breakpoints.tablet}) {
+      padding-right: ${rem(100)};
+    }
+  }
+
   td:nth-child(3),
   td:nth-child(4) {
     padding-left: ${rem(10)};

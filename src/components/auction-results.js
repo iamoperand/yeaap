@@ -12,10 +12,12 @@ import Pagination from './pagination';
 
 import rem from '../utils/rem';
 import { getErrorMessage } from '../utils/error';
+import theme from '../utils/theme';
 
 import { boxBorder } from '../styles/box';
 
 import useSession from '../hooks/use-session';
+import useDeviceBreakpoint from '../hooks/use-device-breakpoint';
 
 const GET_BIDS = gql`
   query getBids($where: AuctionWhereInput!, $page: PageInput) {
@@ -138,6 +140,8 @@ const AuctionResults = ({ auctionId, creatorId, bidCount }) => {
 
   const totalPages = Math.floor(bidCount / itemsAllowedPerPage);
 
+  const { breakpoint } = useDeviceBreakpoint();
+
   return (
     <Wrapper>
       <Pagination
@@ -154,14 +158,16 @@ const AuctionResults = ({ auctionId, creatorId, bidCount }) => {
           <TableWrapper>
             <TableContentStyles>
               <table align="center">
-                <thead>
-                  <tr className="no-hover">
-                    <th></th>
-                    <th>Bid</th>
-                    <th>User</th>
-                    <th></th>
-                  </tr>
-                </thead>
+                {breakpoint === 'mobile' ? null : (
+                  <thead>
+                    <tr className="no-hover">
+                      <th></th>
+                      <th>Bid</th>
+                      <th>User</th>
+                      <th></th>
+                    </tr>
+                  </thead>
+                )}
                 <tbody>
                   {visibleBids.map((bid) => (
                     <BidRow
@@ -170,7 +176,6 @@ const AuctionResults = ({ auctionId, creatorId, bidCount }) => {
                       index={bid.index}
                       isUserCreator={isUserCreator}
                       showWinnerTag={bid.isWinner}
-                      winnerTagLabel="Winner"
                       size="large"
                     />
                   ))}
@@ -207,14 +212,21 @@ const Wrapper = styled.div`
 const LeaderboardWrapper = styled.div`
   margin: 0 auto;
 
-  min-height: 550px;
+  min-height: 280px;
+  @media screen and (min-width: ${theme.breakpoints.tablet}) {
+    min-height: 550px;
+  }
+
   display: flex;
   justify-content: center;
   width: 100%;
 `;
 
 const TableWrapper = styled.div`
-  padding: ${rem(10)} ${rem(30)} ${rem(20)};
+  padding: ${rem(10)};
+  @media screen and (min-width: ${theme.breakpoints.tablet}) {
+    padding: ${rem(10)} ${rem(30)} ${rem(20)};
+  }
   width: 100%;
   border-radius: 10px;
 
@@ -227,8 +239,11 @@ const TableWrapper = styled.div`
 const TableContentStyles = styled.div`
   table {
     border-collapse: collapse;
+    border-right: 20px solid transparent;
+    border-bottom: 20px solid transparent;
     table-layout: fixed;
   }
+  overflow: overlay;
 
   thead th {
     color: #788896;
@@ -242,15 +257,28 @@ const TableContentStyles = styled.div`
 
   th,
   td {
-    padding: ${rem(5)} ${rem(10)};
+    padding: ${rem(4)};
+    @media screen and (min-width: ${theme.breakpoints.tablet}) {
+      padding: ${rem(4)} ${rem(10)};
+    }
   }
+
   th:nth-child(2),
   td:nth-child(2) {
-    padding-right: ${rem(100)};
+    padding-right: ${rem(5)};
+    @media screen and (min-width: ${theme.breakpoints.tablet}) {
+      padding-right: ${rem(100)};
+    }
   }
-  th:nth-child(2),
-  td:nth-child(2) {
-    padding-right: ${rem(100)};
+
+  th:nth-child(3),
+  td:nth-child(3),
+  th:nth-child(4),
+  td:nth-child(4) {
+    padding-left: ${rem(10)};
+    @media screen and (min-width: ${theme.breakpoints.tablet}) {
+      padding-left: ${rem(30)};
+    }
   }
 
   tr:hover {

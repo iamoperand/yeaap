@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import styled from '@emotion/styled';
 
 import rem from '../../utils/rem';
+import theme from '../../utils/theme';
 
 const Message = ({ isOpen, message }) => {
   return (
@@ -29,10 +30,15 @@ const Wrapper = styled.div`
   display: ${(props) => (!props.isOpen ? 'none' : 'flex')};
   padding-bottom: ${rem(25)};
   justify-content: flex-end;
+  position: relative;
+  top: 2px;
 `;
 
 const Text = styled.div`
-  width: ${rem(400)};
+  width: 50%;
+  @media screen and (min-width: ${theme.breakpoints.tablet}) {
+    width: ${rem(400)};
+  }
   color: #4c4c4c;
   white-space: normal;
   background-color: #fff;

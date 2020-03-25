@@ -8,7 +8,7 @@ const colors = {
 };
 
 const breakpoints = {
-  mobile: '576px',
+  mobile: '0px',
   tablet: '768px',
   desktop: '992px'
 };
