@@ -3,7 +3,6 @@ import styled from '@emotion/styled';
 import { css } from '@emotion/core';
 import { useQuery } from '@apollo/react-hooks';
 import gql from 'graphql-tag';
-import { useToasts } from 'react-toast-notifications';
 import { isEmpty, get } from 'lodash';
 import { useModal } from 'react-modal-hook';
 import { useRouter } from 'next/router';
@@ -21,7 +20,6 @@ import TimeIcon from '../assets/icons/time.svg?sprite';
 import ChevronsRightIcon from '../assets/icons/chevrons-right.svg?sprite';
 
 import rem from '../utils/rem';
-import { getErrorMessage } from '../utils/error';
 import theme from '../utils/theme';
 
 import useSession from '../hooks/use-session';
@@ -51,18 +49,7 @@ const GET_ACTIVE_AUCTIONS = gql`
 const Index = () => {
   const { user, isUserLoading } = useSession();
 
-  const { addToast } = useToasts();
-  const { loading: isAuctionLoading, data } = useQuery(GET_ACTIVE_AUCTIONS, {
-    onError: (error) => {
-      const errorMessage = getErrorMessage(
-        error,
-        'An error occurred while updating the auction'
-      );
-      addToast(errorMessage, {
-        appearance: 'error'
-      });
-    }
-  });
+  const { loading: isAuctionLoading, data } = useQuery(GET_ACTIVE_AUCTIONS);
 
   const [showAuthModal, hideAuthModal] = useModal(() => (
     <AuthModal
