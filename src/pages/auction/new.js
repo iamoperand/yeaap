@@ -447,6 +447,11 @@ const AuctionTypeWrapper = styled.div`
 `;
 const CardTitle = styled.div`
   font-size: ${rem(22)};
+  margin: 0 auto;
+  width: 70%;
+  @media screen and (min-width: ${theme.breakpoints.tablet}) {
+    width: 100%;
+  }
 `;
 const CardDescription = styled.div`
   margin-top: ${rem(15)};
