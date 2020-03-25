@@ -20,6 +20,7 @@ export const modalBasic = css`
 
   width: 98%;
   @media screen and (min-width: ${theme.breakpoints.tablet}) {
+    width: auto;
     min-width: ${rem(400)};
   }
 `;
