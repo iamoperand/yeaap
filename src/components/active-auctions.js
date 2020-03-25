@@ -6,6 +6,7 @@ import formatDistance from 'date-fns/formatDistance';
 import { capitalize, isEmpty } from 'lodash';
 
 import rem from '../utils/rem';
+import theme from '../utils/theme';
 
 import {
   HighestBidWinsTag,
@@ -109,7 +110,11 @@ const Auctions = styled.div`
   margin-top: ${rem(40)};
   width: 100%;
   display: grid;
+
   grid-template-columns: 1fr;
+  @media screen and (min-width: ${theme.breakpoints.tablet}) {
+    grid-template-columns: 400px;
+  }
   grid-row-gap: ${rem(30)};
   justify-content: center;
 `;

@@ -37,6 +37,7 @@ export default Footer;
 
 const Wrapper = styled.footer`
   align-self: center;
+  padding: ${rem(10)} 0 ${rem(20)};
 
   display: grid;
   grid-template-areas: 'links' 'copyright';
