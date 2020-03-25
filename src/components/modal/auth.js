@@ -101,7 +101,6 @@ const modalContent = css`
   ${modalCentered};
   ${modalBorder};
 
-  min-width: 0;
   width: ${rem(320)};
   padding: ${rem(40)};
 `;

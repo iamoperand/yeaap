@@ -18,7 +18,7 @@ export const modalBasic = css`
   background: #fff;
   border-radius: ${rem(5)};
 
-  max-width: 95%;
+  width: 98%;
   @media screen and (min-width: ${theme.breakpoints.tablet}) {
     min-width: ${rem(400)};
   }
