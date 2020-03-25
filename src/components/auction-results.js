@@ -19,7 +19,7 @@ import { boxBorder } from '../styles/box';
 import useSession from '../hooks/use-session';
 import useDeviceBreakpoint from '../hooks/use-device-breakpoint';
 
-const GET_BIDS = gql`
+const GET_AUCTION_BIDS = gql`
   query getBids($where: AuctionWhereInput!, $page: PageInput) {
     bids(where: $where, page: $page) {
       edges {
@@ -60,7 +60,7 @@ const AuctionResults = ({ auctionId, creatorId, bidCount }) => {
   const [visibleBids, setVisibleBids] = useState([]);
   const itemsAllowedPerPage = 10;
 
-  const { data, loading, fetchMore } = useQuery(GET_BIDS, {
+  const { data, loading, fetchMore } = useQuery(GET_AUCTION_BIDS, {
     fetchPolicy: 'cache-and-network',
     variables: {
       where: {
@@ -81,7 +81,7 @@ const AuctionResults = ({ auctionId, creatorId, bidCount }) => {
     onError: (error) => {
       const errorMessage = getErrorMessage(
         error,
-        'An error occurred while updating the auction'
+        'An error occurred while fetching the bids'
       );
       addToast(errorMessage, {
         appearance: 'error'
@@ -94,7 +94,7 @@ const AuctionResults = ({ auctionId, creatorId, bidCount }) => {
 
   const loadMore = () => {
     fetchMore({
-      query: GET_BIDS,
+      query: GET_AUCTION_BIDS,
       variables: {
         where: {
           auctionId
