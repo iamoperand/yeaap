@@ -16,7 +16,7 @@ import { labelBasic } from '../../styles/form';
 import { buttonRounded } from '../../styles/button';
 
 import rem from '../../utils/rem';
-import { auth } from '../../utils/firebase';
+import { auth, analytics } from '../../utils/firebase';
 import {
   handleSignInError,
   providerCollection,
@@ -40,6 +40,7 @@ const Auth = ({ onClose, onLogin = noop }) => {
           appearance: 'success',
           autoDismiss: true
         });
+        analytics.logEvent('LOGGED_IN');
         onClose();
         onLogin();
       })
@@ -101,6 +102,7 @@ const modalContent = css`
   ${modalCentered};
   ${modalBorder};
 
+  min-width: 0rem !important;
   width: ${rem(320)};
   padding: ${rem(40)};
 `;

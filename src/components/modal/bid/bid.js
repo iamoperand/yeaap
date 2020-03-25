@@ -29,6 +29,7 @@ import { errorBasic } from '../../../styles/form';
 
 import rem from '../../../utils/rem';
 import { getErrorMessage } from '../../../utils/error';
+import { analytics } from '../../../utils/firebase';
 
 import TopBid from './top-bid';
 import LoadingText from '../../loading-text';
@@ -69,6 +70,7 @@ const schema = {
   }
 };
 
+// eslint-disable-next-line max-lines-per-function
 const Bid = ({ onClose, auctionId, topBid }) => {
   const { addToast } = useToasts();
 
@@ -81,9 +83,13 @@ const Bid = ({ onClose, auctionId, topBid }) => {
       onClose();
     },
     onCompleted: (data) => {
-      addToast(`You just bid for $${data.createBid.amount}, congrats!`, {
+      const { amount } = data.createBid;
+      addToast(`You just bid for $${amount}, congrats!`, {
         appearance: 'success',
         autoDismiss: true
+      });
+      analytics.logEvent('BID_CREATED', {
+        amount
       });
       onClose();
     }

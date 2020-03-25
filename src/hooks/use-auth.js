@@ -4,7 +4,7 @@ import gql from 'graphql-tag';
 import { get } from 'lodash';
 import { useToasts } from 'react-toast-notifications';
 
-import { auth } from '../utils/firebase';
+import { auth, analytics } from '../utils/firebase';
 import { getErrorMessage } from '../utils/error';
 
 const CREATE_USER_SESSION = gql`
@@ -202,6 +202,7 @@ const useAuth = () => {
     },
     onCompleted: (data) => {
       dispatch({ type: actions.USER_FETCHED, payload: get(data, 'me') });
+      analytics.setUserId(data.me.id);
     },
     onError: (error) => {
       const errorMessage = getErrorMessage(error, "Couldn't fetch the user");
