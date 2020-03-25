@@ -65,7 +65,10 @@ const Index = () => {
   });
 
   const [showAuthModal, hideAuthModal] = useModal(() => (
-    <AuthModal onClose={hideAuthModal} />
+    <AuthModal
+      onClose={hideAuthModal}
+      onLogin={() => router.push('/auction/new')}
+    />
   ));
 
   const router = useRouter();

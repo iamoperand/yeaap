@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import ReactModal from 'react-modal';
 import { css } from '@emotion/core';
 import styled from '@emotion/styled';
-import { isEmpty } from 'lodash';
+import { isEmpty, noop } from 'lodash';
 import { useToasts } from 'react-toast-notifications';
 
 import {
@@ -27,7 +27,7 @@ import GoogleIcon from '../../assets/icons/google.svg?sprite';
 import FacebookIcon from '../../assets/icons/facebook.svg?sprite';
 import TwitterIcon from '../../assets/icons/twitter.svg?sprite';
 
-const Auth = ({ onClose }) => {
+const Auth = ({ onClose, onLogin = noop }) => {
   const { addToast } = useToasts();
 
   const loginHandler = (providerId) => () => {
@@ -41,6 +41,7 @@ const Auth = ({ onClose }) => {
           autoDismiss: true
         });
         onClose();
+        onLogin();
       })
       .catch((error) => {
         handleSignInError(error).then((message) => {
@@ -83,7 +84,8 @@ const Auth = ({ onClose }) => {
 };
 
 Auth.propTypes = {
-  onClose: PropTypes.func.isRequired
+  onClose: PropTypes.func.isRequired,
+  onLogin: PropTypes.func
 };
 
 export default Auth;
