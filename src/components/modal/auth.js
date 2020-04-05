@@ -16,6 +16,7 @@ import { labelBasic } from '../../styles/form';
 import { buttonRounded } from '../../styles/button';
 
 import rem from '../../utils/rem';
+import theme from '../../utils/theme';
 import { auth, analytics } from '../../utils/firebase';
 import {
   handleSignInError,
@@ -102,9 +103,12 @@ const modalContent = css`
   ${modalCentered};
   ${modalBorder};
 
+  padding: ${rem(40)};
   min-width: 0rem !important;
   width: ${rem(320)};
-  padding: ${rem(40)};
+  @media screen and (min-width: ${theme.breakpoints.tablet}) {
+    width: ${rem(320)};
+  }
 `;
 
 const Title = styled.div`
