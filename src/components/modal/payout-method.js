@@ -323,7 +323,7 @@ const PayoutMethod = ({ onClose, user, showConfirmVerificationModal }) => {
     >
       <Head>
         <Title>Add payout method</Title>
-        <Note>You will get money only after the auction ends.</Note>
+        <Note>Balance will show up only after the auction ends.</Note>
       </Head>
 
       <Body>
