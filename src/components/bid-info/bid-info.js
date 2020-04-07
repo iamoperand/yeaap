@@ -191,8 +191,18 @@ const BidInfo = ({
     </ConfirmationModal>
   ));
 
+  const isUserCreator = get(user, 'id') === creatorId;
+
   // handler responsible for bidding
   const bidHandler = () => {
+    if (isUserCreator) {
+      addToast('You are the owner of the auction', {
+        appearance: 'info',
+        autoDismiss: true
+      });
+      return;
+    }
+
     // check if the user is authenticated
     if (isEmpty(user)) {
       showAuthModal();
@@ -217,8 +227,6 @@ const BidInfo = ({
       autoDismiss: true
     });
   };
-
-  const isUserCreator = get(user, 'id') === creatorId;
 
   const {
     ref: settingsRef,
@@ -291,7 +299,7 @@ const BidInfo = ({
           {/* disable the button until user is fetched, to check if user has payment methods or not */}
           <Button
             onClick={bidHandler}
-            disabled={isUserLoading || isLeaderboardLoading}
+            disabled={isUserLoading || isLeaderboardLoading || isUserCreator}
           >
             Bid
           </Button>
