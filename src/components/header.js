@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { get } from 'lodash';
 import { useToasts } from 'react-toast-notifications';
 import { useModal } from 'react-modal-hook';
+import { useRouter } from 'next/router';
 
 import rem from '../utils/rem';
 import theme from '../utils/theme';
@@ -73,9 +74,12 @@ Dropdown.propTypes = {
 
 const Header = () => {
   const { user, isUserLoading } = useSession();
+  const router = useRouter();
+
+  const { pathname } = router;
+  const showAvatar = pathname !== '/';
 
   const { ref, isOpen, open, close } = useDropdown();
-
   const toggle = isOpen ? close : open;
 
   const isLoggedIn = !!user;
@@ -86,17 +90,19 @@ const Header = () => {
         <Title>yeaap.co</Title>
       </Link>
 
-      <AvatarWrapper ref={ref} onClick={toggle}>
-        {!isUserLoading && (
-          <Avatar src={get(user, 'photoUrl')} alt={get(user, 'name')} />
-        )}
+      {showAvatar && (
+        <AvatarWrapper ref={ref} onClick={toggle}>
+          {!isUserLoading && (
+            <Avatar src={get(user, 'photoUrl')} alt={get(user, 'name')} />
+          )}
 
-        <Dropdown
-          isOpen={isOpen}
-          isLoggedIn={isLoggedIn}
-          name={get(user, 'name')}
-        />
-      </AvatarWrapper>
+          <Dropdown
+            isOpen={isOpen}
+            isLoggedIn={isLoggedIn}
+            name={get(user, 'name')}
+          />
+        </AvatarWrapper>
+      )}
     </Wrapper>
   );
 };

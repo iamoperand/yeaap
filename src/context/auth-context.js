@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { useRouter } from 'next/router';
 
 import useAuth from '../hooks/use-auth';
 import Layout from '../components/layout';
@@ -15,14 +16,23 @@ const LoadingLayout = () => (
   </Layout>
 );
 
+const checkIfUserIsMust = (pathname) => {
+  return pathname !== '/';
+};
+
 const AuthProvider = ({ children, ...rest }) => {
+  const router = useRouter();
   const { loading, user, isUserLoading } = useAuth();
 
+  const { pathname } = router;
+  const isUserMust = checkIfUserIsMust(pathname);
+
+  const showLoading = isUserMust && loading;
   return (
     <AuthContext.Provider
       value={{ user, isUserLoading }}
       {...rest}
-      children={loading ? <LoadingLayout /> : children}
+      children={showLoading ? <LoadingLayout /> : children}
     />
   );
 };

@@ -23,7 +23,7 @@ module.exports = merge(
     Email: EmailAddressResolver,
     UnsignedFloat: UnsignedFloatResolver
   },
-  ...['auction', 'bid', 'payment', 'session', 'user']
+  ...['auction', 'bid', 'payment', 'session', 'user', 'wait-list']
     .map((mod) => require('./' + mod))
     .map(mapResolverFunctions)
 );

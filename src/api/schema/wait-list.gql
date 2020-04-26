@@ -1,0 +1,21 @@
+input JoinWaitListDataInput {
+  email: Email!
+}
+
+input QueryWaitListInput {
+  password: String!
+}
+
+type WaitListUser {
+  email: Email!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
+extend type Query {
+  queryWaitList(data: QueryWaitListInput): [WaitListUser!]
+}
+
+extend type Mutation {
+  joinWaitList(data: JoinWaitListDataInput!): Boolean
+}
