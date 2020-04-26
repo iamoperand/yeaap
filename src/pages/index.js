@@ -146,8 +146,7 @@ const HeadingWrapper = styled.div`
 `;
 
 const CTAWrapper = styled.div`
-  margin: ${rem(36)} 0;
-
+  margin-top: ${rem(36)};
   display: flex;
   flex-direction: column;
 `;
