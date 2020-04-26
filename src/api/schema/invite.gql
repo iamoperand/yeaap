@@ -1,0 +1,27 @@
+type Invite {
+  code: String!
+  purpose: String!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
+input GenerateInviteDataInput {
+  credentials: String!
+  purpose: String!
+}
+
+input InvitesDataInput {
+  credentials: String!
+}
+
+input InvitesWhereInput {
+  code: String!
+}
+
+extend type Query {
+  invites(data: InvitesDataInput!, where: InvitesWhereInput): [Invite!]
+}
+
+extend type Mutation {
+  generateInvite(data: GenerateInviteDataInput): Invite
+}

@@ -1,8 +1,7 @@
 const { FieldValue } = require('firebase-admin').firestore;
-
 const config = require('../../config');
 
-const serializeFirestoreWaitList = (data) => ({
+const serializeFirestoreWaitListNode = (data) => ({
   ...data,
   createdAt: data.createdAt.toDate(),
   updatedAt: data.updatedAt.toDate()
@@ -14,7 +13,7 @@ const queryWaitList = async (data) => {
     args: { data: inputData }
   } = data;
 
-  if (inputData.password !== config.get('session_secret')) {
+  if (inputData.credentials !== config.get('session_secret')) {
     throw new Error(`You're not authorized to perform this action`);
   }
 
@@ -23,7 +22,7 @@ const queryWaitList = async (data) => {
     .orderBy('createdAt', 'DESC')
     .get()
     .then((snap) =>
-      snap.docs.map((doc) => serializeFirestoreWaitList(doc.data()))
+      snap.docs.map((doc) => serializeFirestoreWaitListNode(doc.data()))
     );
 };
 

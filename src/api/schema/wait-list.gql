@@ -3,17 +3,17 @@ input JoinWaitListDataInput {
 }
 
 input QueryWaitListInput {
-  password: String!
+  credentials: String!
 }
 
-type WaitListUser {
+type WaitListNode {
   email: Email!
   createdAt: DateTime!
   updatedAt: DateTime!
 }
 
 extend type Query {
-  queryWaitList(data: QueryWaitListInput): [WaitListUser!]
+  queryWaitList(data: QueryWaitListInput): [WaitListNode!]
 }
 
 extend type Mutation {
